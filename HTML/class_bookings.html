@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Bookings - Sun Gym</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #0066cc;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .form-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+        .search-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+        .stats-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #e9ecef;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .capacity-indicator {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        .capacity-available {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .capacity-limited {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .capacity-full {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-field .hint {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 2px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            width: 70%;
+            border-radius: 5px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .class-preview {
+            background: #f8f9fa;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+    <script>
+        // Alert handling
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.querySelector('.form-section').prepend(alert);
+            alert.style.display = 'block';
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        // Load booking statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/bookings/stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalBookings').textContent = stats.totalBookings;
+                document.getElementById('activeBookings').textContent = stats.activeBookings;
+                document.getElementById('uniqueMembers').textContent = stats.uniqueMembers;
+                document.getElementById('avgAttendance').textContent = `${stats.averageAttendance}%`;
+
+                // Update class popularity chart
+                const popularityChart = document.getElementById('classPopularity');
+                popularityChart.innerHTML = '';
+                stats.popularClasses.forEach(cls => {
+                    const percentage = (cls.bookings / cls.capacity * 100).toFixed(1);
+                    popularityChart.innerHTML += `
+                        <div>
+                            <strong>${cls.className}:</strong> ${cls.bookings}/${cls.capacity} (${percentage}% full)
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load members for dropdown
+        async function loadMembers() {
+            try {
+                const response = await fetch('/api/members');
+                const members = await response.json();
+                const memberSelects = document.querySelectorAll('.member-select');
+                
+                memberSelects.forEach(select => {
+                    select.innerHTML = '<option value="">Select Member...</option>';
+                    members.forEach(member => {
+                        select.innerHTML += `
+                            <option value="${member.memberID}">
+                                ${member.firstName} ${member.lastName} - ${member.membershipType}
+                            </option>
+                        `;
+                    });
+                });
+            } catch (error) {
+                showAlert('Error loading members', 'error');
+            }
+        }
+
+        // Load classes for dropdown
+        async function loadClasses() {
+            try {
+                const response = await fetch('/api/classes/available');
+                const classes = await response.json();
+                const classSelects = document.querySelectorAll('.class-select');
+                
+                classSelects.forEach(select => {
+                    select.innerHTML = '<option value="">Select Class...</option>';
+                    classes.forEach(cls => {
+                        const capacityText = cls.availableSpots > 0 ? 
+                            `(${cls.availableSpots} spots left)` : 
+                            '(Full)';
+                        select.innerHTML += `
+                            <option value="${cls.classID}" ${cls.availableSpots === 0 ? 'disabled' : ''}>
+                                ${cls.className} - ${cls.scheduleDay} ${cls.scheduleTime} ${capacityText}
+                            </option>
+                        `;
+                    });
+                });
+            } catch (error) {
+                showAlert('Error loading classes', 'error');
+            }
+        }
+
+        // Preview class details
+        async function previewClass(classId) {
+            if (!classId) {
+                document.getElementById('classPreview').style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/classes/${classId}`);
+                const cls = await response.json();
+                
+                const preview = document.getElementById('classPreview');
+                preview.innerHTML = `
+                    <strong>Class Details:</strong><br>
+                    Trainer: ${cls.trainerName || 'No trainer assigned'}<br>
+                    Capacity: ${cls.currentEnrollment}/${cls.maxCapacity}<br>
+                    Schedule: ${cls.scheduleDay} at ${cls.scheduleTime}
+                `;
+                preview.style.display = 'block';
+            } catch (error) {
+                console.error('Error loading class preview:', error);
+            }
+        }
+
+        // Load and filter bookings
+        async function loadBookings() {
+            const memberFilter = document.getElementById('memberFilter').value;
+            const classFilter = document.getElementById('classFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            try {
+                document.querySelector('.loading').style.display = 'block';
+                
+                let url = '/api/bookings?';
+                if (memberFilter) url += `member=${encodeURIComponent(memberFilter)}&`;
+                if (classFilter) url += `class=${encodeURIComponent(classFilter)}&`;
+                if (dateFilter) url += `date=${encodeURIComponent(dateFilter)}`;
+
+                const response = await fetch(url);
+                const bookings = await response.json();
+                
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                bookings.forEach(booking => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${booking.bookingID}</td>
+                            <td>${booking.memberName}</td>
+                            <td>${booking.className}</td>
+                            <td>${booking.scheduleDay} ${booking.scheduleTime}</td>
+                            <td>${booking.bookingDate}</td>
+                            <td>
+                                <button onclick="editBooking(${booking.bookingID})">Edit</button>
+                                <button onclick="deleteBooking(${booking.bookingID})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                showAlert('Error loading bookings', 'error');
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('addBooking').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    showAlert('Booking created successfully', 'success');
+                    e.target.reset();
+                    document.getElementById('classPreview').style.display = 'none';
+                    loadBookings();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Error creating booking', 'error');
+                }
+            } catch (error) {
+                showAlert('Error creating booking', 'error');
+            }
+        });
+
+        // Delete booking
+        async function deleteBooking(id) {
+            if (!confirm('Are you sure you want to delete this booking?')) return;
+
+            try {
+                const response = await fetch(`/api/bookings/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    showAlert('Booking deleted successfully', 'success');
+                    loadBookings();
+                    loadStats();
+                } else {
+                    showAlert('Error deleting booking', 'error');
+                }
+            } catch (error) {
+                showAlert('Error deleting booking', 'error');
+            }
+        }
+
+        // Edit booking
+        async function editBooking(id) {
+            try {
+                const response = await fetch(`/api/bookings/${id}`);
+                const booking = await response.json();
+
+                document.getElementById('editID').value = id;
+                document.getElementById('editMemberID').value = booking.memberID;
+                document.getElementById('editClassID').value = booking.classID;
+                document.getElementById('editBookingDate').value = booking.bookingDate;
+
+                document.getElementById('editModal').style.display = 'block';
+            } catch (error) {
+                showAlert('Error loading booking details', 'error');
+            }
+        }
+
+        // Update booking
+        async function updateBooking(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const id = data.id;
+            delete data.id;
+
+            try {
+                const response = await fetch(`/api/bookings/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    showAlert('Booking updated successfully', 'success');
+                    document.getElementById('editModal').style.display = 'none';
+                    loadBookings();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Error updating booking', 'error');
+                }
+            } catch (error) {
+                showAlert('Error updating booking', 'error');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMembers();
+            loadClasses();
+            loadBookings();
+            loadStats();
+
+            // Add event listeners for filters
+            document.getElementById('memberFilter').addEventListener('change', loadBookings);
+            document.getElementById('classFilter').addEventListener('change', loadBookings);
+            document.getElementById('dateFilter').addEventListener('change', loadBookings);
+
+            // Add event listener for class preview
+            document.getElementById('classID').addEventListener('change', (e) => {
+                previewClass(e.target.value);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Class Bookings</h1>
+    <a href="index.html">Back to Home</a>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <h2>Booking Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Bookings</h3>
+                <p id="totalBookings">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Bookings</h3>
+                <p id="activeBookings">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Unique Members</h3>
+                <p id="uniqueMembers">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Average Attendance</h3>
+                <p id="avgAttendance">Loading...</p>
+            </div>
+        </div>
+        <div class="usage-chart">
+            <h3>Class Popularity</h3>
+            <div id="classPopularity">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Search/Filter Section -->
+    <div class="search-section">
+        <h2>Search/Filter Bookings</h2>
+        <div class="form-field">
+            <label for="memberFilter">Filter by Member:</label>
+            <select id="memberFilter" class="member-select">
+                <option value="">All Members</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="classFilter">Filter by Class:</label>
+            <select id="classFilter" class="class-select">
+                <option value="">All Classes</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="dateFilter">Filter by Date:</label>
+            <input type="date" id="dateFilter">
+        </div>
+    </div>
+
+    <!-- Add Booking Form -->
+    <div class="form-section">
+        <h2>Create New Booking</h2>
+        <form id="addBooking">
+            <div class="form-field">
+                <label for="memberID">Member:</label>
+                <select id="memberID" name="memberID" class="member-select" required>
+                    <option value="">Select Member...</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="classID">Class:</label>
+                <select id="classID" name="classID" class="class-select" required>
+                    <option value="">Select Class...</option>
+                </select>
+                <div id="classPreview" class="class-preview"></div>
+            </div>
+            <div class="form-field">
+                <label for="bookingDate">Booking Date:</label>
+                <input type="date" id="bookingDate" name="bookingDate" required>
+            </div>
+            <div class="form-field">
+                <input type="submit" value="Create Booking">
+            </div>
+        </form>
+    </div>
+
+    <!-- View/Edit/Delete Bookings -->
+    <div class="form-section">
+        <h2>Current Bookings</h2>
+        <div class="loading">Loading bookings...</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Member Name</th>
+                    <th>Class Name</th>
+                    <th>Class Schedule</th>
+                    <th>Booking Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Bookings will be loaded dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Booking</h2>
+            <form id="editForm" onsubmit="updateBooking(event)">
+                <input type="hidden" id="editID" name="id">
+                <div class="form-field">
+                    <label for="editMemberID">Member:</label>
+                    <select id="editMemberID" name="memberID" class="member-select" required>
+                        <option value="">Select Member...</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="editClassID">Class:</label>
+                    <select id="editClassID" name="classID" class="class-select" required>
+                        <option value="">Select Class...</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="editBookingDate">Booking Date:</label>
+                    <input type="date" id="editBookingDate" name="bookingDate" required>
+                </div>
+                <div class="form-field">
+                    <input type="submit" value="Update Booking">
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
