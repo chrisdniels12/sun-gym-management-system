@@ -1,1 +1,0 @@
-# sun-gym-management-system
