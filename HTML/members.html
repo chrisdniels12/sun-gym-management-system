@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Members - Sun Gym</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #0066cc;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .form-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+        .search-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+        .stats-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #e9ecef;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-field .hint {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 2px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            width: 70%;
+            border-radius: 5px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+    <script>
+        // Alert handling
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.querySelector('.form-section').prepend(alert);
+            alert.style.display = 'block';
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
+        }
+
+        // Phone number validation (optional field)
+        function isValidPhone(phone) {
+            return !phone || /^\+?[\d\s-]{10,20}$/.test(phone);
+        }
+
+        // Load member statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/members/stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalMembers').textContent = stats.totalMembers;
+                document.getElementById('activeMembers').textContent = stats.activeMembers;
+                document.getElementById('basicMembers').textContent = stats.membersByType.Basic;
+                document.getElementById('premiumMembers').textContent = stats.membersByType.Premium;
+                document.getElementById('vipMembers').textContent = stats.membersByType.VIP;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load and filter members
+        async function loadMembers() {
+            const nameFilter = document.getElementById('nameFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            try {
+                document.querySelector('.loading').style.display = 'block';
+                
+                let url = '/api/members?';
+                if (nameFilter) url += `name=${encodeURIComponent(nameFilter)}&`;
+                if (typeFilter) url += `type=${encodeURIComponent(typeFilter)}&`;
+                if (dateFilter) url += `date=${encodeURIComponent(dateFilter)}`;
+
+                const response = await fetch(url);
+                const members = await response.json();
+                
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                members.forEach(member => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${member.memberID}</td>
+                            <td>${member.firstName}</td>
+                            <td>${member.lastName}</td>
+                            <td>${member.email}</td>
+                            <td>${member.phoneNumber || 'N/A'}</td>
+                            <td>${member.joinDate}</td>
+                            <td>${member.membershipType}</td>
+                            <td>
+                                <button onclick="editMember(${member.memberID})">Edit</button>
+                                <button onclick="deleteMember(${member.memberID})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                showAlert('Error loading members', 'error');
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('addMember').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            // Validate email
+            if (!isValidEmail(data.email)) {
+                showAlert('Please enter a valid email address', 'error');
+                return;
+            }
+
+            // Validate phone (if provided)
+            if (data.phoneNumber && !isValidPhone(data.phoneNumber)) {
+                showAlert('Please enter a valid phone number', 'error');
+                return;
+            }
+
+            // Handle empty phone number
+            if (!data.phoneNumber) delete data.phoneNumber;
+
+            try {
+                const response = await fetch('/api/members', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    showAlert('Member added successfully', 'success');
+                    e.target.reset();
+                    loadMembers();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Error adding member', 'error');
+                }
+            } catch (error) {
+                showAlert('Error adding member', 'error');
+            }
+        });
+
+        // Delete member
+        async function deleteMember(id) {
+            if (!confirm('Are you sure you want to delete this member? This will also delete all related records.')) return;
+
+            try {
+                const response = await fetch(`/api/members/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    showAlert('Member deleted successfully', 'success');
+                    loadMembers();
+                    loadStats();
+                } else {
+                    showAlert('Error deleting member', 'error');
+                }
+            } catch (error) {
+                showAlert('Error deleting member', 'error');
+            }
+        }
+
+        // Edit member
+        async function editMember(id) {
+            try {
+                const response = await fetch(`/api/members/${id}`);
+                const member = await response.json();
+
+                document.getElementById('editID').value = id;
+                document.getElementById('editFirstName').value = member.firstName;
+                document.getElementById('editLastName').value = member.lastName;
+                document.getElementById('editEmail').value = member.email;
+                document.getElementById('editPhone').value = member.phoneNumber || '';
+                document.getElementById('editMembershipType').value = member.membershipType;
+
+                document.getElementById('editModal').style.display = 'block';
+            } catch (error) {
+                showAlert('Error loading member details', 'error');
+            }
+        }
+
+        // Update member
+        async function updateMember(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const id = data.id;
+            delete data.id;
+
+            // Validate email
+            if (!isValidEmail(data.email)) {
+                showAlert('Please enter a valid email address', 'error');
+                return;
+            }
+
+            // Validate phone (if provided)
+            if (data.phoneNumber && !isValidPhone(data.phoneNumber)) {
+                showAlert('Please enter a valid phone number', 'error');
+                return;
+            }
+
+            // Handle empty phone number
+            if (!data.phoneNumber) delete data.phoneNumber;
+
+            try {
+                const response = await fetch(`/api/members/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    showAlert('Member updated successfully', 'success');
+                    document.getElementById('editModal').style.display = 'none';
+                    loadMembers();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Error updating member', 'error');
+                }
+            } catch (error) {
+                showAlert('Error updating member', 'error');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMembers();
+            loadStats();
+
+            // Add event listeners for filters
+            document.getElementById('nameFilter').addEventListener('input', loadMembers);
+            document.getElementById('typeFilter').addEventListener('change', loadMembers);
+            document.getElementById('dateFilter').addEventListener('change', loadMembers);
+        });
+    </script>
+</head>
+<body>
+    <h1>Manage Members</h1>
+    <a href="index.html">Back to Home</a>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <h2>Membership Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Members</h3>
+                <p id="totalMembers">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Members</h3>
+                <p id="activeMembers">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Basic Members</h3>
+                <p id="basicMembers">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Premium Members</h3>
+                <p id="premiumMembers">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>VIP Members</h3>
+                <p id="vipMembers">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search/Filter Section -->
+    <div class="search-section">
+        <h2>Search/Filter Members</h2>
+        <div class="form-field">
+            <label for="nameFilter">Search by Name:</label>
+            <input type="text" id="nameFilter" placeholder="Enter name...">
+        </div>
+        <div class="form-field">
+            <label for="typeFilter">Filter by Membership:</label>
+            <select id="typeFilter">
+                <option value="">All Types</option>
+                <option value="Basic">Basic</option>
+                <option value="Premium">Premium</option>
+                <option value="VIP">VIP</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="dateFilter">Filter by Join Date:</label>
+            <input type="date" id="dateFilter">
+        </div>
+    </div>
+
+    <!-- Add Member Form -->
+    <div class="form-section">
+        <h2>Add New Member</h2>
+        <form id="addMember">
+            <div class="form-field">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-field">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-field">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <div class="hint">Must be a valid email address</div>
+            </div>
+            <div class="form-field">
+                <label for="phoneNumber">Phone Number: (Optional)</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber">
+                <div class="hint">Format: +1-234-567-8900 or leave empty</div>
+            </div>
+            <div class="form-field">
+                <label for="joinDate">Join Date:</label>
+                <input type="date" id="joinDate" name="joinDate" required>
+            </div>
+            <div class="form-field">
+                <label for="membershipType">Membership Type:</label>
+                <select id="membershipType" name="membershipType" required>
+                    <option value="">Select Membership Type...</option>
+                    <option value="Basic">Basic</option>
+                    <option value="Premium">Premium</option>
+                    <option value="VIP">VIP</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <input type="submit" value="Add Member">
+            </div>
+        </form>
+    </div>
+
+    <!-- View/Edit/Delete Members -->
+    <div class="form-section">
+        <h2>Current Members</h2>
+        <div class="loading">Loading members...</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Join Date</th>
+                    <th>Membership</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Members will be loaded dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Member</h2>
+            <form id="editForm" onsubmit="updateMember(event)">
+                <input type="hidden" id="editID" name="id">
+                <div class="form-field">
+                    <label for="editFirstName">First Name:</label>
+                    <input type="text" id="editFirstName" name="firstName" required>
+                </div>
+                <div class="form-field">
+                    <label for="editLastName">Last Name:</label>
+                    <input type="text" id="editLastName" name="lastName" required>
+                </div>
+                <div class="form-field">
+                    <label for="editEmail">Email:</label>
+                    <input type="email" id="editEmail" name="email" required>
+                    <div class="hint">Must be a valid email address</div>
+                </div>
+                <div class="form-field">
+                    <label for="editPhone">Phone Number: (Optional)</label>
+                    <input type="tel" id="editPhone" name="phoneNumber">
+                    <div class="hint">Format: +1-234-567-8900 or leave empty</div>
+                </div>
+                <div class="form-field">
+                    <label for="editMembershipType">Membership Type:</label>
+                    <select id="editMembershipType" name="membershipType" required>
+                        <option value="Basic">Basic</option>
+                        <option value="Premium">Premium</option>
+                        <option value="VIP">VIP</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <input type="submit" value="Update Member">
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

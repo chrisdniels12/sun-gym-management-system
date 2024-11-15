@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Classes - Sun Gym</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #0066cc;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .form-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+        .search-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+        .stats-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #e9ecef;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .day-column {
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .class-slot {
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .capacity-indicator {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        .capacity-low {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .capacity-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .capacity-full {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-field .hint {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 2px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            width: 70%;
+            border-radius: 5px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+    <script>
+        // Alert handling
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.querySelector('.form-section').prepend(alert);
+            alert.style.display = 'block';
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        // Load class statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/classes/stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalClasses').textContent = stats.totalClasses;
+                document.getElementById('activeClasses').textContent = stats.activeClasses;
+                document.getElementById('totalEnrollments').textContent = stats.totalEnrollments;
+                document.getElementById('avgCapacity').textContent = `${stats.averageCapacity}%`;
+
+                // Update weekly schedule
+                updateScheduleGrid(stats.weeklySchedule);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Update schedule grid
+        function updateScheduleGrid(schedule) {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const grid = document.getElementById('scheduleGrid');
+            grid.innerHTML = '';
+
+            days.forEach(day => {
+                const column = document.createElement('div');
+                column.className = 'day-column';
+                column.innerHTML = `<h3>${day}</h3>`;
+
+                const dayClasses = schedule[day] || [];
+                dayClasses.forEach(cls => {
+                    const capacityClass = getCapacityClass(cls.enrollment, cls.maxCapacity);
+                    column.innerHTML += `
+                        <div class="class-slot">
+                            <strong>${cls.className}</strong><br>
+                            ${cls.scheduleTime}<br>
+                            ${cls.trainerName || 'No trainer assigned'}<br>
+                            <span class="capacity-indicator ${capacityClass}">
+                                ${cls.enrollment}/${cls.maxCapacity}
+                            </span>
+                        </div>
+                    `;
+                });
+
+                grid.appendChild(column);
+            });
+        }
+
+        // Get capacity indicator class
+        function getCapacityClass(enrollment, maxCapacity) {
+            const ratio = enrollment / maxCapacity;
+            if (ratio < 0.5) return 'capacity-low';
+            if (ratio < 0.8) return 'capacity-medium';
+            return 'capacity-full';
+        }
+
+        // Load available trainers
+        async function loadTrainers() {
+            try {
+                const response = await fetch('/api/trainers/available');
+                const trainers = await response.json();
+                const trainerSelects = document.querySelectorAll('.trainer-select');
+                
+                trainerSelects.forEach(select => {
+                    select.innerHTML = '<option value="">Select Trainer (Optional)</option>';
+                    trainers.forEach(trainer => {
+                        select.innerHTML += `
+                            <option value="${trainer.trainerID}">
+                                ${trainer.firstName} ${trainer.lastName} - ${trainer.specialization}
+                            </option>
+                        `;
+                    });
+                });
+            } catch (error) {
+                showAlert('Error loading trainers', 'error');
+            }
+        }
+
+        // Load and filter classes
+        async function loadClasses() {
+            const dayFilter = document.getElementById('dayFilter').value;
+            const trainerFilter = document.getElementById('trainerFilter').value;
+            const capacityFilter = document.getElementById('capacityFilter').value;
+
+            try {
+                document.querySelector('.loading').style.display = 'block';
+                
+                let url = '/api/classes?';
+                if (dayFilter) url += `day=${encodeURIComponent(dayFilter)}&`;
+                if (trainerFilter) url += `trainer=${encodeURIComponent(trainerFilter)}&`;
+                if (capacityFilter) url += `capacity=${encodeURIComponent(capacityFilter)}`;
+
+                const response = await fetch(url);
+                const classes = await response.json();
+                
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                classes.forEach(cls => {
+                    const capacityClass = getCapacityClass(cls.currentEnrollment, cls.maxCapacity);
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${cls.classID}</td>
+                            <td>${cls.className}</td>
+                            <td>${cls.trainerName || 'Unassigned'}</td>
+                            <td>${cls.scheduleDay}</td>
+                            <td>${cls.scheduleTime}</td>
+                            <td>
+                                <span class="capacity-indicator ${capacityClass}">
+                                    ${cls.currentEnrollment}/${cls.maxCapacity}
+                                </span>
+                            </td>
+                            <td>
+                                <button onclick="editClass(${cls.classID})">Edit</button>
+                                <button onclick="deleteClass(${cls.classID})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                showAlert('Error loading classes', 'error');
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('addClass').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            // Validate capacity
+            if (parseInt(data.maxCapacity) <= 0) {
+                showAlert('Maximum capacity must be greater than 0', 'error');
+                return;
+            }
+
+            // Handle optional trainer
+            if (!data.trainerID) delete data.trainerID;
+
+            try {
+                const response = await fetch('/api/classes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    showAlert('Class added successfully', 'success');
+                    e.target.reset();
+                    loadClasses();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Error adding class', 'error');
+                }
+            } catch (error) {
+                showAlert('Error adding class', 'error');
+            }
+        });
+
+        // Delete class
+        async function deleteClass(id) {
+            if (!confirm('Are you sure you want to delete this class? This will remove all member bookings.')) return;
+
+            try {
+                const response = await fetch(`/api/classes/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    showAlert('Class deleted successfully', 'success');
+                    loadClasses();
+                    loadStats();
+                } else {
+                    showAlert('Error deleting class', 'error');
+                }
+            } catch (error) {
+                showAlert('Error deleting class', 'error');
+            }
+        }
+
+        // Edit class
+        async function editClass(id) {
+            try {
+                const response = await fetch(`/api/classes/${id}`);
+                const cls = await response.json();
+
+                document.getElementById('editID').value = id;
+                document.getElementById('editClassName').value = cls.className;
+                document.getElementById('editTrainerID').value = cls.trainerID || '';
+                document.getElementById('editScheduleTime').value = cls.scheduleTime;
+                document.getElementById('editScheduleDay').value = cls.scheduleDay;
+                document.getElementById('editMaxCapacity').value = cls.maxCapacity;
+
+                document.getElementById('editModal').style.display = 'block';
+            } catch (error) {
+                showAlert('Error loading class details', 'error');
+            }
+        }
+
+        // Update class
+        async function updateClass(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const id = data.id;
+            delete data.id;
+
+            // Validate capacity
+            if (parseInt(data.maxCapacity) <= 0) {
+                showAlert('Maximum capacity must be greater than 0', 'error');
+                return;
+            }
+
+            // Handle optional trainer
+            if (!data.trainerID) delete data.trainerID;
+
+            try {
+                const response = await fetch(`/api/classes/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.ok) {
+                    showAlert('Class updated successfully', 'success');
+                    document.getElementById('editModal').style.display = 'none';
+                    loadClasses();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Error updating class', 'error');
+                }
+            } catch (error) {
+                showAlert('Error updating class', 'error');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTrainers();
+            loadClasses();
+            loadStats();
+
+            // Add event listeners for filters
+            document.getElementById('dayFilter').addEventListener('change', loadClasses);
+            document.getElementById('trainerFilter').addEventListener('change', loadClasses);
+            document.getElementById('capacityFilter').addEventListener('change', loadClasses);
+        });
+    </script>
+</head>
+<body>
+    <h1>Manage Classes</h1>
+    <a href="index.html">Back to Home</a>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <h2>Class Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Classes</h3>
+                <p id="totalClasses">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Classes</h3>
+                <p id="activeClasses">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Enrollments</h3>
+                <p id="totalEnrollments">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Average Capacity</h3>
+                <p id="avgCapacity">Loading...</p>
+            </div>
+        </div>
+        <h3>Weekly Schedule</h3>
+        <div id="scheduleGrid" class="schedule-grid">
+            <!-- Schedule will be loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Search/Filter Section -->
+    <div class="search-section">
+        <h2>Search/Filter Classes</h2>
+        <div class="form-field">
+            <label for="dayFilter">Filter by Day:</label>
+            <select id="dayFilter">
+                <option value="">All Days</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="trainerFilter">Filter by Trainer:</label>
+            <select id="trainerFilter" class="trainer-select">
+                <option value="">All Trainers</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="capacityFilter">Filter by Availability:</label>
+            <select id="capacityFilter">
+                <option value="">All Classes</option>
+                <option value="available">Available</option>
+                <option value="limited">Limited Spots</option>
+                <option value="full">Full</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Add Class Form -->
+    <div class="form-section">
+        <h2>Add New Class</h2>
+        <form id="addClass">
+            <div class="form-field">
+                <label for="className">Class Name:</label>
+                <input type="text" id="className" name="className" required>
+            </div>
+            <div class="form-field">
+                <label for="trainerID">Trainer: (Optional)</label>
+                <select id="trainerID" name="trainerID" class="trainer-select">
+                    <option value="">Select Trainer...</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="scheduleTime">Time:</label>
+                <input type="time" id="scheduleTime" name="scheduleTime" required>
+            </div>
+            <div class="form-field">
+                <label for="scheduleDay">Day:</label>
+                <select id="scheduleDay" name="scheduleDay" required>
+                    <option value="">Select Day...</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="maxCapacity">Maximum Capacity:</label>
+                <input type="number" id="maxCapacity" name="maxCapacity" min="1" required>
+                <div class="hint">Must be greater than 0</div>
+            </div>
+            <div class="form-field">
+                <input type="submit" value="Add Class">
+            </div>
+        </form>
+    </div>
+
+    <!-- View/Edit/Delete Classes -->
+    <div class="form-section">
+        <h2>Current Classes</h2>
+        <div class="loading">Loading classes...</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Class Name</th>
+                    <th>Trainer</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Capacity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Classes will be loaded dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Class</h2>
+            <form id="editForm" onsubmit="updateClass(event)">
+                <input type="hidden" id="editID" name="id">
+                <div class="form-field">
+                    <label for="editClassName">Class Name:</label>
+                    <input type="text" id="editClassName" name="className" required>
+                </div>
+                <div class="form-field">
+                    <label for="editTrainerID">Trainer: (Optional)</label>
+                    <select id="editTrainerID" name="trainerID" class="trainer-select">
+                        <option value="">Select Trainer...</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="editScheduleTime">Time:</label>
+                    <input type="time" id="editScheduleTime" name="scheduleTime" required>
+                </div>
+                <div class="form-field">
+                    <label for="editScheduleDay">Day:</label>
+                    <select id="editScheduleDay" name="scheduleDay" required>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="editMaxCapacity">Maximum Capacity:</label>
+                    <input type="number" id="editMaxCapacity" name="maxCapacity" min="1" required>
+                    <div class="hint">Must be greater than 0</div>
+                </div>
+                <div class="form-field">
+                    <input type="submit" value="Update Class">
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member-Trainer Relationships - Sun Gym</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        
+        /* Stats section */
+        .stats-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #e9ecef;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Status indicators */
+        .relationship-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .status-active { background-color: #d4edda; }
+        .status-pending { background-color: #fff3cd; }
+        .status-completed { background-color: #f8d7da; }
+
+        /* Form sections */
+        .form-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Member-Trainer Relationships</h1>
+    <a href="index.html">Back to Home</a>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <h2>Training Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Active Relationships</h3>
+                <p id="activeRelationships">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Sessions</h3>
+                <p id="totalSessions">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Session Duration</h3>
+                <p id="avgDuration">Loading...</p>
+            </div>
+            <div class="stat-card">
+                <h3>Member Progress</h3>
+                <p id="memberProgress">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Form -->
+    <div class="form-section">
+        <h2>Create Training Relationship</h2>
+        <form id="addMemberTrainer" onsubmit="createRelationship(event)">
+            <table>
+                <tr>
+                    <td><label for="memberID">Member:</label></td>
+                    <td>
+                        <select id="memberID" name="memberID" required>
+                            <option value="">Select Member...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="trainerID">Trainer:</label></td>
+                    <td>
+                        <select id="trainerID" name="trainerID" required>
+                            <option value="">Select Trainer...</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="startDate">Start Date:</label></td>
+                    <td><input type="date" id="startDate" name="startDate" required></td>
+                </tr>
+                <tr>
+                    <td><label for="endDate">End Date:</label></td>
+                    <td><input type="date" id="endDate" name="endDate"></td>
+                </tr>
+                <tr>
+                    <td><label for="sessionFrequency">Sessions per Week:</label></td>
+                    <td>
+                        <select id="sessionFrequency" name="sessionFrequency" required>
+                            <option value="1">1 session/week</option>
+                            <option value="2">2 sessions/week</option>
+                            <option value="3">3 sessions/week</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="Create Relationship">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <!-- Relationship List -->
+    <div class="form-section">
+        <h2>Training Relationships</h2>
+        <table id="relationshipsTable">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Trainer</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/member-trainer/stats');
+                const stats = await response.json();
+                
+                document.getElementById('activeRelationships').textContent = stats.activeCount;
+                document.getElementById('totalSessions').textContent = stats.sessionCount;
+                document.getElementById('avgDuration').textContent = `${stats.avgDuration} mins`;
+                document.getElementById('memberProgress').textContent = `${stats.progressRate}%`;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Create relationship with validation
+        async function createRelationship(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            // Validate dates
+            if (data.endDate && data.startDate > data.endDate) {
+                showAlert('End date must be after start date', 'error');
+                return;
+            }
+
+            // Check trainer availability
+            if (!await checkTrainerAvailability(data.trainerID)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/member-trainer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    showAlert('Relationship created successfully', 'success');
+                    e.target.reset();
+                    loadRelationships();
+                    loadStats();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.message || 'Error creating relationship', 'error');
+                }
+            } catch (error) {
+                showAlert('Error creating relationship', 'error');
+            }
+        }
+
+        // Check trainer availability
+        async function checkTrainerAvailability(trainerId) {
+            try {
+                const response = await fetch(`/api/trainers/${trainerId}/availability`);
+                const { available, message } = await response.json();
+                
+                if (!available) {
+                    showAlert(message || 'Trainer not available', 'error');
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error checking availability:', error);
+                return false;
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadRelationships();
+            populateDropdowns();
+        });
+
+        // Show alert message
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
