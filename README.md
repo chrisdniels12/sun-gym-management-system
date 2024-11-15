@@ -57,21 +57,21 @@ A comprehensive gym management system that handles member relationships, equipme
 
 ## File Structure
 /
-├── HTML/
-│   ├── index.html
-│   ├── members.html
-│   ├── trainers.html
-│   ├── equipment.html
-│   ├── classes.html
-│   ├── payments.html
-│   ├── class_bookings.html
-│   ├── member_equipment.html
-│   ├── trainer_equipment.html
-│   └── member_trainer.html
-├── SQL/
-│   ├── DDL.sql
-│   └── DML.sql
-└── README.md
+HTML/
+   index.html
+   members.html
+   trainers.html
+   equipment.html
+   classes.html
+   payments.html
+   class_bookings.html
+   member_equipment.html
+   trainer_equipment.html
+   member_trainer.html
+SQL/
+   DDL.sql
+   DML.sql
+README.md
 
 ## API Endpoints
 - `/api/members`
