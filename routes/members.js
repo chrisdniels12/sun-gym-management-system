@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const connection = require('../utils/db');
+const db = require('../database/db-connector');
 
 /**
  * GET /members
@@ -91,7 +92,17 @@ router.get('/edit/:id', (req, res) => {
  * Add a new member
  */
 router.post('/', (req, res) => {
-    const { firstName, lastName, email, phoneNumber, joinDate, membershipType } = req.body;
+    const sanitizedData = Object.fromEntries(
+        Object.entries(req.body).map(([key, value]) => [key, sanitizeInput(value)])
+    );
+
+    const { firstName, lastName, email, phoneNumber, joinDate, membershipType } = sanitizedData;
+
+    // Validate email format
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format' });
+    }
 
     const query = `
         INSERT INTO Members (firstName, lastName, email, phoneNumber, joinDate, membershipType)
@@ -148,23 +159,43 @@ router.post('/:id', (req, res) => {
 });
 
 /**
- * POST /members/delete/:id
- * Delete a member
+ * DELETE /members/:id
+ * Delete a member and their related records
  */
-router.post('/delete/:id', (req, res) => {
-    console.log('DELETE request received for ID:', req.params.id);
-
+router.post('/delete/:id', async (req, res) => {
     const { id } = req.params;
-    const query = 'DELETE FROM Members WHERE memberID = ?';
-    connection.query(query, [id], (err, results) => {
+
+    // Start a transaction since we're doing multiple operations
+    connection.beginTransaction(async (err) => {
         if (err) {
-            console.error('Error deleting member:', err);
-            return res.status(500).json({ error: 'Failed to delete member' });
+            console.error('Error starting transaction:', err);
+            return res.status(500).json({ error: 'Database error' });
         }
-        if (results.affectedRows === 0) {
-            return res.status(404).json({ message: 'Member not found' });
+
+        try {
+            // First delete related records from intersection tables
+            await connection.query('DELETE FROM MemberTrainer WHERE memberID = ?', [id]);
+            await connection.query('DELETE FROM ClassBookings WHERE memberID = ?', [id]);
+            await connection.query('DELETE FROM MemberEquipment WHERE memberID = ?', [id]);
+
+            // Then delete the member
+            const [results] = await connection.query('DELETE FROM Members WHERE memberID = ?', [id]);
+
+            if (results.affectedRows === 0) {
+                await connection.rollback();
+                return res.status(404).json({ message: 'Member not found' });
+            }
+
+            // If we get here, commit the transaction
+            await connection.commit();
+            res.json({ message: 'Member deleted successfully' });
+
+        } catch (error) {
+            // If anything goes wrong, rollback the transaction
+            await connection.rollback();
+            console.error('Error during delete operation:', error);
+            res.status(500).json({ error: 'Failed to delete member' });
         }
-        res.redirect('/members');
     });
 });
 
