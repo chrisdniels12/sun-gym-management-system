@@ -7,47 +7,18 @@ const db = require('../database/db-connector').pool;
  * Display all members with statistics
  */
 router.get('/', (req, res) => {
-    // Query to get all members
-    const membersQuery = 'SELECT * FROM Members ORDER BY lastName, firstName';
+    const query = `
+        SELECT memberID, firstName, lastName, email, phoneNumber, joinDate, membershipType 
+        FROM Members
+        ORDER BY lastName, firstName`;
 
-    db.query(membersQuery, (err, members) => {
+    db.query(query, (err, results) => {
         if (err) {
             console.error('Error fetching members:', err);
-            return res.status(500).send('Error fetching members');
+            res.status(500).send('Error fetching members');
+            return;
         }
-
-        // Query to get membership statistics
-        const statsQuery = `
-            SELECT 
-                COUNT(*) AS totalMembers,
-                SUM(CASE WHEN MONTH(joinDate) = MONTH(CURRENT_DATE) 
-                    AND YEAR(joinDate) = YEAR(CURRENT_DATE) THEN 1 ELSE 0 END) AS newMembers,
-                COUNT(CASE WHEN membershipType = 'Basic' THEN 1 END) AS basicMembers,
-                COUNT(CASE WHEN membershipType = 'Premium' THEN 1 END) AS premiumMembers,
-                COUNT(CASE WHEN membershipType = 'VIP' THEN 1 END) AS vipMembers
-            FROM Members;
-        `;
-
-        db.query(statsQuery, (err, statsResults) => {
-            if (err) {
-                console.error('Error fetching stats:', err);
-                return res.status(500).send('Error fetching statistics');
-            }
-
-            // Render the members page with data and statistics
-            res.render('members', {
-                members: members,
-                stats: {
-                    totalMembers: statsResults[0].totalMembers,
-                    newMembers: statsResults[0].newMembers,
-                    membersByType: {
-                        Basic: statsResults[0].basicMembers,
-                        Premium: statsResults[0].premiumMembers,
-                        VIP: statsResults[0].vipMembers
-                    }
-                }
-            });
-        });
+        res.render('members', { members: results });
     });
 });
 
@@ -91,41 +62,17 @@ router.get('/edit/:id', (req, res) => {
  * Add a new member
  */
 router.post('/', (req, res) => {
-    console.log('Received member data:', req.body);
-
-    const sanitizedData = Object.fromEntries(
-        Object.entries(req.body).map(([key, value]) => [key, sanitizeInput(value)])
-    );
-
-    console.log('Sanitized data:', sanitizedData);
-
-    const { firstName, lastName, email, phoneNumber, joinDate, membershipType } = sanitizedData;
-
-    // Validate email format
-    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: 'Invalid email format' });
-    }
-
+    const { firstName, lastName, email, phoneNumber, membershipType } = req.body;
     const query = `
         INSERT INTO Members (firstName, lastName, email, phoneNumber, joinDate, membershipType)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    const values = [
-        firstName,
-        lastName,
-        email,
-        phoneNumber || null,
-        joinDate,
-        membershipType,
-    ];
+        VALUES (?, ?, ?, ?, CURRENT_DATE, ?)`;
 
-    db.query(query, values, (err, results) => {
+    db.query(query, [firstName, lastName, email, phoneNumber, membershipType], (err, result) => {
         if (err) {
-            console.error('Database error:', err);
-            return res.status(500).send('Failed to create member');
+            console.error('Error adding member:', err);
+            res.status(500).send('Error adding member');
+            return;
         }
-        console.log('Database response:', results);
         res.redirect('/members');
     });
 });
@@ -135,30 +82,19 @@ router.post('/', (req, res) => {
  * Update an existing member
  */
 router.post('/:id', (req, res) => {
-    const { id } = req.params;
-    const { firstName, lastName, email, phoneNumber, joinDate, membershipType } = req.body;
-
+    const { firstName, lastName, email, phoneNumber, membershipType } = req.body;
     const query = `
-        UPDATE Members
-        SET firstName = ?, lastName = ?, email = ?, phoneNumber = ?, joinDate = ?, membershipType = ?
-        WHERE memberID = ?
-    `;
-    const values = [
-        firstName,
-        lastName,
-        email,
-        phoneNumber,
-        joinDate,
-        membershipType,
-        id,
-    ];
+        UPDATE Members 
+        SET firstName = ?, lastName = ?, email = ?, phoneNumber = ?, membershipType = ?
+        WHERE memberID = ?`;
 
-    db.query(query, values, (err, results) => {
+    db.query(query, [firstName, lastName, email, phoneNumber, membershipType, req.params.id], (err, result) => {
         if (err) {
             console.error('Error updating member:', err);
-            return res.status(500).send('Failed to update member');
+            res.status(500).send('Error updating member');
+            return;
         }
-        res.redirect('/members'); // Redirect back to the members list
+        res.json({ success: true });
     });
 });
 

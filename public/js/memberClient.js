@@ -58,13 +58,13 @@ async function deleteMember(id) {
             }
         });
 
-        if (response.ok) {
-            // Remove the row from the table
+        const data = await response.json();
+
+        if (response.ok && data.message === 'Member deleted successfully') {
             const row = document.querySelector(`tr[data-id="${id}"]`);
             if (row) row.remove();
             showAlert('Member deleted successfully', 'success');
         } else {
-            const data = await response.json();
             showAlert(data.error || 'Error deleting member', 'error');
         }
     } catch (error) {
