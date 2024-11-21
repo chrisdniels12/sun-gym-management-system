@@ -51,7 +51,6 @@ app.get('/', function (req, res) {
             let planets = rows;
 
             // Construct an object for reference in the table
-            // Array.map is awesome for doing something with each element of an array
             let planetmap = {}
             planets.map(planet => {
                 let id = parseInt(planet.id, 10);
@@ -60,7 +59,7 @@ app.get('/', function (req, res) {
 
             // Overwrite the homeworld ID with the name of the planet in the people object
             people = people.map(person => {
-                return Object.assign(person, { homeworld: planetmap[person.homeworld] })
+                return Object.assign(person, { homeworld: planetmap[person.homeworld] || person.homeworld })
             })
 
             return res.render('index', { data: people, planets: planets });
@@ -144,6 +143,31 @@ app.post('/add-person-ajax', function (req, res) {
                 // If all went well, send the results of the query back.
                 else {
                     res.send(rows);
+                }
+            })
+        }
+    })
+});
+
+app.delete('/delete-person-ajax/', function (req, res, next) {
+    let data = req.body;
+    let personID = parseInt(data.id);
+    let deleteBsg_Cert_People = `DELETE FROM bsg_cert_people WHERE pid = ?`;
+    let deleteBsg_People = `DELETE FROM bsg_people WHERE id = ?`;
+
+    // Run the 1st query
+    db.pool.query(deleteBsg_Cert_People, [personID], function (error, rows, fields) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            // Run the second query
+            db.pool.query(deleteBsg_People, [personID], function (error, rows, fields) {
+                if (error) {
+                    console.log(error);
+                    res.sendStatus(400);
+                } else {
+                    res.sendStatus(204);
                 }
             })
         }

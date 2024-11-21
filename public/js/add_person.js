@@ -58,7 +58,6 @@ addPersonForm.addEventListener("submit", function (e) {
 // Creates a single row from an Object representing a single record from 
 // bsg_people
 addRowToTable = (data) => {
-
     // Get a reference to the current table on the page and clear it out.
     let currentTable = document.getElementById("people-table");
 
@@ -69,13 +68,14 @@ addRowToTable = (data) => {
     let parsedData = JSON.parse(data);
     let newRow = parsedData[parsedData.length - 1]
 
-    // Create a row and 4 cells
+    // Create a row and cells
     let row = document.createElement("TR");
     let idCell = document.createElement("TD");
     let firstNameCell = document.createElement("TD");
     let lastNameCell = document.createElement("TD");
     let homeworldCell = document.createElement("TD");
     let ageCell = document.createElement("TD");
+    let deleteCell = document.createElement("TD");
 
     // Fill the cells with correct data
     idCell.innerText = newRow.id;
@@ -84,12 +84,24 @@ addRowToTable = (data) => {
     homeworldCell.innerText = newRow.homeworld;
     ageCell.innerText = newRow.age;
 
-    // Add the cells to the row 
+    // Create the delete button
+    let deleteButton = document.createElement("button");
+    deleteButton.innerHTML = "Delete";
+    deleteButton.onclick = function () {
+        deletePerson(newRow.id);
+    };
+    deleteCell.appendChild(deleteButton);
+
+    // Add the cells to the row
     row.appendChild(idCell);
     row.appendChild(firstNameCell);
     row.appendChild(lastNameCell);
     row.appendChild(homeworldCell);
     row.appendChild(ageCell);
+    row.appendChild(deleteCell);
+
+    // Add a row attribute so the deleteRow function can find a newly added row
+    row.setAttribute('data-value', newRow.id);
 
     // Add the row to the table
     currentTable.appendChild(row);
