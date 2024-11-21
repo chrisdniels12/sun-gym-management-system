@@ -18,11 +18,11 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Members</h3>
-                <p id="totalMembers">{{stats.totalMembers}}</p>
+                <p>{{stats.totalMembers}}</p>
             </div>
             <div class="stat-card">
                 <h3>New This Month</h3>
-                <p id="newMembers">{{stats.newMembers}}</p>
+                <p>{{stats.newMembers}}</p>
             </div>
         </div>
     </div>
@@ -30,26 +30,26 @@
     {{!-- Add Member Form --}}
     <div class="form-section">
         <h2>Add New Member</h2>
-        <form id="addMemberForm">
+        <form id="add-member-form">
             <div class="form-group">
-                <label for="firstName">First Name:</label>
-                <input type="text" id="firstName" name="firstName" required>
+                <label for="input-firstName">First Name:</label>
+                <input type="text" id="input-firstName" required>
             </div>
             <div class="form-group">
-                <label for="lastName">Last Name:</label>
-                <input type="text" id="lastName" name="lastName" required>
+                <label for="input-lastName">Last Name:</label>
+                <input type="text" id="input-lastName" required>
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+                <label for="input-email">Email:</label>
+                <input type="email" id="input-email" required>
             </div>
             <div class="form-group">
-                <label for="phoneNumber">Phone Number (optional):</label>
-                <input type="text" id="phoneNumber" name="phoneNumber">
+                <label for="input-phone">Phone:</label>
+                <input type="tel" id="input-phone">
             </div>
             <div class="form-group">
-                <label for="membershipType">Membership Type:</label>
-                <select id="membershipType" name="membershipType" required>
+                <label for="input-membershipType">Membership Type:</label>
+                <select id="input-membershipType" required>
                     <option value="Basic">Basic</option>
                     <option value="Premium">Premium</option>
                     <option value="VIP">VIP</option>
@@ -62,14 +62,13 @@
     {{!-- Members Table --}}
     <div class="table-section">
         <h2>Current Members</h2>
-        <table id="membersTable">
+        <table id="members-table">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
-                    <th>Join Date</th>
                     <th>Membership</th>
                     <th>Actions</th>
                 </tr>
@@ -81,7 +80,6 @@
                     <td>{{this.firstName}} {{this.lastName}}</td>
                     <td>{{this.email}}</td>
                     <td>{{this.phoneNumber}}</td>
-                    <td>{{this.joinDate}}</td>
                     <td>{{this.membershipType}}</td>
                     <td>
                         <button onclick="editMember({{this.memberID}})">Edit</button>
@@ -93,8 +91,44 @@
         </table>
     </div>
 
-    {{!-- Load client-side JavaScript --}}
-    <script src="/js/memberClient.js"></script>
+    {{!-- Edit Member Modal --}}
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Member</h2>
+            <form id="edit-member-form">
+                <input type="hidden" id="edit-memberID">
+                <div class="form-group">
+                    <label for="edit-firstName">First Name:</label>
+                    <input type="text" id="edit-firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-lastName">Last Name:</label>
+                    <input type="text" id="edit-lastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email:</label>
+                    <input type="email" id="edit-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-phone">Phone:</label>
+                    <input type="tel" id="edit-phone">
+                </div>
+                <div class="form-group">
+                    <label for="edit-membershipType">Membership Type:</label>
+                    <select id="edit-membershipType" required>
+                        <option value="Basic">Basic</option>
+                        <option value="Premium">Premium</option>
+                        <option value="VIP">VIP</option>
+                    </select>
+                </div>
+                <button type="submit">Update Member</button>
+                <button type="button" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    {{!-- Load JavaScript --}}
+    <script src="/js/memberOperations.js"></script>
 </body>
 
 </html>
