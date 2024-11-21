@@ -1,2 +1,3 @@
 node_modules/
-package-lock.jsondatabase/db-connector.js
+package-lock.json
+database/db-connector.js
