@@ -1,6 +1,16 @@
 <h1>Welcome to Sun Gym Management System</h1>
 <p>If you see this text, the server is <strong>definitely</strong> working!</p>
 
+<h2>Search Using an HTML Form</h2>
+<p>Search by last name using the field below. Partial last names are OK too!</p>
+<form id="search-person-html" method='GET' action='/'>
+    <label for="input-lname">Search by Last Name: </label>
+    <input type="text" name="lname" id="input-lname-html-search">
+
+    <input type="submit">
+    <a href='/'><button>Reset</button></a>
+</form>
+
 <h2>Database query result:</h2>
 
 {{!-- Create a table --}}
@@ -47,7 +57,12 @@
     <input type="text" name="input-lname" id="input-lname">
 
     <label for="input-homeworld">Homeworld: </label>
-    <input type="number" name="input-homeworld" id="input-homeworld">
+    <select name="input-homeworld" id="input-homeworld">
+        <option value="">Select a Planet</option>
+        {{#each planets}}
+        <option value="{{this.id}}">{{this.name}}</option>
+        {{/each}}
+    </select>
 
     <label for="input-age">Age: </label>
     <input type="number" name="input-age" id="input-age">
