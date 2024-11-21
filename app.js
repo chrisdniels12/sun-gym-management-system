@@ -39,12 +39,13 @@ app.get('/test', (req, res) => {
 // Use the members router for all /members routes
 app.use('/members', membersRouter);
 
-// Test the pool with a query
-db.query('SELECT 1', (err) => {
+// Test the pool with a more specific query
+db.query('SELECT * FROM Members LIMIT 1', (err, results) => {
     if (err) {
-        console.error('Error connecting to database:', err);
+        console.error('Database error:', err);
         process.exit(1);
     }
+    console.log('Database test query results:', results);
     console.log('Database connection pool ready');
 });
 

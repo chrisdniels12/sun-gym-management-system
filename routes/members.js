@@ -91,9 +91,13 @@ router.get('/edit/:id', (req, res) => {
  * Add a new member
  */
 router.post('/', (req, res) => {
+    console.log('Received member data:', req.body);
+
     const sanitizedData = Object.fromEntries(
         Object.entries(req.body).map(([key, value]) => [key, sanitizeInput(value)])
     );
+
+    console.log('Sanitized data:', sanitizedData);
 
     const { firstName, lastName, email, phoneNumber, joinDate, membershipType } = sanitizedData;
 
@@ -118,10 +122,11 @@ router.post('/', (req, res) => {
 
     db.query(query, values, (err, results) => {
         if (err) {
-            console.error('Error creating member:', err);
+            console.error('Database error:', err);
             return res.status(500).send('Failed to create member');
         }
-        res.redirect('/members'); // Redirect to members list after successful creation
+        console.log('Database response:', results);
+        res.redirect('/members');
     });
 });
 
