@@ -1,0 +1,9 @@
+<h1>Welcome to Sun Gym Management System</h1>
+<p>If you see this text, the server is <strong>definitely</strong> working!</p>
+
+{{#if error}}
+<p style="color: red;">Error: {{error}}</p>
+{{else if data}}
+<p>Database query result:</p>
+<pre>{{data}}</pre>
+{{/if}}
