@@ -4,13 +4,14 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "forever start app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Benjamin Pierce",
   "license": "ISC",
   "dependencies": {
     "express": "^4.21.1",
-    "forever": "^4.0.3"
+    "forever": "^4.0.3",
+    "mysql": "^2.18.1"
   }
 }
