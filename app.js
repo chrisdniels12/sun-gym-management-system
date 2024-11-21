@@ -17,9 +17,22 @@ var db = require('./database/db-connector')
 /*
     ROUTES
 */
+// app.js
+
 app.get('/', function (req, res) {
-    res.render('index');                    // Note the call to render() and not send(). Using render() ensures the templating engine
-});                                         // will process this file, before sending the finished HTML to the client.
+    let query1 = "SELECT * FROM bsg_people;";               // Define our query
+
+    db.pool.query(query1, function (error, rows, fields) {    // Execute the query
+        // If there was an error on the query, log it and send an error message
+        if (error) {
+            console.log(error);
+            res.sendStatus(500);
+        } else {
+            // If the query was successful, render the page with the data
+            res.render('index', { data: rows });              // Render the index.hbs file, and also send the renderer
+        }                                                   // an object where 'data' is equal to the 'rows' we
+    })                                                      // received back from the query
+});
 
 /*
     LISTENER

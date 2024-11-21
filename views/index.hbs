@@ -1,9 +1,37 @@
 <h1>Welcome to Sun Gym Management System</h1>
 <p>If you see this text, the server is <strong>definitely</strong> working!</p>
 
-{{#if error}}
-<p style="color: red;">Error: {{error}}</p>
-{{else if data}}
-<p>Database query result:</p>
-<pre>{{data}}</pre>
-{{/if}}
+<h2>Database query result:</h2>
+
+{{!-- Create a table --}}
+<table border="1">
+    {{!-- Header section --}}
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Homeworld</th>
+            <th>Age</th>
+        </tr>
+    </thead>
+
+    {{!-- Body section --}}
+    <tbody>
+        {{!-- For each row, print the id, fname, lname, homeworld and age, in order --}}
+        {{#each data}}
+        <tr>
+            <td>{{this.id}}</td>
+            <td>{{this.fname}}</td>
+            <td>{{this.lname}}</td>
+            <td>{{this.homeworld}}</td>
+            <td>{{this.age}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+{{!-- If no data is found, display a message --}}
+{{#unless data}}
+<p>No data found in the database.</p>
+{{/unless}}
