@@ -1,6 +1,7 @@
 <h1>Welcome to Sun Gym Management System</h1>
 <p>If you see this text, the server is <strong>definitely</strong> working!</p>
 
+{{!-- Search form --}}
 <h2>Search Using an HTML Form</h2>
 <p>Search by last name using the field below. Partial last names are OK too!</p>
 <form id="search-person-html" method='GET' action='/'>
@@ -14,7 +15,7 @@
 <h2>Database query result:</h2>
 
 {{!-- Create a table --}}
-<table border="1">
+<table id="people-table" border="1">
     {{!-- Header section --}}
     <thead>
         <tr>
@@ -46,7 +47,7 @@
 <p>No data found in the database.</p>
 {{/unless}}
 
-{{!-- Form for adding new data --}}
+{{!-- Form for adding new data using regular HTML form --}}
 <h2>Adding Data using an HTML form</h2>
 <p>To add a new person, please enter their information below and click `Submit`!</p>
 <form id="add-person-form" method="POST" action="/add-person-form">
@@ -69,3 +70,30 @@
 
     <input type="submit">
 </form>
+
+{{!-- Form for adding new data using AJAX --}}
+<h2>Adding Data with AJAX</h2>
+<p>To add a new person, please enter their information below and click 'Submit'!</p>
+<form id="add-person-form-ajax">
+    <label for="input-fname-ajax">First Name: </label>
+    <input type="text" name="input-fname-ajax" id="input-fname-ajax">
+
+    <label for="input-lname-ajax">Last Name: </label>
+    <input type="text" name="input-lname-ajax" id="input-lname-ajax">
+
+    <label for="input-homeworld-ajax">Homeworld: </label>
+    <select name="input-homeworld-ajax" id="input-homeworld-ajax">
+        <option value="">Select a Planet</option>
+        {{#each planets}}
+        <option value="{{this.id}}">{{this.name}}</option>
+        {{/each}}
+    </select>
+
+    <label for="input-age-ajax">Age: </label>
+    <input type="number" name="input-age-ajax" id="input-age-ajax">
+
+    <input type="submit">
+</form>
+
+{{!-- Embed our javascript to handle the DOM manipulation and AJAX request --}}
+<script src="./js/add_person.js"></script>
