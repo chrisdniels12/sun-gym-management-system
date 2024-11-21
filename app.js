@@ -7,6 +7,10 @@ var express = require('express');   // Express library for the web server
 var app = express();            // Instantiate an express object to interact with the server
 PORT = 9125;
 
+
+// Database
+var db = require('./database/db-connector')
+
 /*
     ROUTES
 */
