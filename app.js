@@ -2,7 +2,7 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const db = require('./database/db-connector');
+const db = require('./database/db-connector').pool;
 const membersRouter = require('./routes/members');
 
 // Middleware setup
@@ -18,23 +18,38 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Root route - serve index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
+    const filePath = path.join(__dirname, 'public', 'html', 'index.html');
+    console.log('Attempting to serve:', filePath);
+
+    // Check if file exists
+    if (require('fs').existsSync(filePath)) {
+        console.log('File exists!');
+        res.sendFile(filePath);
+    } else {
+        console.log('File not found!');
+        res.status(404).send('index.html not found');
+    }
+});
+
+// Add a test route
+app.get('/test', (req, res) => {
+    res.send('Server is working!');
 });
 
 // Use the members router for all /members routes
 app.use('/members', membersRouter);
 
-// Add error handling for database connection
-db.connect((err) => {
+// Test the pool with a query
+db.query('SELECT 1', (err) => {
     if (err) {
         console.error('Error connecting to database:', err);
         process.exit(1);
     }
-    console.log('Connected to database');
+    console.log('Database connection pool ready');
 });
 
 // Start server
-const PORT = process.env.PORT || 9999;
+const PORT = process.env.PORT || 8999;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

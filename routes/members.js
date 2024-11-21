@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const connection = require('../utils/db');
-const db = require('../database/db-connector');
+const db = require('../database/db-connector').pool;
 
 /**
  * GET /members
@@ -11,7 +10,7 @@ router.get('/', (req, res) => {
     // Query to get all members
     const membersQuery = 'SELECT * FROM Members ORDER BY lastName, firstName';
 
-    connection.query(membersQuery, (err, members) => {
+    db.query(membersQuery, (err, members) => {
         if (err) {
             console.error('Error fetching members:', err);
             return res.status(500).send('Error fetching members');
@@ -29,7 +28,7 @@ router.get('/', (req, res) => {
             FROM Members;
         `;
 
-        connection.query(statsQuery, (err, statsResults) => {
+        db.query(statsQuery, (err, statsResults) => {
             if (err) {
                 console.error('Error fetching stats:', err);
                 return res.status(500).send('Error fetching statistics');
@@ -69,7 +68,7 @@ router.get('/edit/:id', (req, res) => {
     const { id } = req.params;
     const query = 'SELECT * FROM Members WHERE memberID = ?';
 
-    connection.query(query, [id], (err, results) => {
+    db.query(query, [id], (err, results) => {
         if (err) {
             console.error('Error fetching member:', err);
             return res.status(500).send('Error fetching member');
@@ -117,7 +116,7 @@ router.post('/', (req, res) => {
         membershipType,
     ];
 
-    connection.query(query, values, (err, results) => {
+    db.query(query, values, (err, results) => {
         if (err) {
             console.error('Error creating member:', err);
             return res.status(500).send('Failed to create member');
@@ -149,7 +148,7 @@ router.post('/:id', (req, res) => {
         id,
     ];
 
-    connection.query(query, values, (err, results) => {
+    db.query(query, values, (err, results) => {
         if (err) {
             console.error('Error updating member:', err);
             return res.status(500).send('Failed to update member');
@@ -166,7 +165,7 @@ router.post('/delete/:id', async (req, res) => {
     const { id } = req.params;
 
     // Start a transaction since we're doing multiple operations
-    connection.beginTransaction(async (err) => {
+    db.beginTransaction(async (err) => {
         if (err) {
             console.error('Error starting transaction:', err);
             return res.status(500).json({ error: 'Database error' });
@@ -174,25 +173,25 @@ router.post('/delete/:id', async (req, res) => {
 
         try {
             // First delete related records from intersection tables
-            await connection.query('DELETE FROM MemberTrainer WHERE memberID = ?', [id]);
-            await connection.query('DELETE FROM ClassBookings WHERE memberID = ?', [id]);
-            await connection.query('DELETE FROM MemberEquipment WHERE memberID = ?', [id]);
+            await db.query('DELETE FROM MemberTrainer WHERE memberID = ?', [id]);
+            await db.query('DELETE FROM ClassBookings WHERE memberID = ?', [id]);
+            await db.query('DELETE FROM MemberEquipment WHERE memberID = ?', [id]);
 
             // Then delete the member
-            const [results] = await connection.query('DELETE FROM Members WHERE memberID = ?', [id]);
+            const [results] = await db.query('DELETE FROM Members WHERE memberID = ?', [id]);
 
             if (results.affectedRows === 0) {
-                await connection.rollback();
+                await db.rollback();
                 return res.status(404).json({ message: 'Member not found' });
             }
 
             // If we get here, commit the transaction
-            await connection.commit();
+            await db.commit();
             res.json({ message: 'Member deleted successfully' });
 
         } catch (error) {
             // If anything goes wrong, rollback the transaction
-            await connection.rollback();
+            await db.rollback();
             console.error('Error during delete operation:', error);
             res.status(500).json({ error: 'Failed to delete member' });
         }
