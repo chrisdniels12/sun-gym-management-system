@@ -43,17 +43,44 @@ A comprehensive gym management system that handles member relationships, equipme
 - TrainerEquipment
 - MemberTrainer
 
-## Tech Stack
+## Technologies Used
 - Frontend: HTML, CSS, JavaScript
-- Backend: SQL (MySQL/MariaDB)
-- API: RESTful endpoints
+- Backend: Node.js, Express.js
+- Database: MySQL
+- ORM: Sequelize
+- Template Engine: Handlebars
 
 ## Setup
 1. Clone repository
-2. Import schema (DDL.sql)
-3. Import data (DML.sql)
-4. Configure database connection
-5. Open index.html
+
+git clone https://github.com/your-username/sun-gym-management-system.git
+cd sun-gym-management-system
+
+2. Install dependencies:
+
+npm install
+
+3. Database Configuration:
+- Copy the example database connector file:
+  ```
+  cp database/db-connector.example.js database/db-connector.js
+  ```
+- Open `database/db-connector.js` and update the following fields with your OSU database credentials:
+  ```javascript
+  user: 'your_username',
+  password: 'your_password',
+  database: 'your_database'
+  ```
+
+4. Start the server:
+
+npm start
+
+5. Open a web browser and navigate to `http://localhost:9999` (or whatever port you've configured).
+
+## Notes
+- Make sure not to commit `database/db-connector.js` as it contains sensitive information.
+- Always pull the latest changes before starting work: `git pull origin main`
 
 ## File Structure
 /
