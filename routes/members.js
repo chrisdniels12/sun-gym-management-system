@@ -1,25 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const connection = require('../utils/db'); // Import MySQL connection
+const connection = require('../utils/db');
 
-// Get all members and calculate statistics
+/**
+ * GET /members
+ * Display all members with statistics
+ */
 router.get('/', (req, res) => {
-    // Fetch all members
-    const query = 'SELECT * FROM Members';
-    connection.query(query, (err, results) => {
+    // Query to get all members
+    const membersQuery = 'SELECT * FROM Members ORDER BY lastName, firstName';
+
+    connection.query(membersQuery, (err, members) => {
         if (err) {
             console.error('Error fetching members:', err);
             return res.status(500).send('Error fetching members');
         }
 
-        // Calculate membership statistics
+        // Query to get membership statistics
         const statsQuery = `
             SELECT 
-                COUNT(*) AS totalMembers, 
-                COUNT(CASE WHEN membership_type = 'Basic' THEN 1 END) AS basicMembers,
-                COUNT(CASE WHEN membership_type = 'Premium' THEN 1 END) AS premiumMembers,
-                COUNT(CASE WHEN membership_type = 'VIP' THEN 1 END) AS vipMembers
-            FROM Members WHERE active = 1;
+                COUNT(*) AS totalMembers,
+                SUM(CASE WHEN MONTH(joinDate) = MONTH(CURRENT_DATE) 
+                    AND YEAR(joinDate) = YEAR(CURRENT_DATE) THEN 1 ELSE 0 END) AS newMembers,
+                COUNT(CASE WHEN membershipType = 'Basic' THEN 1 END) AS basicMembers,
+                COUNT(CASE WHEN membershipType = 'Premium' THEN 1 END) AS premiumMembers,
+                COUNT(CASE WHEN membershipType = 'VIP' THEN 1 END) AS vipMembers
+            FROM Members;
         `;
 
         connection.query(statsQuery, (err, statsResults) => {
@@ -28,37 +34,36 @@ router.get('/', (req, res) => {
                 return res.status(500).send('Error fetching statistics');
             }
 
-            const stats = {
-                totalMembers: statsResults[0].totalMembers,
-                activeMembers: statsResults[0].totalMembers, // Adjust logic if needed for active/inactive
-                membersByType: {
-                    Basic: statsResults[0].basicMembers,
-                    Premium: statsResults[0].premiumMembers,
-                    VIP: statsResults[0].vipMembers,
-                },
-            };
-
-            // Render the 'entity' template and pass the member data and statistics
-            res.render('entity', {
-                title: 'Members',
-                buttonText: 'Add New Member',
-                entity: 'member',
-                headers: ['Member ID', 'First Name', 'Last Name', 'Email', 'Phone Number', 'Join Date', 'Membership Type'],
-                records: results, // Member data
-                stats: stats, // Membership statistics
-                idField: 'memberID',
+            // Render the members page with data and statistics
+            res.render('members', {
+                members: members,
+                stats: {
+                    totalMembers: statsResults[0].totalMembers,
+                    newMembers: statsResults[0].newMembers,
+                    membersByType: {
+                        Basic: statsResults[0].basicMembers,
+                        Premium: statsResults[0].premiumMembers,
+                        VIP: statsResults[0].vipMembers
+                    }
+                }
             });
         });
     });
 });
 
-// Render the Create Screen
+/**
+ * GET /members/create
+ * Render the form to create a new member
+ */
 router.get('/create', (req, res) => {
     console.log('Create Route Hit');
     res.render('members_form', { formTitle: 'Add', buttonText: 'Create', action: '/members', record: {} });
 });
 
-// Get a Specific Member by ID
+/**
+ * GET /members/edit/:id
+ * Render the form to edit an existing member
+ */
 router.get('/edit/:id', (req, res) => {
     const { id } = req.params;
     const query = 'SELECT * FROM Members WHERE memberID = ?';
@@ -81,7 +86,10 @@ router.get('/edit/:id', (req, res) => {
     });
 });
 
-// Add a New Member
+/**
+ * POST /members
+ * Add a new member
+ */
 router.post('/', (req, res) => {
     const { firstName, lastName, email, phoneNumber, joinDate, membershipType } = req.body;
 
@@ -107,7 +115,10 @@ router.post('/', (req, res) => {
     });
 });
 
-// === UPDATE: Modify a Member's Details ===
+/**
+ * POST /members/:id
+ * Update an existing member
+ */
 router.post('/:id', (req, res) => {
     const { id } = req.params;
     const { firstName, lastName, email, phoneNumber, joinDate, membershipType } = req.body;
@@ -136,7 +147,10 @@ router.post('/:id', (req, res) => {
     });
 });
 
-// === DELETE: Remove a Member ===
+/**
+ * POST /members/delete/:id
+ * Delete a member
+ */
 router.post('/delete/:id', (req, res) => {
     console.log('DELETE request received for ID:', req.params.id);
 

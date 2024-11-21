@@ -1,86 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Members - Sun Gym</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/css/members.css">
 </head>
-<body>
-    <h1>Manage Members</h1>
-    <a href="/">Back to Home</a>
 
-    <!-- Statistics Section -->
+<body>
+    <h1>Member Management</h1>
+    <a href="/" class="back-link">Back to Home</a>
+
+    {{!-- Stats Section --}}
     <div class="stats-section">
-        <h2>Membership Statistics</h2>
+        <h2>Quick Stats</h2>
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Members</h3>
-                <p>{{stats.totalMembers}}</p>
+                <p id="totalMembers">{{stats.totalMembers}}</p>
             </div>
             <div class="stat-card">
-                <h3>Active Members</h3>
-                <p>{{stats.activeMembers}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>Basic Members</h3>
-                <p>{{stats.membersByType.Basic}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>Premium Members</h3>
-                <p>{{stats.membersByType.Premium}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>VIP Members</h3>
-                <p>{{stats.membersByType.VIP}}</p>
+                <h3>New This Month</h3>
+                <p id="newMembers">{{stats.newMembers}}</p>
             </div>
         </div>
     </div>
 
-<!-- Search/Filter Section -->
-    <div class="search-section">
-        <h2>Search/Filter Members</h2>
-        <div class="form-field">
-            <label for="nameFilter">Search by Name:</label>
-            <input type="text" id="nameFilter" placeholder="Enter name...">
-        </div>
-        <div class="form-field">
-            <label for="typeFilter">Filter by Membership:</label>
-            <select id="typeFilter">
-                <option value="">All Types</option>
-                <option value="Basic">Basic</option>
-                <option value="Premium">Premium</option>
-                <option value="VIP">VIP</option>
-            </select>
-        </div>
-        <div class="form-field">
-            <label for="dateFilter">Filter by Join Date:</label>
-            <input type="date" id="dateFilter">
-        </div>
-    </div>
-
-<!-- Members Table -->
+    {{!-- Add Member Form --}}
     <div class="form-section">
-        <h2>Members List</h2>
-        <table>
+        <h2>Add New Member</h2>
+        <form id="addMemberForm">
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number (optional):</label>
+                <input type="text" id="phoneNumber" name="phoneNumber">
+            </div>
+            <div class="form-group">
+                <label for="membershipType">Membership Type:</label>
+                <select id="membershipType" name="membershipType" required>
+                    <option value="Basic">Basic</option>
+                    <option value="Premium">Premium</option>
+                    <option value="VIP">VIP</option>
+                </select>
+            </div>
+            <button type="submit">Add Member</button>
+        </form>
+    </div>
+
+    {{!-- Members Table --}}
+    <div class="table-section">
+        <h2>Current Members</h2>
+        <table id="membersTable">
             <thead>
                 <tr>
-                    <th>Member ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
+                    <th>ID</th>
+                    <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Join Date</th>
-                    <th>Membership Type</th>
+                    <th>Membership</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {{#each members}}
-                <tr>
+                <tr data-id="{{this.memberID}}">
                     <td>{{this.memberID}}</td>
-                    <td>{{this.firstName}}</td>
-                    <td>{{this.lastName}}</td>
+                    <td>{{this.firstName}} {{this.lastName}}</td>
                     <td>{{this.email}}</td>
                     <td>{{this.phoneNumber}}</td>
                     <td>{{this.joinDate}}</td>
@@ -93,77 +91,10 @@
                 {{/each}}
             </tbody>
         </table>
-        <div class="loading">Loading...</div>
     </div>
 
-<!-- Add Member Form -->
-    <div class="form-section">
-        <h2>Add Member</h2>
-        <form id="addMember">
-            <div class="form-field">
-                <label for="firstName">First Name:</label>
-                <input type="text" name="firstName" required>
-            </div>
-            <div class="form-field">
-                <label for="lastName">Last Name:</label>
-                <input type="text" name="lastName" required>
-            </div>
-            <div class="form-field">
-                <label for="email">Email:</label>
-                <input type="email" name="email" required>
-            </div>
-            <div class="form-field">
-                <label for="phoneNumber">Phone Number (optional):</label>
-                <input type="text" name="phoneNumber">
-            </div>
-            <div class="form-field">
-                <label for="membershipType">Membership Type:</label>
-                <select name="membershipType" required>
-                    <option value="Basic">Basic</option>
-                    <option value="Premium">Premium</option>
-                    <option value="VIP">VIP</option>
-                </select>
-            </div>
-            <button type="submit">Add Member</button>
-        </form>
-    </div>
-
- <!-- Edit Member Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h2>Edit Member</h2>
-            <form id="editMemberForm" onsubmit="updateMember(event)">
-                <input type="hidden" id="editID" name="id">
-                <div class="form-field">
-                    <label for="editFirstName">First Name:</label>
-                    <input type="text" id="editFirstName" name="firstName" required>
-                </div>
-                <div class="form-field">
-                    <label for="editLastName">Last Name:</label>
-                    <input type="text" id="editLastName" name="lastName" required>
-                </div>
-                <div class="form-field">
-                    <label for="editEmail">Email:</label>
-                    <input type="email" id="editEmail" name="email" required>
-                </div>
-                <div class="form-field">
-                    <label for="editPhone">Phone Number (optional):</label>
-                    <input type="text" id="editPhone" name="phoneNumber">
-                </div>
-                <div class="form-field">
-                    <label for="editMembershipType">Membership Type:</label>
-                    <select id="editMembershipType" name="membershipType" required>
-                        <option value="Basic">Basic</option>
-                        <option value="Premium">Premium</option>
-                        <option value="VIP">VIP</option>
-                    </select>
-                </div>
-                <button type="submit">Update Member</button>
-                <button type="button" onclick="closeModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    <script src="/script.js"></script>
+    {{!-- Load client-side JavaScript --}}
+    <script src="/js/memberClient.js"></script>
 </body>
+
 </html>
