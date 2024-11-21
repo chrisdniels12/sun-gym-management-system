@@ -174,6 +174,34 @@ app.delete('/delete-person-ajax/', function (req, res, next) {
     })
 });
 
+app.put('/put-person-ajax', function (req, res, next) {
+    let data = req.body;
+
+    let homeworld = parseInt(data.homeworld);
+    let person = parseInt(data.fullname);
+
+    let queryUpdateWorld = `UPDATE bsg_people SET homeworld = ? WHERE bsg_people.id = ?`;
+    let selectWorld = `SELECT * FROM bsg_planets WHERE id = ?`
+
+    // Run the 1st query
+    db.pool.query(queryUpdateWorld, [homeworld, person], function (error, rows, fields) {
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            // Run the second query
+            db.pool.query(selectWorld, [homeworld], function (error, rows, fields) {
+                if (error) {
+                    console.log(error);
+                    res.sendStatus(400);
+                } else {
+                    res.send(rows);
+                }
+            })
+        }
+    })
+});
+
 /*
     LISTENER
 */

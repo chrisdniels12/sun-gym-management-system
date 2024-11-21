@@ -105,4 +105,11 @@ addRowToTable = (data) => {
 
     // Add the row to the table
     currentTable.appendChild(row);
+
+    // Add new person to the update dropdown
+    let selectMenu = document.getElementById("mySelect");
+    let option = document.createElement("option");
+    option.text = newRow.fname + ' ' + newRow.lname;
+    option.value = newRow.id;
+    selectMenu.add(option);
 }
