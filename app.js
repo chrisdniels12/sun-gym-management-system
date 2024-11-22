@@ -3,53 +3,35 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const db = require('./database/db-connector').pool;
-const membersRouter = require('./routes/members');
 
 // Middleware setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Set view engine
-app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
-
-// Add base path constant
-const BASE_PATH = '/~piercebe/CS340/sun-gym-management-system';
-
-// Update your routes
-app.get(`${BASE_PATH}/:page`, (req, res) => {
-    const page = req.params.page;
-    const filePath = path.join(__dirname, 'public', 'html', `${page}.html`);
-
-    if (require('fs').existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.status(404).send('Page not found');
-    }
-});
+app.use('/~piercebe/CS340/sun-gym-management-system', express.static(path.join(__dirname, 'public')));
 
 // Root route
-app.get(`${BASE_PATH}/`, (req, res) => {
-    const filePath = path.join(__dirname, 'public', 'html', 'index.html');
-    res.sendFile(filePath);
+app.get('/~piercebe/CS340/sun-gym-management-system', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Use the members router for all /members routes
-app.use('/members', membersRouter);
+// HTML routes
+app.get('/~piercebe/CS340/sun-gym-management-system/:page', (req, res) => {
+    const page = req.params.page;
+    res.sendFile(path.join(__dirname, 'public', `${page}.html`));
+});
 
-// Add these routes
-app.use('/api/members', require('./routes/members'));
-app.use('/api/trainers', require('./routes/trainers'));
-app.use('/api/classes', require('./routes/classes'));
-app.use('/api/equipment', require('./routes/equipment'));
-app.use('/api/payments', require('./routes/payments'));
-app.use('/api/member-equipment', require('./routes/member-equipment'));
-app.use('/api/class-bookings', require('./routes/class-bookings'));
-app.use('/api/member-trainer', require('./routes/member-trainer'));
-app.use('/api/trainer-equipment', require('./routes/trainer-equipment'));
+// API routes
+app.use('/~piercebe/CS340/sun-gym-management-system/api/members', require('./routes/members'));
+app.use('/~piercebe/CS340/sun-gym-management-system/api/trainers', require('./routes/trainers'));
+app.use('/~piercebe/CS340/sun-gym-management-system/api/classes', require('./routes/classes'));
+app.use('/~piercebe/CS340/sun-gym-management-system/api/equipment', require('./routes/equipment'));
+app.use('/~piercebe/CS340/sun-gym-management-system/api/payments', require('./routes/payments'));
+app.use('/~piercebe/CS340/sun-gym-management-system/api/member-equipment', require('./routes/member-equipment'));
+app.use('/~piercebe/CS340/sun-gym-management-system/api/class-bookings', require('./routes/class-bookings'));
+app.use('/~piercebe/CS340/sun-gym-management-system/api/member-trainer', require('./routes/member-trainer'));
+app.use('/~piercebe/CS340/sun-gym-management-system/api/trainer-equipment', require('./routes/trainer-equipment'));
 
 // Test the pool with a more specific query
 db.query('SELECT * FROM Members LIMIT 1', (err, results) => {
