@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,7 @@
             margin: 40px;
             line-height: 1.6;
         }
-        
+
         /* Stats section */
         .stats-section {
             margin: 20px 0;
@@ -19,17 +20,19 @@
             border: 1px solid #ddd;
             background-color: #e9ecef;
         }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
+
         .stat-card {
             background: #fff;
             padding: 15px;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         /* Status indicators */
@@ -39,9 +42,18 @@
             border-radius: 4px;
             font-size: 0.9em;
         }
-        .status-active { background-color: #d4edda; }
-        .status-pending { background-color: #fff3cd; }
-        .status-completed { background-color: #f8d7da; }
+
+        .status-active {
+            background-color: #d4edda;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+        }
+
+        .status-completed {
+            background-color: #f8d7da;
+        }
 
         /* Form sections */
         .form-section {
@@ -51,9 +63,10 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Member-Trainer Relationships</h1>
-    <a href="index.html">Back to Home</a>
+    <a href="/">Back to Home</a>
 
     <!-- Statistics Section -->
     <div class="stats-section">
@@ -153,7 +166,7 @@
             try {
                 const response = await fetch('/api/member-trainer/stats');
                 const stats = await response.json();
-                
+
                 document.getElementById('activeRelationships').textContent = stats.activeCount;
                 document.getElementById('totalSessions').textContent = stats.sessionCount;
                 document.getElementById('avgDuration').textContent = `${stats.avgDuration} mins`;
@@ -206,7 +219,7 @@
             try {
                 const response = await fetch(`/api/trainers/${trainerId}/availability`);
                 const { available, message } = await response.json();
-                
+
                 if (!available) {
                     showAlert(message || 'Trainer not available', 'error');
                     return false;
@@ -235,4 +248,5 @@
         }
     </script>
 </body>
+
 </html>

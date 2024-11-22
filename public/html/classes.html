@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,80 +11,98 @@
             margin: 40px;
             line-height: 1.6;
         }
-        h1, h2, h3 {
+
+        h1,
+        h2,
+        h3 {
             color: #333;
             border-bottom: 2px solid #333;
             padding-bottom: 10px;
         }
+
         a {
             text-decoration: none;
             color: #0066cc;
             margin-bottom: 20px;
             display: inline-block;
         }
+
         a:hover {
             text-decoration: underline;
         }
+
         table {
             border-collapse: collapse;
             width: 100%;
             margin: 20px 0;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f4f4f4;
         }
+
         .form-section {
             margin: 20px 0;
             padding: 20px;
             border: 1px solid #ddd;
             background-color: #fff;
         }
+
         .search-section {
             margin: 20px 0;
             padding: 20px;
             border: 1px solid #ddd;
             background-color: #f8f9fa;
         }
+
         .stats-section {
             margin: 20px 0;
             padding: 20px;
             border: 1px solid #ddd;
             background-color: #e9ecef;
         }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
+
         .stat-card {
             background: #fff;
             padding: 15px;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .schedule-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 10px;
             margin-top: 20px;
         }
+
         .day-column {
             background: #fff;
             padding: 10px;
             border-radius: 5px;
         }
+
         .class-slot {
             margin: 5px 0;
             padding: 8px;
             border-radius: 4px;
             font-size: 0.9em;
         }
+
         .capacity-indicator {
             display: inline-block;
             padding: 3px 8px;
@@ -91,53 +110,65 @@
             font-size: 0.8em;
             margin-left: 5px;
         }
+
         .capacity-low {
             background-color: #d4edda;
             color: #155724;
         }
+
         .capacity-medium {
             background-color: #fff3cd;
             color: #856404;
         }
+
         .capacity-full {
             background-color: #f8d7da;
             color: #721c24;
         }
+
         .alert {
             padding: 10px;
             margin: 10px 0;
             border-radius: 4px;
             display: none;
         }
+
         .alert-success {
             background-color: #d4edda;
             border-color: #c3e6cb;
             color: #155724;
         }
+
         .alert-error {
             background-color: #f8d7da;
             border-color: #f5c6cb;
             color: #721c24;
         }
+
         .form-field {
             margin-bottom: 15px;
         }
+
         .form-field label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-        .form-field input, .form-field select {
+
+        .form-field input,
+        .form-field select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+
         .form-field .hint {
             font-size: 0.8em;
             color: #666;
             margin-top: 2px;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -145,8 +176,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
         }
+
         .modal-content {
             background-color: white;
             margin: 15% auto;
@@ -154,6 +186,7 @@
             width: 70%;
             border-radius: 5px;
         }
+
         .loading {
             display: none;
             text-align: center;
@@ -176,7 +209,7 @@
             try {
                 const response = await fetch('/api/classes/stats');
                 const stats = await response.json();
-                
+
                 document.getElementById('totalClasses').textContent = stats.totalClasses;
                 document.getElementById('activeClasses').textContent = stats.activeClasses;
                 document.getElementById('totalEnrollments').textContent = stats.totalEnrollments;
@@ -233,7 +266,7 @@
                 const response = await fetch('/api/trainers/available');
                 const trainers = await response.json();
                 const trainerSelects = document.querySelectorAll('.trainer-select');
-                
+
                 trainerSelects.forEach(select => {
                     select.innerHTML = '<option value="">Select Trainer (Optional)</option>';
                     trainers.forEach(trainer => {
@@ -257,7 +290,7 @@
 
             try {
                 document.querySelector('.loading').style.display = 'block';
-                
+
                 let url = '/api/classes?';
                 if (dayFilter) url += `day=${encodeURIComponent(dayFilter)}&`;
                 if (trainerFilter) url += `trainer=${encodeURIComponent(trainerFilter)}&`;
@@ -265,10 +298,10 @@
 
                 const response = await fetch(url);
                 const classes = await response.json();
-                
+
                 const tbody = document.querySelector('tbody');
                 tbody.innerHTML = '';
-                
+
                 classes.forEach(cls => {
                     const capacityClass = getCapacityClass(cls.currentEnrollment, cls.maxCapacity);
                     tbody.innerHTML += `
@@ -433,9 +466,10 @@
         });
     </script>
 </head>
+
 <body>
     <h1>Manage Classes</h1>
-    <a href="index.html">Back to Home</a>
+    <a href="/">Back to Home</a>
 
     <!-- Statistics Section -->
     <div class="stats-section">
@@ -606,4 +640,5 @@
         </div>
     </div>
 </body>
+
 </html>
