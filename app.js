@@ -16,28 +16,37 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Root route - serve index.html
-app.get('/', (req, res) => {
-    const filePath = path.join(__dirname, 'public', 'html', 'index.html');
-    console.log('Attempting to serve:', filePath);
+// Add HTML routes
+app.get('/:page', (req, res) => {
+    const page = req.params.page;
+    const filePath = path.join(__dirname, 'public', 'html', `${page}.html`);
 
-    // Check if file exists
     if (require('fs').existsSync(filePath)) {
-        console.log('File exists!');
         res.sendFile(filePath);
     } else {
-        console.log('File not found!');
-        res.status(404).send('index.html not found');
+        res.status(404).send('Page not found');
     }
 });
 
-// Add a test route
-app.get('/test', (req, res) => {
-    res.send('Server is working!');
+// Root route - serve index.html
+app.get('/', (req, res) => {
+    const filePath = path.join(__dirname, 'public', 'html', 'index.html');
+    res.sendFile(filePath);
 });
 
 // Use the members router for all /members routes
 app.use('/members', membersRouter);
+
+// Add these routes
+app.use('/api/members', require('./routes/members'));
+app.use('/api/trainers', require('./routes/trainers'));
+app.use('/api/classes', require('./routes/classes'));
+app.use('/api/equipment', require('./routes/equipment'));
+app.use('/api/payments', require('./routes/payments'));
+app.use('/api/member-equipment', require('./routes/member-equipment'));
+app.use('/api/class-bookings', require('./routes/class-bookings'));
+app.use('/api/member-trainer', require('./routes/member-trainer'));
+app.use('/api/trainer-equipment', require('./routes/trainer-equipment'));
 
 // Test the pool with a more specific query
 db.query('SELECT * FROM Members LIMIT 1', (err, results) => {
