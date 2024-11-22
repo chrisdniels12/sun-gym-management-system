@@ -1,3 +1,7 @@
 node_modules/
 package-lock.json
 database/db-connector.js
+*.log
+forever.log
+out.log
+err.log

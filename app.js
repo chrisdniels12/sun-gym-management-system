@@ -16,15 +16,6 @@ app.get('/~piercebe/CS340/sun-gym-management-system', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Serve the members HTML page for /~piercebe/CS340/sun-gym-management-system/members
-// Serve the members HTML page for /members
-app.get('/~piercebe/CS340/sun-gym-management-system/members', (req, res) => {
-    const filePath = path.join(__dirname, 'public', 'html', 'members.html');
-    res.sendFile(filePath);
-});
-
-
-
 // HTML routes
 app.get('/~piercebe/CS340/sun-gym-management-system/:page', (req, res) => {
     const page = req.params.page;
@@ -42,15 +33,16 @@ app.use('/~piercebe/CS340/sun-gym-management-system/api/class-bookings', require
 app.use('/~piercebe/CS340/sun-gym-management-system/api/member-trainer', require('./routes/member-trainer'));
 app.use('/~piercebe/CS340/sun-gym-management-system/api/trainer-equipment', require('./routes/trainer-equipment'));
 
-// Test the pool with a more specific query
-db.query('SELECT * FROM Members LIMIT 1', (err, results) => {
-    if (err) {
-        console.error('Database error:', err);
+// Test the pool with a more specific query using promises
+db.query('SELECT * FROM Members LIMIT 1')
+    .then(([results]) => {
+        console.log('Database test query results:', results);
+        console.log('Database connection pool ready');
+    })
+    .catch(error => {
+        console.error('Database error:', error);
         process.exit(1);
-    }
-    console.log('Database test query results:', results);
-    console.log('Database connection pool ready');
-});
+    });
 
 // Start server
 const PORT = process.env.PORT || 8999;
