@@ -1,18 +1,69 @@
 # Sun Gym Management System
 
-A comprehensive gym management system that handles member relationships, equipment tracking, class scheduling, and trainer certifications.
+A comprehensive gym management system built with Node.js, Express, and MySQL.
 
-## Core Features
+## Quick Setup
+
+1. **Clone the Repository**
+```bash
+git clone <repository-url>
+cd sun-gym-management-system
+```
+
+2. **Install Dependencies**
+```bash
+npm install
+```
+
+3. **Database Setup**
+```bash
+# Create database connector
+cp database/db-connector.example.js database/db-connector.js
+
+# Edit database credentials
+nano database/db-connector.js
+
+# Import database schema
+mysql -u username -p database_name < sql/DDL.sql
+```
+
+4. **Start Server**
+```bash
+npm run dev  # Development with auto-reload
+# or
+npm start    # Production
+```
+
+5. **Access Application**
+- Open browser to: `http://localhost:8999`
+- Default routes are prefixed with: `/~piercebe/CS340/sun-gym-management-system`
+
+## Project Structure
+
+```
+├── public/
+│   ├── css/          # Stylesheets
+│   ├── js/           # Client-side JavaScript
+│   └── html/         # Static HTML pages
+├── routes/           # API route handlers
+├── sql/             # Database scripts
+│   ├── DDL.sql      # Schema definition
+│   └── DML.sql      # Query templates
+├── views/           # Handlebars templates
+└── app.js           # Main application file
+```
+
+## Features
 
 ### Member Management
-- Member registration and profiles
-- Membership tracking
-- Payment history
-- Equipment usage
-- Class bookings
+- Member registration and profile management
+- Membership type tracking (Basic, Premium, VIP)
+- Payment history tracking
+- Equipment usage monitoring
+- Class booking system
 
 ### Trainer Management
-- Trainer profiles and specializations
+- Trainer profiles with specializations
 - Equipment certifications
 - Member assignments
 - Class scheduling
@@ -22,91 +73,42 @@ A comprehensive gym management system that handles member relationships, equipme
 - Inventory tracking
 - Usage monitoring
 - Maintenance scheduling
-- Certification requirements
-- Status tracking
+- Status tracking (Available, In Use, Under Maintenance)
 
 ### Class Management
-- Scheduling system
+- Class scheduling system
 - Capacity management
 - Trainer assignments
 - Member bookings
 - Attendance tracking
 
-## Database Structure
-- Members
-- Trainers
-- Equipment
-- Classes
-- Payments
-- ClassBookings
-- MemberEquipment
-- TrainerEquipment
-- MemberTrainer
-
-## Technologies Used
-- Frontend: HTML, CSS, JavaScript
-- Backend: Node.js, Express.js
-- Database: MySQL
-- ORM: Sequelize
-- Template Engine: Handlebars
-
-## Setup
-1. Clone repository
-
-git clone https://github.com/your-username/sun-gym-management-system.git
-cd sun-gym-management-system
-
-2. Install dependencies:
-
-npm install
-
-3. Database Configuration:
-- Copy the example database connector file:
-  ```
-  cp database/db-connector.example.js database/db-connector.js
-  ```
-- Open `database/db-connector.js` and update the following fields with your OSU database credentials:
-  ```javascript
-  user: 'your_username',
-  password: 'your_password',
-  database: 'your_database'
-  ```
-
-4. Start the server:
-
-npm start
-
-5. Open a web browser and navigate to `http://localhost:9999` (or whatever port you've configured).
-
-## Notes
-- Make sure not to commit `database/db-connector.js` as it contains sensitive information.
-- Always pull the latest changes before starting work: `git pull origin main`
-
-## File Structure
-/
-HTML/
-   index.html
-   members.html
-   trainers.html
-   equipment.html
-   classes.html
-   payments.html
-   class_bookings.html
-   member_equipment.html
-   trainer_equipment.html
-   member_trainer.html
-SQL/
-   DDL.sql
-   DML.sql
-README.md
-
 ## API Endpoints
-- `/api/members`
-- `/api/trainers`
-- `/api/equipment`
-- `/api/classes`
-- `/api/payments`
-- `/api/class-bookings`
-- `/api/member-equipment`
-- `/api/trainer-equipment`
-- `/api/member-trainer`
+
+### Primary Entities
+- `/api/members` - Member CRUD operations
+- `/api/trainers` - Trainer management
+- `/api/equipment` - Equipment inventory
+- `/api/classes` - Class scheduling
+- `/api/payments` - Payment tracking
+
+### Relationships
+- `/api/class-bookings` - Class enrollment
+- `/api/member-equipment` - Equipment usage
+- `/api/trainer-equipment` - Equipment certifications
+- `/api/member-trainer` - Training relationships
+
+## Technologies
+
+- **Frontend**: HTML5, CSS3, JavaScript
+- **Backend**: Node.js, Express.js
+- **Database**: MySQL
+- **Template Engine**: Handlebars
+- **Development**: Nodemon
+
+## Development Notes
+
+- Run tests before committing: `npm test`
+- Database credentials should never be committed
+- Use `npm run dev` for development with auto-reload
+- All API routes include proper error handling
+- Frontend includes form validation
