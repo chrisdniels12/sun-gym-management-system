@@ -1,0 +1,38 @@
+/* Class Management Styles */
+.class-schedule {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.schedule-slot {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.capacity-indicator {
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.capacity-low {
+    background: #28a745;
+}
+
+.capacity-medium {
+    background: #ffc107;
+}
+
+.capacity-high {
+    background: #dc3545;
+}
+
+/* Form Styles */
+.class-form {
+    max-width: 600px;
+    margin: 20px auto;
+}
