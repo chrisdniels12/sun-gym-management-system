@@ -16,8 +16,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Add HTML routes
-app.get('/:page', (req, res) => {
+// Add base path constant
+const BASE_PATH = '/~piercebe/CS340/sun-gym-management-system';
+
+// Update your routes
+app.get(`${BASE_PATH}/:page`, (req, res) => {
     const page = req.params.page;
     const filePath = path.join(__dirname, 'public', 'html', `${page}.html`);
 
@@ -28,8 +31,8 @@ app.get('/:page', (req, res) => {
     }
 });
 
-// Root route - serve index.html
-app.get('/', (req, res) => {
+// Root route
+app.get(`${BASE_PATH}/`, (req, res) => {
     const filePath = path.join(__dirname, 'public', 'html', 'index.html');
     res.sendFile(filePath);
 });
