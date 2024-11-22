@@ -34,15 +34,18 @@ app.use('/~piercebe/CS340/sun-gym-management-system/api/member-trainer', require
 app.use('/~piercebe/CS340/sun-gym-management-system/api/trainer-equipment', require('./routes/trainer-equipment'));
 
 // Test the pool with a more specific query using promises
-db.query('SELECT * FROM Members LIMIT 1')
-    .then(([results]) => {
+async function testDatabase() {
+    try {
+        const [results] = await db.execute('SELECT * FROM Members LIMIT 1');
         console.log('Database test query results:', results);
         console.log('Database connection pool ready');
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Database error:', error);
-        process.exit(1);
-    });
+        console.error('Continuing despite database error');
+    }
+}
+
+testDatabase();
 
 // Start server
 const PORT = process.env.PORT || 8999;
