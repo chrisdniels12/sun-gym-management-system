@@ -1,0 +1,52 @@
+/* Equipment Management Styles */
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.equipment-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.status-available {
+    background: #28a745;
+    color: white;
+}
+
+.status-in-use {
+    background: #ffc107;
+    color: black;
+}
+
+.status-maintenance {
+    background: #dc3545;
+    color: white;
+}
+
+/* Form Styles */
+.equipment-form {
+    max-width: 500px;
+    margin: 20px auto;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
