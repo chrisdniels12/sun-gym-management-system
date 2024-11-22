@@ -22,20 +22,72 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET bookings by member
+// Example: GET /api/class-bookings/member/1
+router.get('/member/:id', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT CB.*, 
+                   C.className, C.schedule, C.maxCapacity,
+                   DATE_FORMAT(CB.bookingDate, '%Y-%m-%d') as formattedDate
+            FROM Class_Bookings CB
+            JOIN Classes C ON CB.classID = C.classID
+            WHERE CB.memberID = ?
+            ORDER BY C.schedule DESC`,
+            [req.params.id]
+        );
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET class capacity stats
+// Example: GET /api/class-bookings/stats
+router.get('/stats', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT 
+                C.classID,
+                C.className,
+                C.maxCapacity,
+                COUNT(CB.bookingID) as currentBookings,
+                (C.maxCapacity - COUNT(CB.bookingID)) as availableSpots
+            FROM Classes C
+            LEFT JOIN Class_Bookings CB ON C.classID = CB.classID
+            WHERE CB.status != 'Cancelled' OR CB.status IS NULL
+            GROUP BY C.classID, C.className, C.maxCapacity`
+        );
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // CREATE new class booking
 // Example: POST /api/class-bookings
 // Required body: { memberID: 1, classID: 2, bookingDate: "2024-01-15", status: "Confirmed" }
 router.post('/', async (req, res) => {
-    // Extract booking details from request body
     const { memberID, classID, bookingDate, status } = req.body;
     try {
-        // Insert new booking record
+        // Check class capacity
+        const hasCapacity = await checkClassCapacity(classID);
+        if (!hasCapacity) {
+            return res.status(400).json({ error: 'Class is at full capacity' });
+        }
+
+        // Create booking with transaction
+        await db.query('START TRANSACTION');
+
         const [result] = await db.query(
             'INSERT INTO Class_Bookings (memberID, classID, bookingDate, status) VALUES (?, ?, ?, ?)',
             [memberID, classID, bookingDate, status]
         );
+
+        await db.query('COMMIT');
         res.status(201).json({ id: result.insertId });
     } catch (error) {
+        await db.query('ROLLBACK');
         res.status(500).json({ error: error.message });
     }
 });
