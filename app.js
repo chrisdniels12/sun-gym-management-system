@@ -16,6 +16,15 @@ app.get('/~piercebe/CS340/sun-gym-management-system', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Serve the members HTML page for /~piercebe/CS340/sun-gym-management-system/members
+app.get('/~piercebe/CS340/sun-gym-management-system/members', (req, res) => {
+    const filePath = path.join(__dirname, 'public', 'html', 'members.html');
+    res.sendFile(filePath);
+});
+
+});
+
+
 // HTML routes
 app.get('/~piercebe/CS340/sun-gym-management-system/:page', (req, res) => {
     const page = req.params.page;
