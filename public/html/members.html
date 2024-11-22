@@ -174,14 +174,14 @@
         // Load member statistics
         async function loadStats() {
             try {
-                const response = await fetch('/api/members/stats');
+                const response = await fetch('/members/stats');
                 const stats = await response.json();
 
-                document.getElementById('totalMembers').textContent = stats.totalMembers;
-                document.getElementById('activeMembers').textContent = stats.activeMembers;
-                document.getElementById('basicMembers').textContent = stats.membersByType.Basic;
-                document.getElementById('premiumMembers').textContent = stats.membersByType.Premium;
-                document.getElementById('vipMembers').textContent = stats.membersByType.VIP;
+                document.getElementById('totalMembers').textContent = stats.total || 0;
+                document.getElementById('activeMembers').textContent = stats.active || 0;
+                document.getElementById('basicMembers').textContent = stats.basic || 0;
+                document.getElementById('premiumMembers').textContent = stats.premium || 0;
+                document.getElementById('vipMembers').textContent = stats.vip || 0;
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
@@ -196,7 +196,7 @@
             try {
                 document.querySelector('.loading').style.display = 'block';
 
-                let url = '/api/members?';
+                let url = '/members?';
                 if (nameFilter) url += `name=${encodeURIComponent(nameFilter)}&`;
                 if (typeFilter) url += `type=${encodeURIComponent(typeFilter)}&`;
                 if (dateFilter) url += `date=${encodeURIComponent(dateFilter)}`;
@@ -208,6 +208,7 @@
                 tbody.innerHTML = '';
 
                 members.forEach(member => {
+                    const joinDate = new Date(member.joinDate).toLocaleDateString();
                     tbody.innerHTML += `
                         <tr>
                             <td>${member.memberID}</td>
@@ -215,7 +216,7 @@
                             <td>${member.lastName}</td>
                             <td>${member.email}</td>
                             <td>${member.phoneNumber || 'N/A'}</td>
-                            <td>${member.joinDate}</td>
+                            <td>${joinDate}</td>
                             <td>${member.membershipType}</td>
                             <td>
                                 <button onclick="editMember(${member.memberID})">Edit</button>
@@ -253,7 +254,7 @@
             if (!data.phoneNumber) delete data.phoneNumber;
 
             try {
-                const response = await fetch('/api/members', {
+                const response = await fetch('/members', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -277,10 +278,10 @@
 
         // Delete member
         async function deleteMember(id) {
-            if (!confirm('Are you sure you want to delete this member? This will also delete all related records.')) return;
+            if (!confirm('Are you sure you want to delete this member?')) return;
 
             try {
-                const response = await fetch(`/api/members/${id}`, {
+                const response = await fetch(`/members/${id}`, {
                     method: 'DELETE',
                 });
 
