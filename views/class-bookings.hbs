@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Bookings - Sun Gym</title>
+    <link rel="stylesheet" href="/~piercebe/CS340/sun-gym-management-system/css/class-bookings.css">
+</head>
+<body>
+    <h1>Class Booking Management</h1>
+    <a href="/~piercebe/CS340/sun-gym-management-system" class="back-link">Back to Home</a>
+
+    {{!-- Stats Section --}}
+    <div class="stats-section">
+        <h2>Booking Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Bookings</h3>
+                <p>{{stats.totalBookings}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Members</h3>
+                <p>{{stats.activeMembers}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Popular Class</h3>
+                <p>{{stats.popularClass}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Average Attendance</h3>
+                <p>{{stats.avgAttendance}}%</p>
+            </div>
+        </div>
+    </div>
+
+    {{!-- Add Booking Form --}}
+    <div class="form-section">
+        <h2>Add New Booking</h2>
+        <form id="addBooking" method="POST">
+            <div class="form-group">
+                <label for="memberID">Member:</label>
+                <select id="memberID" name="memberID" required>
+                    <option value="">Select Member...</option>
+                    {{#each members}}
+                    <option value="{{this.memberID}}">{{this.firstName}} {{this.lastName}} - {{this.membershipType}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="classID">Class:</label>
+                <select id="classID" name="classID" required>
+                    <option value="">Select Class...</option>
+                    {{#each classes}}
+                    <option value="{{this.classID}}">{{this.className}} - {{this.scheduleDay}} {{formatTime this.scheduleTime}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="bookingDate">Booking Date:</label>
+                <input type="date" id="bookingDate" name="bookingDate" required>
+            </div>
+            <button type="submit">Add Booking</button>
+        </form>
+    </div>
+
+    {{!-- Bookings Table --}}
+    <div class="table-section">
+        <h2>Current Bookings</h2>
+        <table id="bookings-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Member</th>
+                    <th>Class</th>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Booking Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each bookings}}
+                <tr>
+                    <td>{{this.bookingID}}</td>
+                    <td>{{this.memberName}}</td>
+                    <td>{{this.className}}</td>
+                    <td>{{this.scheduleDay}}</td>
+                    <td>{{formatTime this.scheduleTime}}</td>
+                    <td>{{this.bookingDate}}</td>
+                    <td>
+                        <button onclick="deleteBooking({{this.bookingID}})">Cancel</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/~piercebe/CS340/sun-gym-management-system/js/classBookingsOperations.js"></script>
+</body>
+</html> 

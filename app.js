@@ -10,7 +10,15 @@ const ONID = process.env.ONID || 'piercebe'; // Default for development
 const BASE_PATH = `/~${ONID}/CS340/sun-gym-management-system`;
 
 // Handlebars setup
-app.engine('hbs', exphbs.engine({ extname: '.hbs' }));
+app.engine('hbs', exphbs.engine({
+    extname: '.hbs',
+    helpers: {
+        formatTime: function (time) {
+            // Convert time to HH:mm format
+            return time ? time.slice(0, 5) : '';  // Takes only HH:mm part
+        }
+    }
+}));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -127,7 +135,12 @@ app.get(`${BASE_PATH}/trainers`, async (req, res) => {
 // Classes route
 app.get(`${BASE_PATH}/classes`, async (req, res) => {
     try {
-        const [classes] = await db.query('SELECT * FROM Classes ORDER BY scheduleDay, scheduleTime');
+        const [classes] = await db.query(`
+            SELECT c.*, CONCAT(t.firstName, ' ', t.lastName) as trainerName 
+            FROM Classes c
+            LEFT JOIN Trainers t ON c.trainerID = t.trainerID
+            ORDER BY c.scheduleDay, c.scheduleTime
+        `);
         const [trainers] = await db.query('SELECT * FROM Trainers');
 
         // Calculate stats
@@ -252,5 +265,49 @@ app.get(`${BASE_PATH}/member-equipment`, async (req, res) => {
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Error loading member-equipment data');
+    }
+});
+
+// Add this route
+app.get(`${BASE_PATH}/class-bookings`, async (req, res) => {
+    try {
+        const [bookings] = await db.query(`
+            SELECT cb.bookingID, 
+                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
+                   c.className, c.scheduleDay, c.scheduleTime,
+                   cb.bookingDate
+            FROM ClassBookings cb
+            JOIN Members m ON cb.memberID = m.memberID
+            JOIN Classes c ON cb.classID = c.classID
+            ORDER BY cb.bookingDate DESC, c.scheduleTime
+        `);
+
+        const [members] = await db.query('SELECT memberID, firstName, lastName, membershipType FROM Members');
+        const [classes] = await db.query('SELECT classID, className, scheduleDay, scheduleTime FROM Classes');
+
+        // Calculate stats
+        const totalBookings = bookings.length;
+        const activeMembers = new Set(bookings.map(b => b.memberName)).size;
+        const classPopularity = bookings.reduce((acc, curr) => {
+            acc[curr.className] = (acc[curr.className] || 0) + 1;
+            return acc;
+        }, {});
+        const popularClass = Object.entries(classPopularity).sort((a, b) => b[1] - a[1])[0];
+        const avgAttendance = Math.round((totalBookings / classes.length) * 100);
+
+        res.render('class-bookings', {
+            bookings,
+            members,
+            classes,
+            stats: {
+                totalBookings,
+                activeMembers,
+                popularClass: popularClass ? popularClass[0] : 'N/A',
+                avgAttendance
+            }
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error loading class bookings');
     }
 });

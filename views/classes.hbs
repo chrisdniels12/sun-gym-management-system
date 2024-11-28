@@ -56,7 +56,7 @@
             </div>
             <div class="form-group">
                 <label for="scheduleTime">Time:</label>
-                <input type="time" id="scheduleTime" name="scheduleTime" required>
+                <input type="time" id="scheduleTime" name="scheduleTime" required step="900">
             </div>
             <div class="form-group">
                 <label for="scheduleDay">Day:</label>
@@ -100,7 +100,7 @@
                     <td>{{this.className}}</td>
                     <td>{{this.trainerName}}</td>
                     <td>{{this.scheduleDay}}</td>
-                    <td>{{this.scheduleTime}}</td>
+                    <td>{{formatTime this.scheduleTime}}</td>
                     <td>{{this.currentEnrollment}}/{{this.maxCapacity}}</td>
                 </tr>
                 {{/each}}
