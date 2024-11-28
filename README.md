@@ -1,114 +1,195 @@
 # Sun Gym Management System
 
-A comprehensive gym management system built with Node.js, Express, and MySQL.
+A modern gym management system built with Node.js, Express, Handlebars, and MySQL.
 
-## Quick Setup
+## Setup Instructions
 
-1. **Clone the Repository**
+1. **Clone the Repository and Switch to Updated Branch**
 ```bash
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/chrisdniels12/sun-gym-management-system.git
+
+# Navigate to project directory
 cd sun-gym-management-system
+
+# Switch to updated branch
+git checkout updated-handlebars-version
 ```
 
 2. **Install Dependencies**
 ```bash
+# Install all required packages
 npm install
+
+# Install nodemon globally (for development)
+npm install -g nodemon
 ```
 
 3. **Database Setup**
 ```bash
-# Create database connector
+# Create database connector from example
 cp database/db-connector.example.js database/db-connector.js
 
-# Edit database credentials
-nano database/db-connector.js
+# Edit database credentials in db-connector.js with YOUR OSU credentials
+const pool = mysql.createPool({
+    connectionLimit: 10,
+    host: 'classmysql.engr.oregonstate.edu',
+    user: 'cs340_[YOUR_ONID]',  // Example: cs340_smithj
+    password: '[YOUR_DB_PASSWORD]',
+    database: 'cs340_[YOUR_ONID]'  // Same as user
+});
 
-# Import database schema
-mysql -u username -p database_name < sql/DDL.sql
+# Import the provided DDL and DML files into YOUR database
+# Log into phpMyAdmin with YOUR credentials
+# Go to the 'Import' tab
+# Upload and execute these files in order:
+1. database/DDL.sql  # Creates tables
+2. database/DML.sql  # Adds sample data
 ```
 
-4. **Start Server**
+**Note**: Each user needs to:
+1. Use their own ONID credentials (cs340_[onid])
+2. Import the DDL.sql to create tables in their database
+3. Import the DML.sql to add sample data
+4. Update db-connector.js with their credentials
+
+4. **Start the Server**
 ```bash
-npm run dev  # Development with auto-reload
-# or
-npm start    # Production
+# Development mode with auto-reload
+nodemon app.js
+
+# OR Production mode
+node app.js
 ```
 
-5. **Access Application**
-- Open browser to: `http://localhost:8999`
-- Default routes are prefixed with: `/~piercebe/CS340/sun-gym-management-system`
+5. **Access the Application**
+```bash
+# Replace [your_onid] with your OSU ONID username
+# Example: if your ONID is smithj, use:
+# http://localhost:8999/~smithj/CS340/sun-gym-management-system
+```
+
+- Open browser to: `http://localhost:8999/~[your_onid]/CS340/sun-gym-management-system`
+- All routes are prefixed with: `/~[your_onid]/CS340/sun-gym-management-system`
+
+**Note about ONID paths:**
+- Each user needs to use their own ONID username in the URL
+- The app uses an environment variable `ONID` to set this path
+- If not set, it defaults to 'piercebe' for development
+- You can set your ONID before starting the server:
+  ```bash
+  # Windows
+  set ONID=your_onid
+  nodemon app.js
+
+  # Mac/Linux
+  export ONID=your_onid
+  nodemon app.js
+  ```
 
 ## Project Structure
 
 ```
+sun-gym-management-system/
+├── database/                 # Database configuration
+│   ├── DDL.sql              # Database schema
+│   ├── DML.sql              # Sample data and queries
+│   └── db-connector.js      # Database connection setup
 ├── public/
-│   ├── css/          # Stylesheets
-│   ├── js/           # Client-side JavaScript
-│   └── html/         # Static HTML pages
-├── routes/           # API route handlers
-├── sql/             # Database scripts
-│   ├── DDL.sql      # Schema definition
-│   └── DML.sql      # Query templates
-├── views/           # Handlebars templates
-└── app.js           # Main application file
+│   ├── css/                 # Stylesheets
+│   │   ├── main.css         # Shared styles
+│   │   └── [entity].css     # Entity-specific styles
+│   ├── js/                  # Client-side JavaScript
+│   │   └── [entity]Operations.js  # CRUD operations
+│   ├── html/                # Active HTML files
+│   │   └── index.html       # Home page
+│   ├── html_archive/        # Original HTML files (reference)
+│   └── js_archive/          # Original JS files (reference)
+├── routes/                  # Express route handlers
+│   └── [entity].js         # Entity-specific routes
+├── views/                   # Handlebars templates
+│   └── [entity].hbs        # Entity-specific templates
+├── app.js                   # Main application file
+└── package.json            # Project dependencies
 ```
 
 ## Features
 
-### Member Management
-- Member registration and profile management
-- Membership type tracking (Basic, Premium, VIP)
-- Payment history tracking
-- Equipment usage monitoring
-- Class booking system
+### Primary Tables
+- **Members**: Full member profile management with duplicate detection
+- **Trainers**: Trainer profiles with specialization tracking
+- **Classes**: Class scheduling with capacity management
+- **Equipment**: Inventory with status tracking
+- **Payments**: Member payment processing and history
 
-### Trainer Management
-- Trainer profiles with specializations
-- Equipment certifications
-- Member assignments
-- Class scheduling
-- Availability tracking
-
-### Equipment Management
-- Inventory tracking
-- Usage monitoring
-- Maintenance scheduling
-- Status tracking (Available, In Use, Under Maintenance)
-
-### Class Management
-- Class scheduling system
-- Capacity management
-- Trainer assignments
-- Member bookings
-- Attendance tracking
+### Relationship Management
+- **Member-Equipment**: Track equipment usage by members
+- **Class-Bookings**: Manage class enrollments
+- **Member-Trainer**: Personal training assignments
+- **Trainer-Equipment**: Equipment certifications
 
 ## API Endpoints
 
-### Primary Entities
-- `/api/members` - Member CRUD operations
-- `/api/trainers` - Trainer management
-- `/api/equipment` - Equipment inventory
-- `/api/classes` - Class scheduling
-- `/api/payments` - Payment tracking
+### Primary Tables
+- `/api/members` - Member CRUD with duplicate checking
+- `/api/trainers` - Trainer management with specializations
+- `/api/classes` - Class scheduling with capacity checks
+- `/api/equipment` - Equipment tracking with status updates
+- `/api/payments` - Payment processing and history
 
 ### Relationships
-- `/api/class-bookings` - Class enrollment
-- `/api/member-equipment` - Equipment usage
-- `/api/trainer-equipment` - Equipment certifications
-- `/api/member-trainer` - Training relationships
+- `/api/member-equipment` - Equipment usage tracking
+- `/api/class-bookings` - Class enrollment management
+- `/api/member-trainer` - Training relationship management
+- `/api/trainer-equipment` - Certification tracking
 
 ## Technologies
 
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Backend**: Node.js, Express.js
-- **Database**: MySQL
-- **Template Engine**: Handlebars
-- **Development**: Nodemon
+- **Frontend**:
+  - HTML5, CSS3, JavaScript
+  - Handlebars templating
+  - Modern responsive design
+  - Client-side validation
+
+- **Backend**:
+  - Node.js & Express.js
+  - MySQL with connection pooling
+  - RESTful API architecture
+  - Server-side validation
+
+- **Development Tools**:
+  - Nodemon for auto-reload
+  - Git for version control
+  - npm for package management
 
 ## Development Notes
 
-- Run tests before committing: `npm test`
-- Database credentials should never be committed
-- Use `npm run dev` for development with auto-reload
-- All API routes include proper error handling
-- Frontend includes form validation
+### Using Nodemon
+- Nodemon automatically restarts the server when files change
+- Install globally: `npm install -g nodemon`
+- Start server: `nodemon app.js`
+- Manual restart: Type `rs` in terminal
+- Stop server: `Ctrl + C`
+
+### Error Handling
+- All forms include duplicate entry detection
+- Server-side validation for all inputs
+- Proper error messages displayed to users
+- Database errors properly caught and handled
+
+### Code Organization
+- Modular CSS with shared styles in main.css
+- Separate JavaScript files for each entity
+- Consistent naming conventions
+- Clear file structure
+
+### Database
+- Proper foreign key constraints
+- Indexed fields for performance
+- Sample data for testing
+- Clear schema documentation
+
+### Version Control
+- Main branch: Original implementation
+- updated-handlebars-version: Current working version
+- All changes documented in commits

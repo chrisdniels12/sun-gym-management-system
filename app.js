@@ -5,6 +5,10 @@ const path = require('path');
 const exphbs = require('express-handlebars');
 const db = require('./database/db-connector').pool;
 
+// Add this near the top of app.js
+const ONID = process.env.ONID || 'piercebe'; // Default for development
+const BASE_PATH = `/~${ONID}/CS340/sun-gym-management-system`;
+
 // Handlebars setup
 app.engine('hbs', exphbs.engine({ extname: '.hbs' }));
 app.set('view engine', 'hbs');
@@ -15,10 +19,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the 'public' directory
-app.use('/~piercebe/CS340/sun-gym-management-system', express.static(path.join(__dirname, 'public')));
+app.use(`${BASE_PATH}`, express.static(path.join(__dirname, 'public')));
 
 // Root route - serve index.html
-app.get('/~piercebe/CS340/sun-gym-management-system', (req, res) => {
+app.get(`${BASE_PATH}`, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
 });
 
@@ -38,15 +42,15 @@ app.get('/~piercebe/CS340/sun-gym-management-system', (req, res) => {
 // });
 
 // API routes
-app.use('/~piercebe/CS340/sun-gym-management-system/api/members', require('./routes/members'));
-app.use('/~piercebe/CS340/sun-gym-management-system/api/trainers', require('./routes/trainers'));
-app.use('/~piercebe/CS340/sun-gym-management-system/api/classes', require('./routes/classes'));
-app.use('/~piercebe/CS340/sun-gym-management-system/api/equipment', require('./routes/equipment'));
-app.use('/~piercebe/CS340/sun-gym-management-system/api/payments', require('./routes/payments'));
-app.use('/~piercebe/CS340/sun-gym-management-system/api/member-equipment', require('./routes/member-equipment'));
-app.use('/~piercebe/CS340/sun-gym-management-system/api/class-bookings', require('./routes/class-bookings'));
-app.use('/~piercebe/CS340/sun-gym-management-system/api/member-trainer', require('./routes/member-trainer'));
-app.use('/~piercebe/CS340/sun-gym-management-system/api/trainer-equipment', require('./routes/trainer-equipment'));
+app.use(`${BASE_PATH}/api/members`, require('./routes/members'));
+app.use(`${BASE_PATH}/api/trainers`, require('./routes/trainers'));
+app.use(`${BASE_PATH}/api/classes`, require('./routes/classes'));
+app.use(`${BASE_PATH}/api/equipment`, require('./routes/equipment'));
+app.use(`${BASE_PATH}/api/payments`, require('./routes/payments'));
+app.use(`${BASE_PATH}/api/member-equipment`, require('./routes/member-equipment'));
+app.use(`${BASE_PATH}/api/class-bookings`, require('./routes/class-bookings'));
+app.use(`${BASE_PATH}/api/member-trainer`, require('./routes/member-trainer'));
+app.use(`${BASE_PATH}/api/trainer-equipment`, require('./routes/trainer-equipment'));
 
 // Test database connection
 async function testDatabase() {
@@ -69,7 +73,7 @@ app.listen(PORT, () => {
 });
 
 // Members route
-app.get('/~piercebe/CS340/sun-gym-management-system/members', async (req, res) => {
+app.get(`${BASE_PATH}/members`, async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM Members ORDER BY lastName, firstName');
 
@@ -98,7 +102,7 @@ app.get('/~piercebe/CS340/sun-gym-management-system/members', async (req, res) =
 });
 
 // Trainers route
-app.get('/~piercebe/CS340/sun-gym-management-system/trainers', async (req, res) => {
+app.get(`${BASE_PATH}/trainers`, async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM Trainers ORDER BY lastName, firstName');
 
@@ -121,7 +125,7 @@ app.get('/~piercebe/CS340/sun-gym-management-system/trainers', async (req, res) 
 });
 
 // Classes route
-app.get('/~piercebe/CS340/sun-gym-management-system/classes', async (req, res) => {
+app.get(`${BASE_PATH}/classes`, async (req, res) => {
     try {
         const [classes] = await db.query('SELECT * FROM Classes ORDER BY scheduleDay, scheduleTime');
         const [trainers] = await db.query('SELECT * FROM Trainers');
@@ -150,7 +154,7 @@ app.get('/~piercebe/CS340/sun-gym-management-system/classes', async (req, res) =
 });
 
 // Equipment route
-app.get('/~piercebe/CS340/sun-gym-management-system/equipment', async (req, res) => {
+app.get(`${BASE_PATH}/equipment`, async (req, res) => {
     try {
         const [equipment] = await db.query('SELECT * FROM Equipment ORDER BY equipmentName');
 
@@ -176,7 +180,7 @@ app.get('/~piercebe/CS340/sun-gym-management-system/equipment', async (req, res)
 });
 
 // Payments route
-app.get('/~piercebe/CS340/sun-gym-management-system/payments', async (req, res) => {
+app.get(`${BASE_PATH}/payments`, async (req, res) => {
     try {
         const [payments] = await db.query(`
             SELECT p.paymentID, CONCAT(m.firstName, ' ', m.lastName) AS memberName, 
@@ -210,7 +214,7 @@ app.get('/~piercebe/CS340/sun-gym-management-system/payments', async (req, res) 
 });
 
 // Add this route
-app.get('/~piercebe/CS340/sun-gym-management-system/member-equipment', async (req, res) => {
+app.get(`${BASE_PATH}/member-equipment`, async (req, res) => {
     try {
         const [usageHistory] = await db.query(`
             SELECT me.memberEquipID, CONCAT(m.firstName, ' ', m.lastName) AS memberName, 
