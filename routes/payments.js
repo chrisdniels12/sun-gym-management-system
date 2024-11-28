@@ -2,68 +2,43 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db-connector').pool;
 
-// GET all payments - Returns a list of all payment records
-// Example: GET /api/payments
+// GET all payments
 router.get('/', async (req, res) => {
     try {
-        // Query database for all payments, join with Members table to get member names
         const [rows] = await db.query(`
-            SELECT Payments.*, Members.firstName, Members.lastName 
-            FROM Payments 
-            JOIN Members ON Payments.memberID = Members.memberID 
-            ORDER BY paymentDate DESC`
-        );
+            SELECT p.paymentID, CONCAT(m.firstName, ' ', m.lastName) AS memberName, 
+                   p.amount, p.paymentDate, p.paymentMethod
+            FROM Payments p
+            JOIN Members m ON p.memberID = m.memberID
+            ORDER BY p.paymentDate DESC
+        `);
+        console.log('Fetched payments:', rows);
         res.json(rows);
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// CREATE new payment - Records a new payment in the system
-// Example: POST /api/payments
-// Required body: { memberID: 1, amount: 50.00, paymentDate: "2024-01-15", paymentType: "Credit Card" }
+// CREATE new payment
 router.post('/', async (req, res) => {
-    // Extract payment details from request body
-    const { memberID, amount, paymentDate, paymentType } = req.body;
+    const { memberID, amount, paymentDate, paymentMethod } = req.body;
     try {
-        // Insert new payment record into database
+        // Insert new payment
         const [result] = await db.query(
-            'INSERT INTO Payments (memberID, amount, paymentDate, paymentType) VALUES (?, ?, ?, ?)',
-            [memberID, amount, paymentDate, paymentType]
+            'INSERT INTO Payments (memberID, amount, paymentDate, paymentMethod) VALUES (?, ?, ?, ?)',
+            [memberID, amount, paymentDate, paymentMethod]
         );
-        res.status(201).json({ id: result.insertId });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
-// UPDATE payment - Modifies an existing payment record
-// Example: PUT /api/payments/1
-// Required body: { amount: 75.00, paymentDate: "2024-01-16", paymentType: "Debit Card" }
-router.put('/:id', async (req, res) => {
-    // Extract updated payment details from request body
-    const { amount, paymentDate, paymentType } = req.body;
-    try {
-        // Update the payment record with matching ID
-        await db.query(
-            'UPDATE Payments SET amount=?, paymentDate=?, paymentType=? WHERE paymentID=?',
-            [amount, paymentDate, paymentType, req.params.id]
-        );
-        res.json({ message: 'Payment updated successfully' });
+        res.status(201).json({
+            message: 'Payment added successfully',
+            id: result.insertId
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// DELETE payment - Removes a payment record from the system
-// Example: DELETE /api/payments/1
-router.delete('/:id', async (req, res) => {
-    try {
-        // Remove the payment record with specified ID
-        await db.query('DELETE FROM Payments WHERE paymentID=?', [req.params.id]);
-        res.json({ message: 'Payment deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error adding payment:', error);
+        res.status(500).json({
+            error: error.message || 'Error adding payment to database'
+        });
     }
 });
 

@@ -151,6 +151,8 @@
         }
     </style>
     <script>
+        console.clear();
+
         // Alert handling
         function showAlert(message, type) {
             const alert = document.createElement('div');
@@ -189,26 +191,23 @@
 
         // Load and filter members
         async function loadMembers() {
-            const nameFilter = document.getElementById('nameFilter').value;
-            const typeFilter = document.getElementById('typeFilter').value;
-            const dateFilter = document.getElementById('dateFilter').value;
-
             try {
-                document.querySelector('.loading').style.display = 'block';
+                console.log('Fetching members...');
+                const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/members');
+                console.log('Response:', response);
 
-                let url = '/members?';
-                if (nameFilter) url += `name=${encodeURIComponent(nameFilter)}&`;
-                if (typeFilter) url += `type=${encodeURIComponent(typeFilter)}&`;
-                if (dateFilter) url += `date=${encodeURIComponent(dateFilter)}`;
+                if (!response.ok) {
+                    throw new Error('Failed to fetch members');
+                }
 
-                const response = await fetch(url);
                 const members = await response.json();
+                console.log('Members data:', members);
 
                 const tbody = document.querySelector('tbody');
                 tbody.innerHTML = '';
 
                 members.forEach(member => {
-                    const joinDate = new Date(member.joinDate).toLocaleDateString();
+                    console.log('Processing member:', member);
                     tbody.innerHTML += `
                         <tr>
                             <td>${member.memberID}</td>
@@ -216,7 +215,7 @@
                             <td>${member.lastName}</td>
                             <td>${member.email}</td>
                             <td>${member.phoneNumber || 'N/A'}</td>
-                            <td>${joinDate}</td>
+                            <td>${new Date(member.joinDate).toLocaleDateString()}</td>
                             <td>${member.membershipType}</td>
                             <td>
                                 <button onclick="editMember(${member.memberID})">Edit</button>
@@ -226,53 +225,49 @@
                     `;
                 });
             } catch (error) {
-                showAlert('Error loading members', 'error');
-            } finally {
-                document.querySelector('.loading').style.display = 'none';
+                console.error('Error loading members:', error);
+                alert('Error loading members');
             }
         }
 
         // Handle form submission
-        document.getElementById('addMember').addEventListener('submit', async (e) => {
+        document.getElementById('addMember').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
+            console.log('Form submitted');
 
-            // Validate email
-            if (!isValidEmail(data.email)) {
-                showAlert('Please enter a valid email address', 'error');
-                return;
-            }
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
+                membershipType: document.getElementById('membershipType').value
+            };
 
-            // Validate phone (if provided)
-            if (data.phoneNumber && !isValidPhone(data.phoneNumber)) {
-                showAlert('Please enter a valid phone number', 'error');
-                return;
-            }
-
-            // Handle empty phone number
-            if (!data.phoneNumber) delete data.phoneNumber;
+            console.log('Sending data:', formData);
 
             try {
-                const response = await fetch('/members', {
+                const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/members', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify(formData)
                 });
 
+                console.log('Response status:', response.status);
+                const responseData = await response.json();
+                console.log('Response data:', responseData);
+
                 if (response.ok) {
-                    showAlert('Member added successfully', 'success');
-                    e.target.reset();
+                    alert('Member added successfully!');
+                    document.getElementById('addMember').reset();
                     loadMembers();
-                    loadStats();
                 } else {
-                    const error = await response.json();
-                    showAlert(error.message || 'Error adding member', 'error');
+                    throw new Error(responseData.error || 'Failed to add member');
                 }
             } catch (error) {
-                showAlert('Error adding member', 'error');
+                console.error('Error:', error);
+                alert(error.message);
             }
         });
 
@@ -369,6 +364,7 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded, calling loadMembers()');
             loadMembers();
             loadStats();
 
@@ -382,7 +378,7 @@
 
 <body>
     <h1>Manage Members</h1>
-    <a href="/">Back to Home</a>
+    <a href="/~piercebe/CS340/sun-gym-management-system">Back to Home</a>
 
     <!-- Statistics Section -->
     <div class="stats-section">
@@ -436,7 +432,7 @@
     <!-- Add Member Form -->
     <div class="form-section">
         <h2>Add New Member</h2>
-        <form id="addMember">
+        <form id="addMember" method="POST">
             <div class="form-field">
                 <label for="firstName">First Name:</label>
                 <input type="text" id="firstName" name="firstName" required>
@@ -448,29 +444,20 @@
             <div class="form-field">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required>
-                <div class="hint">Must be a valid email address</div>
             </div>
             <div class="form-field">
-                <label for="phoneNumber">Phone Number: (Optional)</label>
+                <label for="phoneNumber">Phone Number:</label>
                 <input type="tel" id="phoneNumber" name="phoneNumber">
-                <div class="hint">Format: +1-234-567-8900 or leave empty</div>
-            </div>
-            <div class="form-field">
-                <label for="joinDate">Join Date:</label>
-                <input type="date" id="joinDate" name="joinDate" required>
             </div>
             <div class="form-field">
                 <label for="membershipType">Membership Type:</label>
                 <select id="membershipType" name="membershipType" required>
-                    <option value="">Select Membership Type...</option>
                     <option value="Basic">Basic</option>
                     <option value="Premium">Premium</option>
                     <option value="VIP">VIP</option>
                 </select>
             </div>
-            <div class="form-field">
-                <input type="submit" value="Add Member">
-            </div>
+            <button type="submit">Add Member</button>
         </form>
     </div>
 

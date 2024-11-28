@@ -1,5 +1,14 @@
-/* Class Management Styles */
-.class-schedule {
+/* Import main styles */
+@import 'main.css';
+
+/* Class-specific styles */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.schedule-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 10px;
@@ -31,7 +40,7 @@
     background: #dc3545;
 }
 
-/* Form Styles */
+/* Form Styles - specific to classes */
 .class-form {
     max-width: 600px;
     margin: 20px auto;

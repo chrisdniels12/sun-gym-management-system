@@ -287,3 +287,10 @@ LEFT JOIN MemberTrainer mt ON t.trainerID = mt.trainerID
 GROUP BY t.trainerID, t.firstName, t.lastName, t.specialization
 HAVING activeClients < 5 OR activeClients IS NULL
 ORDER BY activeClients ASC;
+
+-- Sample Equipment data
+INSERT INTO Equipment (equipmentName, type, status, location) VALUES
+('Treadmill 1', 'Cardio', 'Available', 'Cardio Zone A'),
+('Bench Press 1', 'Strength', 'Available', 'Weight Room B'),
+('Yoga Mat 1', 'Flexibility', 'In Use', 'Studio C'),
+('Rowing Machine 1', 'Cardio', 'Maintenance', 'Cardio Zone B');

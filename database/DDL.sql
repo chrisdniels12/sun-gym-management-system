@@ -68,11 +68,12 @@ CREATE TABLE Payments (
 -- Equipments Table with improved constraints and indexes
 CREATE TABLE Equipments (
     equipmentID INT AUTO_INCREMENT PRIMARY KEY,
-    equipmentName VARCHAR(100) NOT NULL,
+    equipmentName VARCHAR(255) NOT NULL,
     equipmentType VARCHAR(50) NOT NULL,
     purchaseDate DATE NOT NULL,
     lastMaintenanceDate DATE,
     status ENUM('Available', 'In Use', 'Under Maintenance', 'Out of Order') NOT NULL,
+    location VARCHAR(100),
     INDEX idx_equipment_type (equipmentType),
     INDEX idx_status (status),
     INDEX idx_maintenance (lastMaintenanceDate),
@@ -159,10 +160,10 @@ INSERT INTO Payments (paymentID, memberID, amount, paymentDate, paymentMethod) V
 (3, 2, 30.00, '2023-02-20', 'Cash');
 
 -- Equipments
-INSERT INTO Equipments (equipmentID, equipmentName, equipmentType, purchaseDate, lastMaintenanceDate, status) VALUES
-(1, 'Treadmill', 'Cardio', '2020-01-01', '2024-10-01', 'Available'),
-(2, 'Dumbbells', 'Strength', '2021-02-15', NULL, 'In Use'),
-(3, 'Rowing Machine', 'Cardio', '2021-11-15', '2023-03-01', 'Under Maintenance');
+INSERT INTO Equipments (equipmentID, equipmentName, equipmentType, purchaseDate, lastMaintenanceDate, status, location) VALUES
+(1, 'Treadmill', 'Cardio', '2020-01-01', '2024-10-01', 'Available', 'Location1'),
+(2, 'Dumbbells', 'Strength', '2021-02-15', NULL, 'In Use', 'Location2'),
+(3, 'Rowing Machine', 'Cardio', '2021-11-15', '2023-03-01', 'Under Maintenance', 'Location3');
 
 -- MemberEquipment
 INSERT INTO MemberEquipment (memberEquipID, memberID, equipmentID, usageDate, usageDuration) VALUES

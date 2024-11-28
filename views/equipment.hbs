@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Equipment - Sun Gym</title>
+    <link rel="stylesheet" href="/~piercebe/CS340/sun-gym-management-system/css/equipment.css">
+</head>
+<body>
+    <h1>Equipment Management</h1>
+    <a href="/~piercebe/CS340/sun-gym-management-system" class="back-link">Back to Home</a>
+
+    {{!-- Stats Section --}}
+    <div class="stats-section">
+        <h2>Equipment Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Equipment</h3>
+                <p>{{stats.totalEquipment}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Available</h3>
+                <p>{{stats.availableEquipment}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>In Maintenance</h3>
+                <p>{{stats.maintenanceEquipment}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>In Use</h3>
+                <p>{{stats.inUseEquipment}}</p>
+            </div>
+        </div>
+    </div>
+
+    {{!-- Add Equipment Form --}}
+    <div class="form-section">
+        <h2>Add New Equipment</h2>
+        <form id="addEquipment" method="POST">
+            <div class="form-group">
+                <label for="equipmentName">Equipment Name:</label>
+                <input type="text" id="equipmentName" name="equipmentName" required>
+            </div>
+            <div class="form-group">
+                <label for="type">Type:</label>
+                <select id="type" name="type" required>
+                    <option value="">Select Type...</option>
+                    <option value="Cardio">Cardio</option>
+                    <option value="Strength">Strength</option>
+                    <option value="Flexibility">Flexibility</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status" name="status" required>
+                    <option value="Available">Available</option>
+                    <option value="In Use">In Use</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" required>
+            </div>
+            <button type="submit">Add Equipment</button>
+        </form>
+    </div>
+
+    {{!-- Equipment Table --}}
+    <div class="table-section">
+        <h2>Current Equipment</h2>
+        <table id="equipment-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each equipment}}
+                <tr>
+                    <td>{{this.equipmentID}}</td>
+                    <td>{{this.equipmentName}}</td>
+                    <td>{{this.type}}</td>
+                    <td>{{this.status}}</td>
+                    <td>{{this.location}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/~piercebe/CS340/sun-gym-management-system/js/equipmentOperations.js"></script>
+</body>
+</html> 

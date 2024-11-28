@@ -1,0 +1,181 @@
+/* Base Styles */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 40px;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f7fa;
+}
+
+h1,
+h2,
+h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: 2.2rem;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 2rem;
+}
+
+/* Navigation */
+.back-link {
+    display: inline-block;
+    color: #3498db;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+/* Common Section Styles */
+.form-section,
+.table-section,
+.stats-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: white;
+}
+
+th {
+    background-color: #f8fafc;
+    color: #2c3e50;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid #edf2f7;
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid #edf2f7;
+    color: #4a5568;
+}
+
+tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Button Styles */
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button[type="button"] {
+    background-color: #e74c3c;
+}
+
+button[type="button"]:hover {
+    background-color: #c0392b;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    margin: 10% auto;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Error and Success Messages */
+.error-message {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.success-message {
+    color: #28a745;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        margin: 20px;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+}

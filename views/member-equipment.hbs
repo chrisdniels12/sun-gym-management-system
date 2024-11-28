@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member-Equipment Usage - Sun Gym</title>
+    <link rel="stylesheet" href="/~piercebe/CS340/sun-gym-management-system/css/member-equipment.css">
+</head>
+<body>
+    <h1>Member-Equipment Usage</h1>
+    <a href="/~piercebe/CS340/sun-gym-management-system" class="back-link">Back to Home</a>
+
+    {{!-- Stats Section --}}
+    <div class="stats-section">
+        <h2>Usage Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Usage Records</h3>
+                <p>{{stats.totalUsage}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Users Today</h3>
+                <p>{{stats.activeUsers}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Popular Equipment</h3>
+                <p>{{stats.popularEquipment}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Usage Duration</h3>
+                <p>{{stats.avgDuration}} mins</p>
+            </div>
+        </div>
+    </div>
+
+    {{!-- Add Equipment Usage Form --}}
+    <div class="form-section">
+        <h2>Record Equipment Usage</h2>
+        <form id="addMemberEquipment" method="POST">
+            <div class="form-group">
+                <label for="memberID">Member:</label>
+                <select id="memberID" name="memberID" required>
+                    <option value="">Select Member...</option>
+                    {{#each members}}
+                    <option value="{{this.memberID}}">{{this.firstName}} {{this.lastName}} - {{this.membershipType}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="equipmentID">Equipment:</label>
+                <select id="equipmentID" name="equipmentID" required>
+                    <option value="">Select Equipment...</option>
+                    {{#each equipment}}
+                    <option value="{{this.equipmentID}}">{{this.equipmentName}} - {{this.type}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="usageDate">Usage Date:</label>
+                <input type="date" id="usageDate" name="usageDate" required>
+            </div>
+            <div class="form-group">
+                <label for="usageDuration">Duration (minutes):</label>
+                <input type="number" id="usageDuration" name="usageDuration" min="1" max="240" required>
+            </div>
+            <button type="submit">Record Usage</button>
+        </form>
+    </div>
+
+    {{!-- Equipment Usage Table --}}
+    <div class="table-section">
+        <h2>Equipment Usage History</h2>
+        <table id="usage-table">
+            <thead>
+                <tr>
+                    <th>Usage ID</th>
+                    <th>Member Name</th>
+                    <th>Equipment</th>
+                    <th>Usage Date</th>
+                    <th>Duration (min)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each usageHistory}}
+                <tr>
+                    <td>{{this.memberEquipID}}</td>
+                    <td>{{this.memberName}}</td>
+                    <td>{{this.equipmentName}}</td>
+                    <td>{{this.usageDate}}</td>
+                    <td>{{this.usageDuration}}</td>
+                    <td>
+                        <button onclick="editUsage({{this.memberEquipID}})">Edit</button>
+                        <button onclick="deleteUsage({{this.memberEquipID}})">Delete</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/~piercebe/CS340/sun-gym-management-system/js/memberEquipmentOperations.js"></script>
+</body>
+</html> 

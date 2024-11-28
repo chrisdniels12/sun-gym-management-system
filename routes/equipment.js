@@ -2,65 +2,72 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db-connector').pool;
 
-// GET all equipment - Returns a list of all gym equipment
-// Example: GET /api/equipment
+// GET all equipment
 router.get('/', async (req, res) => {
     try {
-        // Query database for all equipment, sort by equipment name
-        const [rows] = await db.query('SELECT * FROM Equipment ORDER BY equipmentName');
+        const [rows] = await db.query(`
+            SELECT equipmentID, equipmentName, type, status, 
+                   location, lastMaintenance 
+            FROM Equipment 
+            ORDER BY equipmentName`
+        );
+        console.log('Fetched equipment:', rows);
         res.json(rows);
     } catch (error) {
-        // If there's an error, return a 500 status code and the error message
+        console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// CREATE new equipment - Adds a new piece of equipment to the system
-// Example: POST /api/equipment
-// Required body: { equipmentName: "Treadmill", type: "Cardio", status: "Available" }
+// CREATE new equipment
 router.post('/', async (req, res) => {
-    // Extract equipment details from request body
-    const { equipmentName, type, status } = req.body;
+    const { equipmentName, type, status, location } = req.body;
     try {
-        // Insert new equipment into database
+        // Check for duplicate equipment
+        const [existingEquipment] = await db.query(
+            'SELECT * FROM Equipment WHERE equipmentName = ? OR location = ?',
+            [equipmentName, location]
+        );
+
+        // Collect all conflicts
+        if (existingEquipment.length > 0) {
+            const errors = [];
+            const checkedFields = new Set();
+
+            existingEquipment.forEach(existing => {
+                if (existing.equipmentName === equipmentName && !checkedFields.has('name')) {
+                    errors.push({ field: 'name', value: equipmentName });
+                    checkedFields.add('name');
+                }
+                if (existing.location === location && !checkedFields.has('location')) {
+                    errors.push({ field: 'location', value: location });
+                    checkedFields.add('location');
+                }
+            });
+
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    error: 'Duplicate entries found',
+                    duplicates: errors
+                });
+            }
+        }
+
+        // If no duplicates, insert new equipment
         const [result] = await db.query(
-            'INSERT INTO Equipment (equipmentName, type, status) VALUES (?, ?, ?)',
-            [equipmentName, type, status]
+            'INSERT INTO Equipment (equipmentName, type, status, location) VALUES (?, ?, ?, ?)',
+            [equipmentName, type, status, location]
         );
-        // Return the ID of the newly created equipment
-        res.status(201).json({ id: result.insertId });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
-// UPDATE equipment - Modifies existing equipment details
-// Example: PUT /api/equipment/1
-// Required body: { equipmentName: "Treadmill Pro", type: "Cardio", status: "In Maintenance" }
-router.put('/:id', async (req, res) => {
-    // Extract updated equipment details from request body
-    const { equipmentName, type, status } = req.body;
-    try {
-        // Update the equipment with matching ID
-        await db.query(
-            'UPDATE Equipment SET equipmentName=?, type=?, status=? WHERE equipmentID=?',
-            [equipmentName, type, status, req.params.id]
-        );
-        res.json({ message: 'Equipment updated successfully' });
+        res.status(201).json({
+            message: 'Equipment added successfully',
+            id: result.insertId
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// DELETE equipment - Removes equipment from the system
-// Example: DELETE /api/equipment/1
-router.delete('/:id', async (req, res) => {
-    try {
-        // Remove the equipment with specified ID from database
-        await db.query('DELETE FROM Equipment WHERE equipmentID=?', [req.params.id]);
-        res.json({ message: 'Equipment deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error adding equipment:', error);
+        res.status(500).json({
+            error: error.message || 'Error adding equipment to database'
+        });
     }
 });
 
