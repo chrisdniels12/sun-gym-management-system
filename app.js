@@ -16,6 +16,9 @@ app.engine('hbs', exphbs.engine({
         formatTime: function (time) {
             // Convert time to HH:mm format
             return time ? time.slice(0, 5) : '';  // Takes only HH:mm part
+        },
+        toLowerCase: function (str) {
+            return str ? str.toLowerCase() : '';
         }
     }
 }));
@@ -113,17 +116,27 @@ app.get(`${BASE_PATH}/members`, async (req, res) => {
 app.get(`${BASE_PATH}/trainers`, async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM Trainers ORDER BY lastName, firstName');
+        const [classResult] = await db.query('SELECT COUNT(*) as count FROM Classes WHERE trainerID IS NOT NULL');
+        const [availableResult] = await db.query(`
+            SELECT COUNT(*) as count FROM Trainers t
+            LEFT JOIN Classes c ON t.trainerID = c.trainerID
+            WHERE c.trainerID IS NULL
+        `);
 
         // Calculate stats
         const totalTrainers = rows.length;
-        const [classResult] = await db.query('SELECT COUNT(*) as count FROM Classes WHERE trainerID IS NOT NULL');
         const activeClasses = classResult[0].count;
+        const availableTrainers = availableResult[0].count;
+        const avgClassLoad = totalTrainers ? Math.round(activeClasses / totalTrainers) : 0;
 
         res.render('trainers', {
+            basePath: BASE_PATH,  // Add this line
             trainers: rows,
             stats: {
-                totalTrainers: totalTrainers,
-                activeClasses: activeClasses
+                totalTrainers,
+                activeClasses,
+                availableTrainers,
+                avgClassLoad
             }
         });
     } catch (error) {
@@ -169,7 +182,7 @@ app.get(`${BASE_PATH}/classes`, async (req, res) => {
 // Equipment route
 app.get(`${BASE_PATH}/equipment`, async (req, res) => {
     try {
-        const [equipment] = await db.query('SELECT * FROM Equipment ORDER BY equipmentName');
+        const [equipment] = await db.query('SELECT * FROM Equipments ORDER BY equipmentName');
 
         // Calculate stats
         const totalEquipment = equipment.length;
@@ -234,12 +247,12 @@ app.get(`${BASE_PATH}/member-equipment`, async (req, res) => {
                    e.equipmentName, me.usageDate, me.usageDuration
             FROM MemberEquipment me
             JOIN Members m ON me.memberID = m.memberID
-            JOIN Equipment e ON me.equipmentID = e.equipmentID
+            JOIN Equipments e ON me.equipmentID = e.equipmentID
             ORDER BY me.usageDate DESC
         `);
 
         const [members] = await db.query('SELECT memberID, firstName, lastName, membershipType FROM Members');
-        const [equipment] = await db.query('SELECT equipmentID, equipmentName, type FROM Equipment');
+        const [equipment] = await db.query('SELECT equipmentID, equipmentName, equipmentType FROM Equipments');
 
         // Calculate stats
         const totalUsage = usageHistory.length;
@@ -309,5 +322,114 @@ app.get(`${BASE_PATH}/class-bookings`, async (req, res) => {
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Error loading class bookings');
+    }
+});
+
+// Add this route
+app.get(`${BASE_PATH}/member-trainer`, async (req, res) => {
+    try {
+        const [assignments] = await db.query(`
+            SELECT mt.memberTrainerID, 
+                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
+                   CONCAT(t.firstName, ' ', t.lastName) as trainerName,
+                   t.specialization,
+                   mt.startDate, mt.endDate,
+                   CASE 
+                       WHEN mt.endDate IS NULL THEN 'Active'
+                       WHEN mt.endDate >= CURRENT_DATE THEN 'Active'
+                       ELSE 'Completed'
+                   END as status
+            FROM MemberTrainer mt
+            JOIN Members m ON mt.memberID = m.memberID
+            JOIN Trainers t ON mt.trainerID = t.trainerID
+            ORDER BY mt.startDate DESC
+        `);
+
+        const [members] = await db.query('SELECT memberID, firstName, lastName, membershipType FROM Members');
+        const [trainers] = await db.query('SELECT trainerID, firstName, lastName, specialization FROM Trainers');
+
+        // Calculate stats
+        const activeAssignments = assignments.filter(a => a.status === 'Active').length;
+        const membersTraining = new Set(assignments.filter(a => a.status === 'Active').map(a => a.memberName)).size;
+        const trainerWorkload = assignments.reduce((acc, curr) => {
+            if (curr.status === 'Active') {
+                acc[curr.trainerName] = (acc[curr.trainerName] || 0) + 1;
+            }
+            return acc;
+        }, {});
+        const busiestTrainer = Object.entries(trainerWorkload).sort((a, b) => b[1] - a[1])[0];
+        const avgTrainingDays = Math.round(assignments.reduce((sum, a) => {
+            if (a.endDate) {
+                const days = Math.round((new Date(a.endDate) - new Date(a.startDate)) / (1000 * 60 * 60 * 24));
+                return sum + days;
+            }
+            return sum;
+        }, 0) / assignments.length);
+
+        res.render('member-trainer', {
+            assignments,
+            members,
+            trainers,
+            stats: {
+                activeAssignments,
+                membersTraining,
+                busiestTrainer: busiestTrainer ? busiestTrainer[0] : 'N/A',
+                avgTrainingDays
+            }
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error loading member-trainer data');
+    }
+});
+
+// Add this route
+app.get(`${BASE_PATH}/trainer-equipment`, async (req, res) => {
+    try {
+        const [certifications] = await db.query(`
+            SELECT te.trainerEquipID, 
+                   CONCAT(t.firstName, ' ', t.lastName) as trainerName,
+                   e.equipmentName,
+                   te.certificationDate, te.expiryDate,
+                   CASE 
+                       WHEN te.expiryDate >= CURRENT_DATE THEN 'Valid'
+                       ELSE 'Expired'
+                   END as status
+            FROM TrainerEquipment te
+            JOIN Trainers t ON te.trainerID = t.trainerID
+            JOIN Equipments e ON te.equipmentID = e.equipmentID
+            ORDER BY te.expiryDate DESC
+        `);
+
+        const [trainers] = await db.query('SELECT trainerID, firstName, lastName, specialization FROM Trainers');
+        const [equipment] = await db.query('SELECT equipmentID, equipmentName, equipmentType FROM Equipments');
+
+        // Calculate stats
+        const totalCertifications = certifications.length;
+        const certifiedTrainers = new Set(certifications.map(c => c.trainerName)).size;
+        const trainerCerts = certifications.reduce((acc, curr) => {
+            if (curr.status === 'Valid') {
+                acc[curr.trainerName] = (acc[curr.trainerName] || 0) + 1;
+            }
+            return acc;
+        }, {});
+        const mostCertifiedTrainer = Object.entries(trainerCerts).sort((a, b) => b[1] - a[1])[0];
+        const avgCertifications = Math.round(Object.values(trainerCerts).reduce((sum, count) => sum + count, 0) / certifiedTrainers);
+
+        res.render('trainer-equipment', {
+            basePath: BASE_PATH,
+            certifications,
+            trainers,
+            equipment,
+            stats: {
+                totalCertifications,
+                certifiedTrainers,
+                mostCertifiedTrainer: mostCertifiedTrainer ? mostCertifiedTrainer[0] : 'N/A',
+                avgCertifications
+            }
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error loading trainer-equipment data');
     }
 });

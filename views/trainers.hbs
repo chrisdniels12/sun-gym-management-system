@@ -3,96 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Trainers - Sun Gym</title>
-    {{!-- Use same CSS file for consistent styling --}}
-    <link rel="stylesheet" href="/~piercebe/CS340/sun-gym-management-system/css/trainers.css">
+    <meta name="base-path" content="{{basePath}}">
+    <title>Trainer Management - Sun Gym</title>
+    <link rel="stylesheet" href="{{basePath}}/css/trainers.css">
 </head>
 <body>
-    <h1>Trainer Management</h1>
-    {{!-- Correct path for home link --}}
-    <a href="/~piercebe/CS340/sun-gym-management-system" class="back-link">Back to Home</a>
+    <div class="container">
+        <h1>Trainer Management</h1>
+        <a href="{{basePath}}" class="back-link">Back to Home</a>
 
-    {{!-- Stats Section --}}
-    <div class="stats-section">
-        <h2>Quick Stats</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Trainers</h3>
-                <p>{{stats.totalTrainers}}</p>
+        {{!-- Stats Section --}}
+        <div class="stats-section">
+            <h2>Quick Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Trainers</h3>
+                    <p>{{stats.totalTrainers}}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Classes</h3>
+                    <p>{{stats.activeClasses}}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Available Trainers</h3>
+                    <p>{{stats.availableTrainers}}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg Class Load</h3>
+                    <p>{{stats.avgClassLoad}}</p>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Active Classes</h3>
-                <p>{{stats.activeClasses}}</p>
-            </div>
+        </div>
+
+        {{!-- Add Trainer Form --}}
+        <div class="form-section">
+            <h2>Add New Trainer</h2>
+            <form id="add-trainer-form">
+                <div class="form-group">
+                    <label for="hireDate">Hire Date:</label>
+                    <input type="date" id="hireDate" name="hireDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Phone:</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber">
+                </div>
+                <div class="form-group">
+                    <label for="specialization">Specialization:</label>
+                    <select id="specialization" name="specialization" required>
+                        <option value="Strength Training">Strength Training</option>
+                        <option value="Cardio">Cardio</option>
+                        <option value="Yoga">Yoga</option>
+                        <option value="CrossFit">CrossFit</option>
+                    </select>
+                </div>
+                <button type="submit">Add Trainer</button>
+            </form>
+        </div>
+
+        {{!-- Trainers Table --}}
+        <div class="table-section">
+            <h2>Current Trainers</h2>
+            <table id="trainers-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Specialization</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each trainers}}
+                    <tr>
+                        <td>{{this.trainerID}}</td>
+                        <td>{{this.firstName}}</td>
+                        <td>{{this.lastName}}</td>
+                        <td>{{this.email}}</td>
+                        <td>{{this.phoneNumber}}</td>
+                        <td>{{this.specialization}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
         </div>
     </div>
 
-    {{!-- Add Trainer Form --}}
-    <div class="form-section">
-        <h2>Add New Trainer</h2>
-        <form id="add-trainer-form" action="/~piercebe/CS340/sun-gym-management-system/api/trainers" method="POST">
-            <div class="form-group">
-                <label for="hireDate">Hire Date:</label>
-                <input type="date" id="hireDate" name="hireDate" required>
-            </div>
-            <div class="form-group">
-                <label for="firstName">First Name:</label>
-                <input type="text" id="firstName" name="firstName" required>
-            </div>
-            <div class="form-group">
-                <label for="lastName">Last Name:</label>
-                <input type="text" id="lastName" name="lastName" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="phoneNumber">Phone:</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber">
-            </div>
-            <div class="form-group">
-                <label for="specialization">Specialization:</label>
-                <select id="specialization" name="specialization" required>
-                    <option value="Strength Training">Strength Training</option>
-                    <option value="Cardio">Cardio</option>
-                    <option value="Yoga">Yoga</option>
-                    <option value="CrossFit">CrossFit</option>
-                </select>
-            </div>
-            <button type="submit">Add Trainer</button>
-        </form>
-    </div>
-
-    {{!-- Trainers Table --}}
-    <div class="table-section">
-        <h2>Current Trainers</h2>
-        <table id="trainers-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Specialization</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each trainers}}
-                <tr>
-                    <td>{{this.trainerID}}</td>
-                    <td>{{this.firstName}}</td>
-                    <td>{{this.lastName}}</td>
-                    <td>{{this.email}}</td>
-                    <td>{{this.phoneNumber}}</td>
-                    <td>{{this.specialization}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
-
-    <script src="/~piercebe/CS340/sun-gym-management-system/js/trainerOperations.js"></script>
+    <script src="{{basePath}}/js/trainerOperations.js"></script>
 </body>
 </html> 

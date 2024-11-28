@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
                    e.equipmentName, me.usageDate, me.usageDuration
             FROM MemberEquipment me
             JOIN Members m ON me.memberID = m.memberID
-            JOIN Equipment e ON me.equipmentID = e.equipmentID
+            JOIN Equipments e ON me.equipmentID = e.equipmentID
             ORDER BY me.usageDate DESC
         `);
         console.log('Fetched member equipment usage:', rows);

@@ -109,15 +109,15 @@ CREATE TABLE MemberEquipment (
 
 -- TrainerEquipment Intersection Table with improved constraints and indexes
 CREATE TABLE TrainerEquipment (
-    equipTrainID INT AUTO_INCREMENT PRIMARY KEY,
-    trainerID INT NOT NULL,
-    equipmentID INT NOT NULL,
-    assignmentDate DATE NOT NULL,
-    FOREIGN KEY (trainerID) REFERENCES Trainers(trainerID) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (equipmentID) REFERENCES Equipments(equipmentID) ON DELETE CASCADE ON UPDATE CASCADE,
-    INDEX idx_assignment_date (assignmentDate),
-    INDEX idx_trainer_equipment (trainerID, equipmentID),
-    UNIQUE KEY unique_trainer_equipment (trainerID, equipmentID)
+    trainerEquipID INT AUTO_INCREMENT PRIMARY KEY,
+    trainerID INT,
+    equipmentID INT,
+    certificationDate DATE NOT NULL,
+    expiryDate DATE NOT NULL,
+    FOREIGN KEY (trainerID) REFERENCES Trainers(trainerID)
+        ON DELETE CASCADE,
+    FOREIGN KEY (equipmentID) REFERENCES Equipments(equipmentID)
+        ON DELETE CASCADE
 );
 
 -- MemberTrainer Intersection Table with improved constraints and indexes
@@ -178,10 +178,10 @@ INSERT INTO ClassBookings (bookingID, memberID, classID, bookingDate) VALUES
 (3, 2, 1, '2023-02-20');
 
 -- TrainerEquipment
-INSERT INTO TrainerEquipment (equipTrainID, trainerID, equipmentID, assignmentDate) VALUES
-(1, 1, 1, '2022-03-01'),
-(2, 2, 2, '2021-06-10'),
-(3, 3, 3, '2023-01-15');
+INSERT INTO TrainerEquipment (trainerEquipID, trainerID, equipmentID, certificationDate, expiryDate) VALUES
+(1, 1, 1, '2022-03-01', '2024-03-01'),
+(2, 2, 2, '2021-06-10', '2023-06-10'),
+(3, 3, 3, '2023-01-15', '2025-01-15');
 
 -- MemberTrainer
 INSERT INTO MemberTrainer (memberTrainerID, memberID, trainerID, startDate, endDate) VALUES

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-path" content="{{basePath}}">
+    <title>Trainer Equipment Certifications - Sun Gym</title>
+    <link rel="stylesheet" href="{{basePath}}/css/trainer-equipment.css">
+</head>
+<body>
+    <h1>Trainer Equipment Certifications</h1>
+    <a href="{{basePath}}" class="back-link">Back to Home</a>
+
+    {{!-- Stats Section --}}
+    <div class="stats-section">
+        <h2>Certification Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Certifications</h3>
+                <p>{{stats.totalCertifications}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Certified Trainers</h3>
+                <p>{{stats.certifiedTrainers}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Most Certified</h3>
+                <p>{{stats.mostCertifiedTrainer}}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Avg Certifications</h3>
+                <p>{{stats.avgCertifications}}</p>
+            </div>
+        </div>
+    </div>
+
+    {{!-- Add Certification Form --}}
+    <div class="form-section">
+        <h2>Add New Certification</h2>
+        <form id="addTrainerEquipment" method="POST">
+            <div class="form-group">
+                <label for="trainerID">Trainer:</label>
+                <select id="trainerID" name="trainerID" required>
+                    <option value="">Select Trainer...</option>
+                    {{#each trainers}}
+                    <option value="{{this.trainerID}}">{{this.firstName}} {{this.lastName}} - {{this.specialization}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="equipmentID">Equipment:</label>
+                <select id="equipmentID" name="equipmentID" required>
+                    <option value="">Select Equipment...</option>
+                    {{#each equipment}}
+                    <option value="{{this.equipmentID}}">{{this.equipmentName}} - {{this.type}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="certificationDate">Certification Date:</label>
+                <input type="date" id="certificationDate" name="certificationDate" required>
+            </div>
+            <div class="form-group">
+                <label for="expiryDate">Expiry Date:</label>
+                <input type="date" id="expiryDate" name="expiryDate" required>
+            </div>
+            <button type="submit">Add Certification</button>
+        </form>
+    </div>
+
+    {{!-- Certifications Table --}}
+    <div class="table-section">
+        <h2>Current Certifications</h2>
+        <table id="certifications-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Trainer</th>
+                    <th>Equipment</th>
+                    <th>Certification Date</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each certifications}}
+                <tr>
+                    <td>{{this.trainerEquipID}}</td>
+                    <td>{{this.trainerName}}</td>
+                    <td>{{this.equipmentName}}</td>
+                    <td>{{this.certificationDate}}</td>
+                    <td>{{this.expiryDate}}</td>
+                    <td>
+                        <span class="status-badge status-{{toLowerCase this.status}}">
+                            {{this.status}}
+                        </span>
+                    </td>
+                    <td>
+                        <button onclick="renewCertification({{this.trainerEquipID}})">Renew</button>
+                        <button onclick="deleteCertification({{this.trainerEquipID}})">Delete</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="{{basePath}}/js/trainerEquipmentOperations.js"></script>
+</body>
+</html> 

@@ -252,7 +252,7 @@ SELECT te.equipTrainID,
        e.equipmentName, e.equipmentType,
        te.assignmentDate,
        COUNT(DISTINCT me.memberID) as membersSupervised
-FROM TrainerEquipment te
+FROM Trainer_Equipment te
 JOIN Trainers t ON te.trainerID = t.trainerID
 JOIN Equipments e ON te.equipmentID = e.equipmentID
 LEFT JOIN MemberEquipment me ON e.equipmentID = me.equipmentID
@@ -294,3 +294,10 @@ INSERT INTO Equipment (equipmentName, type, status, location) VALUES
 ('Bench Press 1', 'Strength', 'Available', 'Weight Room B'),
 ('Yoga Mat 1', 'Flexibility', 'In Use', 'Studio C'),
 ('Rowing Machine 1', 'Cardio', 'Maintenance', 'Cardio Zone B');
+
+-- Insert sample Trainer_Equipment data
+INSERT INTO Trainer_Equipment (trainerID, equipmentID, certificationDate, expiryDate) VALUES
+(1, 1, '2023-01-01', '2024-01-01'),
+(1, 2, '2023-02-01', '2024-02-01'),
+(2, 3, '2023-03-01', '2024-03-01'),
+(3, 4, '2023-04-01', '2024-04-01');

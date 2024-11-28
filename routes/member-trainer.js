@@ -2,69 +2,101 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db-connector').pool;
 
-// GET all member-trainer relationships - Returns all training sessions
-// Example: GET /api/member-trainer
+// GET all assignments
 router.get('/', async (req, res) => {
     try {
-        // Query database for all training sessions with member and trainer details
         const [rows] = await db.query(`
-            SELECT MT.*, 
-                   M.firstName as memberFirstName, M.lastName as memberLastName,
-                   T.firstName as trainerFirstName, T.lastName as trainerLastName
-            FROM Member_Trainer MT
-            JOIN Members M ON MT.memberID = M.memberID
-            JOIN Trainers T ON MT.trainerID = T.trainerID
-            ORDER BY MT.sessionDate DESC`
-        );
+            SELECT mt.memberTrainerID, 
+                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
+                   CONCAT(t.firstName, ' ', t.lastName) as trainerName,
+                   t.specialization,
+                   mt.startDate, mt.endDate,
+                   CASE 
+                       WHEN mt.endDate IS NULL THEN 'Active'
+                       WHEN mt.endDate >= CURRENT_DATE THEN 'Active'
+                       ELSE 'Completed'
+                   END as status
+            FROM MemberTrainer mt
+            JOIN Members m ON mt.memberID = m.memberID
+            JOIN Trainers t ON mt.trainerID = t.trainerID
+            ORDER BY mt.startDate DESC
+        `);
+        console.log('Fetched assignments:', rows);
         res.json(rows);
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// CREATE new training session
-// Example: POST /api/member-trainer
-// Required body: { memberID: 1, trainerID: 2, sessionDate: "2024-01-15", duration: 60 }
+// CREATE new assignment
 router.post('/', async (req, res) => {
-    // Extract session details from request body
-    const { memberID, trainerID, sessionDate, duration } = req.body;
+    const { memberID, trainerID, startDate, endDate } = req.body;
     try {
-        // Insert new training session record
+        // Check for active assignment
+        const [activeAssignments] = await db.query(
+            'SELECT * FROM MemberTrainer WHERE memberID = ? AND (endDate IS NULL OR endDate >= CURRENT_DATE)',
+            [memberID]
+        );
+
+        // Check trainer capacity
+        const [trainerAssignments] = await db.query(
+            'SELECT COUNT(*) as clientCount FROM MemberTrainer WHERE trainerID = ? AND (endDate IS NULL OR endDate >= CURRENT_DATE)',
+            [trainerID]
+        );
+
+        // Collect all conflicts
+        const errors = [];
+        if (activeAssignments.length > 0) {
+            errors.push({ field: 'active_assignment', value: 'exists' });
+        }
+        if (trainerAssignments[0].clientCount >= 5) {  // Maximum 5 active clients per trainer
+            errors.push({ field: 'trainer_capacity', value: 'full' });
+        }
+
+        if (errors.length > 0) {
+            return res.status(400).json({
+                error: 'Duplicate entries found',
+                duplicates: errors
+            });
+        }
+
+        // If no conflicts, insert new assignment
         const [result] = await db.query(
-            'INSERT INTO Member_Trainer (memberID, trainerID, sessionDate, duration) VALUES (?, ?, ?, ?)',
-            [memberID, trainerID, sessionDate, duration]
+            'INSERT INTO MemberTrainer (memberID, trainerID, startDate, endDate) VALUES (?, ?, ?, ?)',
+            [memberID, trainerID, startDate, endDate]
         );
-        res.status(201).json({ id: result.insertId });
+
+        res.status(201).json({
+            message: 'Assignment added successfully',
+            id: result.insertId
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error adding assignment:', error);
+        res.status(500).json({
+            error: error.message || 'Error adding assignment to database'
+        });
     }
 });
 
-// UPDATE training session
-// Example: PUT /api/member-trainer/1
-// Required body: { sessionDate: "2024-01-16", duration: 45 }
-router.put('/:id', async (req, res) => {
-    // Extract updated session details from request body
-    const { sessionDate, duration } = req.body;
+// END assignment (update endDate)
+router.put('/:id/end', async (req, res) => {
     try {
-        // Update the session record with matching ID
         await db.query(
-            'UPDATE Member_Trainer SET sessionDate=?, duration=? WHERE sessionID=?',
-            [sessionDate, duration, req.params.id]
+            'UPDATE MemberTrainer SET endDate = CURRENT_DATE WHERE memberTrainerID = ?',
+            [req.params.id]
         );
-        res.json({ message: 'Training session updated successfully' });
+        res.json({ message: 'Assignment ended successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// DELETE training session
-// Example: DELETE /api/member-trainer/1
+// DELETE assignment
 router.delete('/:id', async (req, res) => {
     try {
-        // Remove the session record with specified ID
-        await db.query('DELETE FROM Member_Trainer WHERE sessionID=?', [req.params.id]);
-        res.json({ message: 'Training session deleted successfully' });
+        await db.query('DELETE FROM MemberTrainer WHERE memberTrainerID = ?', [req.params.id]);
+        res.json({ message: 'Assignment deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

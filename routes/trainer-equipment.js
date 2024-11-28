@@ -2,68 +2,89 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db-connector').pool;
 
-// GET all trainer-equipment certifications - Returns all equipment certifications
-// Example: GET /api/trainer-equipment
+// GET all certifications
 router.get('/', async (req, res) => {
     try {
-        // Query database for all certifications with trainer and equipment details
         const [rows] = await db.query(`
-            SELECT TE.*, 
-                   T.firstName, T.lastName,
-                   E.equipmentName
-            FROM Trainer_Equipment TE
-            JOIN Trainers T ON TE.trainerID = T.trainerID
-            JOIN Equipment E ON TE.equipmentID = E.equipmentID
-            ORDER BY T.lastName, T.firstName`
-        );
+            SELECT te.trainerEquipID, 
+                   CONCAT(t.firstName, ' ', t.lastName) as trainerName,
+                   e.equipmentName,
+                   te.certificationDate, te.expiryDate,
+                   CASE 
+                       WHEN te.expiryDate >= CURRENT_DATE THEN 'Valid'
+                       ELSE 'Expired'
+                   END as status
+            FROM TrainerEquipment te
+            JOIN Trainers t ON te.trainerID = t.trainerID
+            JOIN Equipments e ON te.equipmentID = e.equipmentID
+            ORDER BY te.expiryDate DESC
+        `);
+        console.log('Fetched certifications:', rows);
         res.json(rows);
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// CREATE new equipment certification
-// Example: POST /api/trainer-equipment
-// Required body: { trainerID: 1, equipmentID: 2, certificationDate: "2024-01-15" }
+// CREATE new certification
 router.post('/', async (req, res) => {
-    // Extract certification details from request body
-    const { trainerID, equipmentID, certificationDate } = req.body;
+    const { trainerID, equipmentID, certificationDate, expiryDate } = req.body;
     try {
-        // Insert new certification record
+        // Check for active certification
+        const [existingCerts] = await db.query(
+            'SELECT * FROM TrainerEquipment WHERE trainerID = ? AND equipmentID = ? AND expiryDate >= CURRENT_DATE',
+            [trainerID, equipmentID]
+        );
+
+        // Collect all conflicts
+        const errors = [];
+        if (existingCerts.length > 0) {
+            errors.push({ field: 'active_certification', value: 'exists' });
+        }
+
+        if (errors.length > 0) {
+            return res.status(400).json({
+                error: 'Duplicate entries found',
+                duplicates: errors
+            });
+        }
+
+        // If no conflicts, insert new certification
         const [result] = await db.query(
-            'INSERT INTO Trainer_Equipment (trainerID, equipmentID, certificationDate) VALUES (?, ?, ?)',
-            [trainerID, equipmentID, certificationDate]
+            'INSERT INTO TrainerEquipment (trainerID, equipmentID, certificationDate, expiryDate) VALUES (?, ?, ?, ?)',
+            [trainerID, equipmentID, certificationDate, expiryDate]
         );
-        res.status(201).json({ id: result.insertId });
+
+        res.status(201).json({
+            message: 'Certification added successfully',
+            id: result.insertId
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error adding certification:', error);
+        res.status(500).json({
+            error: error.message || 'Error adding certification to database'
+        });
     }
 });
 
-// UPDATE equipment certification
-// Example: PUT /api/trainer-equipment/1
-// Required body: { certificationDate: "2024-01-16" }
-router.put('/:id', async (req, res) => {
-    // Extract updated certification details from request body
-    const { certificationDate } = req.body;
+// RENEW certification
+router.put('/:id/renew', async (req, res) => {
     try {
-        // Update the certification record with matching ID
         await db.query(
-            'UPDATE Trainer_Equipment SET certificationDate=? WHERE certificationID=?',
-            [certificationDate, req.params.id]
+            'UPDATE TrainerEquipment SET expiryDate = ? WHERE trainerEquipID = ?',
+            [req.body.expiryDate, req.params.id]
         );
-        res.json({ message: 'Certification updated successfully' });
+        res.json({ message: 'Certification renewed successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// DELETE equipment certification
-// Example: DELETE /api/trainer-equipment/1
+// DELETE certification
 router.delete('/:id', async (req, res) => {
     try {
-        // Remove the certification record with specified ID
-        await db.query('DELETE FROM Trainer_Equipment WHERE certificationID=?', [req.params.id]);
+        await db.query('DELETE FROM TrainerEquipment WHERE trainerEquipID = ?', [req.params.id]);
         res.json({ message: 'Certification deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
