@@ -98,16 +98,15 @@ sun-gym-management-system/
 ├── public/
 │   ├── css/                 # Stylesheets
 │   │   ├── main.css         # Shared styles
+│   │   ├── index.css        # Home page styles
 │   │   └── [entity].css     # Entity-specific styles
 │   ├── js/                  # Client-side JavaScript
 │   │   └── [entity]Operations.js  # CRUD operations
-│   ├── html/                # Active HTML files
-│   │   └── index.html       # Home page
-│   ├── html_archive/        # Original HTML files (reference)
-│   └── js_archive/          # Original JS files (reference)
+│   └── html_archive/        # Original HTML files (reference)
 ├── routes/                  # Express route handlers
 │   └── [entity].js         # Entity-specific routes
 ├── views/                   # Handlebars templates
+│   ├── index.hbs           # Home page template
 │   └── [entity].hbs        # Entity-specific templates
 ├── app.js                   # Main application file
 └── package.json            # Project dependencies
@@ -178,6 +177,7 @@ sun-gym-management-system/
 - Database errors properly caught and handled
 
 ### Code Organization
+- Handlebars templates for all pages including home page
 - Modular CSS with shared styles in main.css
 - Separate JavaScript files for each entity
 - Consistent naming conventions
