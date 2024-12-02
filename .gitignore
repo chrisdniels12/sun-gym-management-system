@@ -1,6 +1,18 @@
+# Database credentials
+database/db-connector.js
+
+# Environment files
+.env
+
+# Dependencies
 node_modules/
 package-lock.json
-database/db-connector.js
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
 *.log
 forever.log
 out.log

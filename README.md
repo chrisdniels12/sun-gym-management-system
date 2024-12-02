@@ -20,9 +20,6 @@ git checkout updated-handlebars-version
 ```bash
 # Install all required packages
 npm install
-
-# Install nodemon globally (for development)
-npm install -g nodemon
 ```
 
 3. **Database Setup**
@@ -55,10 +52,7 @@ const pool = mysql.createPool({
 
 4. **Start the Server**
 ```bash
-# Development mode with auto-reload
-nodemon app.js
-
-# OR Production mode
+# Start the server
 node app.js
 ```
 
@@ -78,14 +72,41 @@ node app.js
 - If not set, it defaults to 'piercebe' for development
 - You can set your ONID before starting the server:
   ```bash
-  # Windows
+  # Windows Command Prompt
   set ONID=your_onid
-  nodemon app.js
+  node app.js
+
+  # Windows PowerShell
+  $env:ONID = "your_onid"
+  node app.js
 
   # Mac/Linux
   export ONID=your_onid
-  nodemon app.js
+  node app.js
   ```
+
+## Important Notes
+
+### Base Path and ONID Setup
+- Each user needs to set their ONID environment variable before starting the server
+- This affects all URLs and file paths in the application
+- If not set, defaults to 'piercebe' for development
+
+### Common Issues
+1. **Styling not loading:**
+   - Verify ONID is set correctly
+   - Check route passes `basePath` to template
+   - Verify CSS file exists and is imported
+
+2. **Links not working:**
+   - Check `basePath` in template
+   - Verify route handler includes `basePath`
+   - Check browser console for path errors
+
+3. **API calls failing:**
+   - Verify `BASE_PATH` in JavaScript
+   - Check network tab for correct URLs
+   - Ensure ONID environment variable is set
 
 ## Project Structure
 
@@ -157,18 +178,10 @@ sun-gym-management-system/
   - Server-side validation
 
 - **Development Tools**:
-  - Nodemon for auto-reload
   - Git for version control
   - npm for package management
 
 ## Development Notes
-
-### Using Nodemon
-- Nodemon automatically restarts the server when files change
-- Install globally: `npm install -g nodemon`
-- Start server: `nodemon app.js`
-- Manual restart: Type `rs` in terminal
-- Stop server: `Ctrl + C`
 
 ### Error Handling
 - All forms include duplicate entry detection
