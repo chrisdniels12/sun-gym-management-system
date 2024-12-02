@@ -50,12 +50,17 @@
 </head>
 
 <body>
+    <script>
+        // Get BASE_PATH from meta tag
+        const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
+    </script>
+
     <h1>Sun Gym Management System</h1>
 
     <h2>Primary Tables</h2>
     <ul>
         <li>
-            <a href="/~piercebe/CS340/sun-gym-management-system/members">Members</a>
+            <a href="${BASE_PATH}/members">Members</a>
             <span class="description">- Manage member profiles, view and update membership details</span>
         </li>
         <li>

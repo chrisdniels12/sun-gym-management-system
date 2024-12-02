@@ -8,6 +8,7 @@ const db = require('./database/db-connector').pool;
 // Add this near the top of app.js
 const ONID = process.env.ONID || 'piercebe'; // Default for development
 const BASE_PATH = `/~${ONID}/CS340/sun-gym-management-system`;
+console.log('Current BASE_PATH:', BASE_PATH);
 
 // Handlebars setup
 app.engine('hbs', exphbs.engine({
@@ -32,9 +33,9 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the 'public' directory
 app.use(`${BASE_PATH}`, express.static(path.join(__dirname, 'public')));
 
-// Root route - serve index.html
+// Root route - serve index.html with BASE_PATH
 app.get(`${BASE_PATH}`, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'html', 'index.html'));
+    res.render('index', { basePath: BASE_PATH });
 });
 
 // Keep HTML routes commented out since files are now in html_archive

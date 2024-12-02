@@ -1,125 +1,61 @@
-<h1>Welcome to Sun Gym Management System</h1>
-<p>If you see this text, the server is <strong>definitely</strong> working!</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-path" content="{{basePath}}">
+    <title>Sun Gym Management System</title>
+    <link rel="stylesheet" href="{{basePath}}/css/index.css">
+</head>
+<body>
+    <h1>Sun Gym Management System</h1>
 
-{{!-- Search form --}}
-<h2>Search Using an HTML Form</h2>
-<p>Search by last name using the field below. Partial last names are OK too!</p>
-<form id="search-person-html" method='GET' action='/'>
-    <label for="input-lname">Search by Last Name: </label>
-    <input type="text" name="lname" id="input-lname-html-search">
+    <h2>Primary Tables</h2>
+    <ul>
+        <li>
+            <a href="{{basePath}}/members">Members</a>
+            <span class="description">- Manage member profiles, view and update membership details</span>
+        </li>
+        <li>
+            <a href="{{basePath}}/trainers">Trainers</a>
+            <span class="description">- Manage trainer profiles and their specializations</span>
+        </li>
+        <li>
+            <a href="{{basePath}}/classes">Classes</a>
+            <span class="description">- Manage fitness classes, schedules, and capacity</span>
+        </li>
+        <li>
+            <a href="{{basePath}}/equipment">Equipment</a>
+            <span class="description">- Track gym equipment inventory and maintenance status</span>
+        </li>
+        <li>
+            <a href="{{basePath}}/payments">Payments</a>
+            <span class="description">- Track and manage member payments</span>
+        </li>
+    </ul>
 
-    <input type="submit">
-</form>
-<a href='/' class="button">Reset</a>
+    <h2>Relationship Management</h2>
+    <ul>
+        <li>
+            <a href="{{basePath}}/member-equipment">Member-Equipment</a>
+            <span class="description">- Track and manage member equipment usage</span>
+        </li>
+        <li>
+            <a href="{{basePath}}/class-bookings">Class-Bookings</a>
+            <span class="description">- Manage member class enrollments and attendance</span>
+        </li>
+        <li>
+            <a href="{{basePath}}/member-trainer">Member-Trainer</a>
+            <span class="description">- Manage personal training relationships and schedules</span>
+        </li>
+        <li>
+            <a href="{{basePath}}/trainer-equipment">Trainer-Equipment</a>
+            <span class="description">- Manage trainer equipment certifications and assignments</span>
+        </li>
+    </ul>
 
-<h2>Database query result:</h2>
-
-{{!-- Create a table --}}
-<table id="people-table" border="1">
-    {{!-- Header section --}}
-    <thead>
-        <tr>
-            {{#each data.[0]}}
-            <th>
-                {{@key}}
-            </th>
-            {{/each}}
-            <th>delete</th>
-        </tr>
-    </thead>
-
-    {{!-- Body section --}}
-    <tbody>
-        {{#each data}}
-        <tr data-value={{this.id}}>
-            <td>{{this.id}}</td>
-            <td>{{this.fname}}</td>
-            <td>{{this.lname}}</td>
-            <td>{{this.homeworld}}</td>
-            <td>{{this.age}}</td>
-            <td><button onclick="deletePerson({{this.id}})">Delete</button></td>
-        </tr>
-        {{/each}}
-    </tbody>
-</table>
-
-{{!-- If no data is found, display a message --}}
-{{#unless data}}
-<p>No data found in the database.</p>
-{{/unless}}
-
-{{!-- Form for adding new data using regular HTML form --}}
-<h2>Adding Data using an HTML form</h2>
-<p>To add a new person, please enter their information below and click `Submit`!</p>
-<form id="add-person-form" method="POST" action="/add-person-form">
-    <label for="input-fname">First Name: </label>
-    <input type="text" name="input-fname" id="input-fname">
-
-    <label for="input-lname">Last Name: </label>
-    <input type="text" name="input-lname" id="input-lname">
-
-    <label for="input-homeworld">Homeworld: </label>
-    <select name="input-homeworld" id="input-homeworld">
-        <option value="">Select a Planet</option>
-        {{#each planets}}
-        <option value="{{this.id}}">{{this.name}}</option>
-        {{/each}}
-    </select>
-
-    <label for="input-age">Age: </label>
-    <input type="number" name="input-age" id="input-age">
-
-    <input type="submit">
-</form>
-
-{{!-- Form for adding new data using AJAX --}}
-<h2>Adding Data with AJAX</h2>
-<p>To add a new person, please enter their information below and click 'Submit'!</p>
-<form id="add-person-form-ajax">
-    <label for="input-fname-ajax">First Name: </label>
-    <input type="text" name="input-fname-ajax" id="input-fname-ajax">
-
-    <label for="input-lname-ajax">Last Name: </label>
-    <input type="text" name="input-lname-ajax" id="input-lname-ajax">
-
-    <label for="input-homeworld-ajax">Homeworld: </label>
-    <select name="input-homeworld-ajax" id="input-homeworld-ajax">
-        <option value="">Select a Planet</option>
-        {{#each planets}}
-        <option value="{{this.id}}">{{this.name}}</option>
-        {{/each}}
-    </select>
-
-    <label for="input-age-ajax">Age: </label>
-    <input type="number" name="input-age-ajax" id="input-age-ajax">
-
-    <input type="submit">
-</form>
-
-{{!-- Embed our javascript to handle the DOM manipulation and AJAX request --}}
-<script src="./js/add_person.js"></script>
-<script src="./js/delete_person.js"></script>
-
-<h2>Updating A User's HomeWorld Form</h2>
-<p>To update a specific user's homeworld select their name from the drop-down menu on the left and their desired
-    homeworld from the drop down menu on the right</p>
-<form id="update-person-form-ajax">
-    <label for="input-fullname">Full name: </label>
-    <select name="input-fullname" id="mySelect">
-        <option value="test">Select a Person</option>
-        {{#each data}}
-        <option value="{{this.id}}">{{this.fname}} {{this.lname}}</option>
-        {{/each}}
-    </select>
-
-    <label for="input-homeworld">Homeworld: </label>
-    <select name="input-homeworld" id="input-homeworld-update">
-        <option>Select a Planet</option>
-        {{#each planets}}
-        <option value="{{this.id}}">{{this.name}}</option>
-        {{/each}}
-    </select>
-    <input type="submit">
-</form>
-
-<script src="./js/update_person.js"></script>
+    <footer>
+        <p>Sun Gym Management System - Database Administration Interface</p>
+    </footer>
+</body>
+</html>
