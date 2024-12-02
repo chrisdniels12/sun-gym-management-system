@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-path" content="{{basePath}}">
     <title>Manage Payments - Sun Gym</title>
-    <link rel="stylesheet" href="/~piercebe/CS340/sun-gym-management-system/css/payments.css">
+    <link rel="stylesheet" href="{{basePath}}/css/payments.css">
 </head>
 <body>
     <h1>Payment Management</h1>
-    <a href="/~piercebe/CS340/sun-gym-management-system" class="back-link">Back to Home</a>
+    <a href="{{basePath}}" class="back-link">Back to Home</a>
 
     {{!-- Stats Section --}}
     <div class="stats-section">
@@ -90,6 +91,6 @@
         </table>
     </div>
 
-    <script src="/~piercebe/CS340/sun-gym-management-system/js/paymentOperations.js"></script>
+    <script src="{{basePath}}/js/paymentOperations.js"></script>
 </body>
 </html> 

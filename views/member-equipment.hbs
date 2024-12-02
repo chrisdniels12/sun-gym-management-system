@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-path" content="{{basePath}}">
     <title>Member-Equipment Usage - Sun Gym</title>
-    <link rel="stylesheet" href="/~piercebe/CS340/sun-gym-management-system/css/member-equipment.css">
+    <link rel="stylesheet" href="{{basePath}}/css/member-equipment.css">
 </head>
 <body>
     <h1>Member-Equipment Usage</h1>
-    <a href="/~piercebe/CS340/sun-gym-management-system" class="back-link">Back to Home</a>
+    <a href="{{basePath}}" class="back-link">Back to Home</a>
 
     {{!-- Stats Section --}}
     <div class="stats-section">
@@ -99,6 +100,6 @@
         </table>
     </div>
 
-    <script src="/~piercebe/CS340/sun-gym-management-system/js/memberEquipmentOperations.js"></script>
+    <script src="{{basePath}}/js/memberEquipmentOperations.js"></script>
 </body>
 </html> 

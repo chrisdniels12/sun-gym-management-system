@@ -2,6 +2,9 @@
 const addMemberEquipmentForm = document.getElementById('addMemberEquipment');
 const usageTable = document.getElementById('usage-table');
 
+// Get BASE_PATH from meta tag
+const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
+
 // Add Member Equipment Usage
 addMemberEquipmentForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -17,10 +20,8 @@ addMemberEquipmentForm.addEventListener('submit', async function (e) {
         usageDuration: document.getElementById('usageDuration').value
     };
 
-    console.log('Sending data:', formData);
-
     try {
-        const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/member-equipment', {
+        const response = await fetch(`${BASE_PATH}/api/member-equipment`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -43,6 +44,27 @@ addMemberEquipmentForm.addEventListener('submit', async function (e) {
         showError('form', `Error recording usage: ${error.message}`);
     }
 });
+
+// Edit and Delete functions
+function editUsage(id) {
+    console.log('Edit usage:', id);
+    // Implement edit functionality
+}
+
+function deleteUsage(id) {
+    if (confirm('Are you sure you want to delete this usage record?')) {
+        fetch(`${BASE_PATH}/api/member-equipment/${id}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+}
 
 // Helper Functions
 function showError(fieldId, message) {
@@ -70,15 +92,4 @@ function clearErrors() {
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Page loaded');
-});
-
-// Edit and Delete functions (to be implemented)
-function editUsage(id) {
-    console.log('Edit usage:', id);
-    // Implement edit functionality
-}
-
-function deleteUsage(id) {
-    console.log('Delete usage:', id);
-    // Implement delete functionality
-} 
+}); 

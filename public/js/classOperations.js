@@ -2,6 +2,9 @@
 const addClassForm = document.getElementById('addClass');
 const classesTable = document.getElementById('classes-table');
 
+// Get BASE_PATH from meta tag
+const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
+
 // Add Class
 addClassForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -21,7 +24,7 @@ addClassForm.addEventListener('submit', async function (e) {
     console.log('Sending data:', formData);
 
     try {
-        const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/classes', {
+        const response = await fetch(`${BASE_PATH}/api/classes`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

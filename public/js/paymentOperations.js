@@ -2,6 +2,9 @@
 const addPaymentForm = document.getElementById('addPayment');
 const paymentsTable = document.getElementById('payments-table');
 
+// Get BASE_PATH from meta tag
+const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
+
 // Add Payment
 addPaymentForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -17,10 +20,8 @@ addPaymentForm.addEventListener('submit', async function (e) {
         paymentMethod: document.getElementById('paymentMethod').value
     };
 
-    console.log('Sending data:', formData);
-
     try {
-        const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/payments', {
+        const response = await fetch(`${BASE_PATH}/api/payments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

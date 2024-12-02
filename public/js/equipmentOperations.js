@@ -2,6 +2,9 @@
 const addEquipmentForm = document.getElementById('addEquipment');
 const equipmentTable = document.getElementById('equipment-table');
 
+// Get BASE_PATH from meta tag
+const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
+
 // Add Equipment
 addEquipmentForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -20,7 +23,7 @@ addEquipmentForm.addEventListener('submit', async function (e) {
     console.log('Sending data:', formData);
 
     try {
-        const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/equipment', {
+        const response = await fetch(`${BASE_PATH}/api/equipment`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

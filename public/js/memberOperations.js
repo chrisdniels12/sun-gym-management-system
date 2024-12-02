@@ -3,6 +3,9 @@ const addMemberForm = document.getElementById('addMember');
 const editMemberForm = document.getElementById('edit-member-form');
 const membersTable = document.getElementById('members-table');
 
+// Get BASE_PATH from meta tag
+const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
+
 // Add Member
 addMemberForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -22,7 +25,7 @@ addMemberForm.addEventListener('submit', async function (e) {
     console.log('Sending data:', formData);
 
     try {
-        const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/members', {
+        const response = await fetch(`${BASE_PATH}/api/members`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -92,7 +95,7 @@ editMemberForm.addEventListener("submit", async function (e) {
     };
 
     try {
-        const response = await fetch(`/~piercebe/CS340/sun-gym-management-system/api/members/${id}`, {
+        const response = await fetch(`${BASE_PATH}/api/members/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
@@ -112,7 +115,7 @@ editMemberForm.addEventListener("submit", async function (e) {
 // Delete Member
 function deleteMember(id) {
     if (confirm('Are you sure you want to delete this member?')) {
-        fetch(`/~piercebe/CS340/sun-gym-management-system/api/members/${id}`, {
+        fetch(`${BASE_PATH}/api/members/${id}`, {
             method: 'DELETE',
         })
             .then(response => response.json())
@@ -142,7 +145,7 @@ window.onclick = function (event) {
 async function loadMembers() {
     try {
         console.log('Fetching members...'); // Add this log
-        const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/members');
+        const response = await fetch(`${BASE_PATH}/api/members`);
         console.log('Response:', response); // Add this log
 
         if (!response.ok) {

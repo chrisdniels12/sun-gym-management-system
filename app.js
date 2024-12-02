@@ -100,6 +100,7 @@ app.get(`${BASE_PATH}/members`, async (req, res) => {
 
         // Pass both members and stats to the template
         res.render('members', {
+            basePath: BASE_PATH,
             members: rows,
             stats: {
                 totalMembers: totalMembers,
@@ -165,6 +166,7 @@ app.get(`${BASE_PATH}/classes`, async (req, res) => {
             Math.round((totalEnrollments / (totalClasses * classes[0].maxCapacity)) * 100) : 0;
 
         res.render('classes', {
+            basePath: BASE_PATH,
             classes: classes,
             trainers: trainers,
             stats: {
@@ -192,6 +194,7 @@ app.get(`${BASE_PATH}/equipment`, async (req, res) => {
         const inUseEquipment = equipment.filter(e => e.status === 'In Use').length;
 
         res.render('equipment', {
+            basePath: BASE_PATH,
             equipment: equipment,
             stats: {
                 totalEquipment,
@@ -226,6 +229,7 @@ app.get(`${BASE_PATH}/payments`, async (req, res) => {
         const [members] = await db.query('SELECT memberID, firstName, lastName FROM Members ORDER BY lastName, firstName');
 
         res.render('payments', {
+            basePath: BASE_PATH,
             payments: payments,
             members: members,
             stats: {
@@ -266,6 +270,7 @@ app.get(`${BASE_PATH}/member-equipment`, async (req, res) => {
         const avgDuration = Math.round(usageHistory.reduce((sum, u) => sum + u.usageDuration, 0) / totalUsage);
 
         res.render('member-equipment', {
+            basePath: BASE_PATH,
             usageHistory,
             members,
             equipment,
@@ -310,6 +315,7 @@ app.get(`${BASE_PATH}/class-bookings`, async (req, res) => {
         const avgAttendance = Math.round((totalBookings / classes.length) * 100);
 
         res.render('class-bookings', {
+            basePath: BASE_PATH,
             bookings,
             members,
             classes,

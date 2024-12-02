@@ -2,6 +2,9 @@
 const addMemberTrainerForm = document.getElementById('addMemberTrainer');
 const assignmentsTable = document.getElementById('assignments-table');
 
+// Get BASE_PATH from meta tag
+const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
+
 // Add Assignment
 addMemberTrainerForm.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -17,10 +20,8 @@ addMemberTrainerForm.addEventListener('submit', async function (e) {
         endDate: document.getElementById('endDate').value || null
     };
 
-    console.log('Sending data:', formData);
-
     try {
-        const response = await fetch('/~piercebe/CS340/sun-gym-management-system/api/member-trainer', {
+        const response = await fetch(`${BASE_PATH}/api/member-trainer`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -60,7 +61,7 @@ addMemberTrainerForm.addEventListener('submit', async function (e) {
 async function endAssignment(id) {
     if (confirm('Are you sure you want to end this training assignment?')) {
         try {
-            const response = await fetch(`/~piercebe/CS340/sun-gym-management-system/api/member-trainer/${id}/end`, {
+            const response = await fetch(`${BASE_PATH}/api/member-trainer/${id}/end`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -85,7 +86,7 @@ async function endAssignment(id) {
 async function deleteAssignment(id) {
     if (confirm('Are you sure you want to delete this training assignment?')) {
         try {
-            const response = await fetch(`/~piercebe/CS340/sun-gym-management-system/api/member-trainer/${id}`, {
+            const response = await fetch(`${BASE_PATH}/api/member-trainer/${id}`, {
                 method: 'DELETE'
             });
 
