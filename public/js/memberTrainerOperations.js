@@ -5,6 +5,8 @@ const assignmentsTable = document.getElementById('assignments-table');
 // Get BASE_PATH from meta tag
 const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
 
+console.log('BASE_PATH in JS:', BASE_PATH);
+
 // Add Assignment
 addMemberTrainerForm.addEventListener('submit', async function (e) {
     e.preventDefault();
