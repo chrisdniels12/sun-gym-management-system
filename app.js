@@ -332,7 +332,7 @@ app.get(`${BASE_PATH}/class-bookings`, async (req, res) => {
     }
 });
 
-// Add this route
+// Member-Trainer route
 app.get(`${BASE_PATH}/member-trainer`, async (req, res) => {
     try {
         const [assignments] = await db.query(`
@@ -374,6 +374,7 @@ app.get(`${BASE_PATH}/member-trainer`, async (req, res) => {
         }, 0) / assignments.length);
 
         res.render('member-trainer', {
+            basePath: BASE_PATH,  // Add this line
             assignments,
             members,
             trainers,
