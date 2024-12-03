@@ -101,62 +101,7 @@ node app.js
   export ONID=your_onid
   node app.js
   ```
-
-### OSU Engineering Server Deployment
-1. **Install Forever Globally**
-```bash
-# SSH into your engineering server
-ssh your_onid@access.engr.oregonstate.edu
-
-# Install forever globally
-npm install -g forever
-```
-
-2. **Upload Project Files**
-```bash
-# Create project directory (if it doesn't exist)
-mkdir -p ~/public_html/CS340
-
-# Create and upload db-connector.js with your credentials
-nano ~/public_html/CS340/sun-gym-management-system/database/db-connector.js
-
-# Set correct permissions
-chmod 755 ~/public_html/CS340/sun-gym-management-system
-chmod 755 ~/public_html/CS340/sun-gym-management-system/public
-chmod 644 ~/public_html/CS340/sun-gym-management-system/public/*
-```
-
-3. **Start Application with Forever**
-```bash
-# Navigate to project directory
-cd ~/public_html/CS340/sun-gym-management-system
-
-# Set your ONID and start server with forever
-export ONID=your_onid
-forever start app.js
-
-# Verify it's running
-forever list
-```
-
-4. **Managing the Server**
-```bash
-# View running processes
-forever list
-
-# Stop the server
-forever stop app.js
-
-# Restart the server
-forever restart app.js
-
-# View logs
-forever logs app.js
-```
-
-The application will now be accessible at:
-`https://classwork.engr.oregonstate.edu/~your_onid/CS340/sun-gym-management-system`
-
+  
 ## Important Notes
 
 ### Base Path and ONID Setup
