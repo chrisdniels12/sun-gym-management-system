@@ -6,9 +6,9 @@ const db = require('../database/db-connector').pool;
 router.get('/', async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT equipmentID, equipmentName, type, status, 
+            SELECT equipmentID, equipmentName, equipmentType, status, 
                    location, lastMaintenance 
-            FROM Equipment 
+            FROM Equipments 
             ORDER BY equipmentName`
         );
         console.log('Fetched equipment:', rows);
@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
     try {
         // Check for duplicate equipment
         const [existingEquipment] = await db.query(
-            'SELECT * FROM Equipment WHERE equipmentName = ? OR location = ?',
+            'SELECT * FROM Equipments WHERE equipmentName = ? OR location = ?',
             [equipmentName, location]
         );
 
@@ -55,7 +55,7 @@ router.post('/', async (req, res) => {
 
         // If no duplicates, insert new equipment
         const [result] = await db.query(
-            'INSERT INTO Equipment (equipmentName, type, status, location) VALUES (?, ?, ?, ?)',
+            'INSERT INTO Equipments (equipmentName, equipmentType, status, location) VALUES (?, ?, ?, ?)',
             [equipmentName, type, status, location]
         );
 
