@@ -15,11 +15,14 @@ router.get('/', async (req, res) => {
 // Add a new trainer
 router.post('/', async (req, res) => {
     const { firstName, lastName, email, phoneNumber, specialization, hireDate } = req.body;
+    console.log('Received trainer data:', { firstName, lastName, email, phoneNumber, specialization, hireDate });
+
     try {
         const [existingTrainers] = await db.query(
             'SELECT * FROM Trainers WHERE email = ? OR phoneNumber = ? OR (firstName = ? AND lastName = ?)',
             [email, phoneNumber, firstName, lastName]
         );
+        console.log('Checked for existing trainers:', existingTrainers);
 
         // Check for all duplicates and collect errors (only one per field)
         if (existingTrainers.length > 0) {
@@ -41,19 +44,16 @@ router.post('/', async (req, res) => {
                 }
             });
 
-            if (errors.length > 0) {
-                return res.status(400).json({
-                    error: 'Duplicate entries found',
-                    duplicates: errors
-                });
-            }
+            console.log('Found duplicates:', errors);
         }
 
         // If no duplicates, insert new trainer
+        console.log('Attempting to insert trainer...');
         const [result] = await db.query(
             'INSERT INTO Trainers (firstName, lastName, email, phoneNumber, specialization, hireDate) VALUES (?, ?, ?, ?, ?, ?)',
             [firstName, lastName, email, phoneNumber, specialization, hireDate]
         );
+        console.log('Insert result:', result);
 
         res.status(201).json({
             message: 'Trainer added successfully',
@@ -61,6 +61,11 @@ router.post('/', async (req, res) => {
         });
     } catch (error) {
         console.error('Error adding trainer:', error);
+        console.error('Full error details:', {
+            message: error.message,
+            code: error.code,
+            sqlMessage: error.sqlMessage
+        });
         res.status(500).json({
             error: error.message || 'Error adding trainer to database'
         });

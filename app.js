@@ -117,28 +117,18 @@ app.get(`${BASE_PATH}/members`, async (req, res) => {
 // Trainers route
 app.get(`${BASE_PATH}/trainers`, async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM Trainers ORDER BY lastName, firstName');
-        const [classResult] = await db.query('SELECT COUNT(*) as count FROM Classes WHERE trainerID IS NOT NULL');
-        const [availableResult] = await db.query(`
-            SELECT COUNT(*) as count FROM Trainers t
-            LEFT JOIN Classes c ON t.trainerID = c.trainerID
-            WHERE c.trainerID IS NULL
-        `);
+        const [trainers] = await db.query('SELECT * FROM Trainers');
 
         // Calculate stats
-        const totalTrainers = rows.length;
-        const activeClasses = classResult[0].count;
-        const availableTrainers = availableResult[0].count;
-        const avgClassLoad = totalTrainers ? Math.round(activeClasses / totalTrainers) : 0;
+        const totalTrainers = trainers.length;
+        // ... other stats ...
 
         res.render('trainers', {
-            basePath: BASE_PATH,  // Add this line
-            trainers: rows,
+            basePath: BASE_PATH,  // Make sure this is here
+            trainers: trainers,
             stats: {
                 totalTrainers,
-                activeClasses,
-                availableTrainers,
-                avgClassLoad
+                // ... other stats
             }
         });
     } catch (error) {
