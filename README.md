@@ -4,7 +4,7 @@ A modern gym management system built with Node.js, Express, Handlebars, and MySQ
 
 ## Setup Instructions
 
-1. **Clone the Repository and Switch to Updated Branch**
+1. **Clone the Repository**
 ```bash
 # Clone the repository
 git clone https://github.com/chrisdniels12/sun-gym-management-system.git
