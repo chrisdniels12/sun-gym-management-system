@@ -69,4 +69,58 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Add route to handle nullable trainer relationship
+router.put('/members/:id/trainer', async (req, res) => {
+    try {
+        const memberId = req.params.id;
+        const { trainerId } = req.body;
+
+        // Allow setting trainer to null
+        const query = 'UPDATE Members SET trainer_id = ? WHERE member_id = ?';
+        await db.pool.query(query, [trainerId || null, memberId]);
+
+        res.status(200).json({ message: 'Trainer updated successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update trainer' });
+    }
+});
+
+// Add route to delete member-trainer relationship
+router.delete('/member-trainers/:memberId/:trainerId', async (req, res) => {
+    try {
+        const { memberId, trainerId } = req.params;
+        const query = 'DELETE FROM MemberTrainers WHERE member_id = ? AND trainer_id = ?';
+        await db.pool.query(query, [memberId, trainerId]);
+        res.status(200).json({ message: 'Relationship deleted successfully' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete relationship' });
+    }
+});
+
+// DELETE member
+router.delete('/:id', async (req, res) => {
+    try {
+        const memberId = req.params.id;
+
+        // First delete related records in intersection tables
+        await db.query('DELETE FROM MemberTrainers WHERE member_id = ?', [memberId]);
+        await db.query('DELETE FROM ClassBookings WHERE member_id = ?', [memberId]);
+        await db.query('DELETE FROM MemberEquipment WHERE member_id = ?', [memberId]);
+
+        // Then delete the member
+        const [result] = await db.query('DELETE FROM Members WHERE member_id = ?', [memberId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Member not found' });
+        }
+
+        res.json({ message: 'Member deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting member:', error);
+        res.status(500).json({ error: 'Failed to delete member' });
+    }
+});
+
 module.exports = router;

@@ -1,134 +1,125 @@
-<!DOCTYPE html>
-<html lang="en">
+{{!-- Remove DOCTYPE, html, head, and body tags since they're in the layout --}}
+<h1>Member Management</h1>
+<a href="{{basePath}}" class="back-link">Back to Home</a>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="base-path" content="{{basePath}}">
-    <title>Manage Members - Sun Gym</title>
-    <link rel="stylesheet" href="{{basePath}}/css/members.css">
-</head>
-
-<body>
-    <h1>Member Management</h1>
-    <a href="{{basePath}}" class="back-link">Back to Home</a>
-
-    {{!-- Stats Section --}}
-    <div class="stats-section">
-        <h2>Quick Stats</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Members</h3>
-                <p>{{stats.totalMembers}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>New This Month</h3>
-                <p>{{stats.newMembers}}</p>
-            </div>
+{{!-- Stats Section --}}
+<div class="stats-section">
+    <h2>Quick Stats</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Members</h3>
+            <p>{{stats.totalMembers}}</p>
+        </div>
+        <div class="stat-card">
+            <h3>New This Month</h3>
+            <p>{{stats.newMembers}}</p>
         </div>
     </div>
+</div>
 
-    {{!-- Add Member Form --}}
-    <div class="form-section">
-        <h2>Add New Member</h2>
-        <form id="addMember" method="POST">
+{{!-- Add Member Form --}}
+<div class="form-section">
+    <h2>Add New Member</h2>
+    <form id="addMember" method="POST">
+        <div class="form-group">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required>
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber">Phone:</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber">
+        </div>
+        <div class="form-group">
+            <label for="membershipType">Membership Type:</label>
+            <select id="membershipType" name="membershipType" required>
+                <option value="Basic">Basic</option>
+                <option value="Premium">Premium</option>
+                <option value="VIP">VIP</option>
+            </select>
+        </div>
+        <button type="submit">Add Member</button>
+    </form>
+</div>
+
+{{!-- Members Table --}}
+<div class="table-section">
+    <h2>Current Members</h2>
+    <table id="members-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Join Date</th>
+                <th>Membership Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each members}}
+            <tr data-id="{{this.memberID}}">
+                <td>{{this.memberID}}</td>
+                <td>{{this.firstName}}</td>
+                <td>{{this.lastName}}</td>
+                <td>{{this.email}}</td>
+                <td>{{this.phoneNumber}}</td>
+                <td>{{this.joinDate}}</td>
+                <td>{{this.membershipType}}</td>
+                <td>
+                    <button onclick="editMember({{this.memberID}})" class="edit-btn">Edit</button>
+                    <button onclick="deleteMember({{this.memberID}})" class="delete-btn">Delete</button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+{{!-- Edit Member Modal --}}
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <h2>Edit Member</h2>
+        <form id="edit-member-form">
+            <input type="hidden" id="edit-memberID">
             <div class="form-group">
-                <label for="firstName">First Name:</label>
-                <input type="text" id="firstName" name="firstName" required>
+                <label for="edit-firstName">First Name:</label>
+                <input type="text" id="edit-firstName" required>
             </div>
             <div class="form-group">
-                <label for="lastName">Last Name:</label>
-                <input type="text" id="lastName" name="lastName" required>
+                <label for="edit-lastName">Last Name:</label>
+                <input type="text" id="edit-lastName" required>
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
+                <label for="edit-email">Email:</label>
+                <input type="email" id="edit-email" required>
             </div>
             <div class="form-group">
-                <label for="phoneNumber">Phone:</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber">
+                <label for="edit-phone">Phone:</label>
+                <input type="tel" id="edit-phone">
             </div>
             <div class="form-group">
-                <label for="membershipType">Membership Type:</label>
-                <select id="membershipType" name="membershipType" required>
+                <label for="edit-membershipType">Membership Type:</label>
+                <select id="edit-membershipType" required>
                     <option value="Basic">Basic</option>
                     <option value="Premium">Premium</option>
                     <option value="VIP">VIP</option>
                 </select>
             </div>
-            <button type="submit">Add Member</button>
+            <button type="submit">Update Member</button>
+            <button type="button" onclick="closeEditModal()">Cancel</button>
         </form>
     </div>
+</div>
 
-    {{!-- Members Table --}}
-    <div class="table-section">
-        <h2>Current Members</h2>
-        <table id="members-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Join Date</th>
-                    <th>Membership</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each members}}
-                <tr>
-                    <td>{{this.memberID}}</td>
-                    <td>{{this.firstName}}</td>
-                    <td>{{this.lastName}}</td>
-                    <td>{{this.email}}</td>
-                    <td>{{this.phoneNumber}}</td>
-                    <td>{{this.joinDate}}</td>
-                    <td>{{this.membershipType}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
-
-    {{!-- Edit Member Modal --}}
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <h2>Edit Member</h2>
-            <form id="edit-member-form">
-                <input type="hidden" id="edit-memberID">
-                <div class="form-group">
-                    <label for="edit-firstName">First Name:</label>
-                    <input type="text" id="edit-firstName" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-lastName">Last Name:</label>
-                    <input type="text" id="edit-lastName" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-email">Email:</label>
-                    <input type="email" id="edit-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-phone">Phone:</label>
-                    <input type="tel" id="edit-phone">
-                </div>
-                <div class="form-group">
-                    <label for="edit-membershipType">Membership Type:</label>
-                    <select id="edit-membershipType" required>
-                        <option value="Basic">Basic</option>
-                        <option value="Premium">Premium</option>
-                        <option value="VIP">VIP</option>
-                    </select>
-                </div>
-                <button type="submit">Update Member</button>
-                <button type="button" onclick="closeEditModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-
-    {{!-- Load JavaScript --}}
-    <script src="{{basePath}}/js/memberOperations.js"></script>
-</body>
-
-</html>
+{{!-- Load JavaScript --}}
+<script src="{{basePath}}/js/memberOperations.js"></script>

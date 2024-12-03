@@ -113,18 +113,25 @@ editMemberForm.addEventListener("submit", async function (e) {
 });
 
 // Delete Member
-function deleteMember(id) {
+async function deleteMember(id) {
     if (confirm('Are you sure you want to delete this member?')) {
-        fetch(`${BASE_PATH}/api/members/${id}`, {
-            method: 'DELETE',
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    location.reload(); // Refresh to show deletion
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        try {
+            const response = await fetch(`${BASE_PATH}/api/members/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete member');
+            }
+
+            const data = await response.json();
+            if (data.message) {
+                location.reload(); // Refresh to show deletion
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error deleting member');
+        }
     }
 }
 
@@ -205,3 +212,21 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Page loaded, calling loadMembers()');
     loadMembers();
 });
+
+// Add function to update member-trainer relationships
+async function updateMemberTrainer(memberId, oldTrainerId, newTrainerId) {
+    try {
+        const response = await fetch(`/api/member-trainers/${memberId}/${oldTrainerId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newTrainerId })
+        });
+        if (!response.ok) throw new Error('Failed to update relationship');
+        refreshTable();
+    } catch (err) {
+        console.error('Error:', err);
+        alert('Failed to update member-trainer relationship');
+    }
+}

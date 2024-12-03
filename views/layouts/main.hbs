@@ -1,13 +1,19 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Sun Gym Management System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base-path" content="{{basePath}}">
+    <title>{{title}} - Sun Gym</title>
+    {{#if customCSS}}
+    <link rel="stylesheet" href="{{basePath}}/css/{{customCSS}}.css">
+    {{/if}}
 </head>
-
 <body>
     {{{body}}}
-</body>
 
+    {{#if customJS}}
+    <script src="{{basePath}}/js/{{customJS}}.js"></script>
+    {{/if}}
+</body>
 </html>

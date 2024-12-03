@@ -4,6 +4,7 @@ const app = express();
 const path = require('path');
 const exphbs = require('express-handlebars');
 const db = require('./database/db-connector').pool;
+const handlebars = require('express-handlebars');
 
 // Add this near the top of app.js
 const ONID = process.env.ONID || 'piercebe'; // Default for development
@@ -11,8 +12,10 @@ const BASE_PATH = `/~${ONID}/CS340/sun-gym-management-system`;
 console.log('Current BASE_PATH:', BASE_PATH);
 
 // Handlebars setup
-app.engine('hbs', exphbs.engine({
+const hbs = handlebars.create({
     extname: '.hbs',
+    defaultLayout: 'main',
+    layoutsDir: path.join(__dirname, 'views/layouts'),
     helpers: {
         formatTime: function (time) {
             // Convert time to HH:mm format
@@ -22,7 +25,9 @@ app.engine('hbs', exphbs.engine({
             return str ? str.toLowerCase() : '';
         }
     }
-}));
+});
+
+app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -100,6 +105,9 @@ app.get(`${BASE_PATH}/members`, async (req, res) => {
 
         // Pass both members and stats to the template
         res.render('members', {
+            title: 'Manage Members',
+            customCSS: 'members',
+            customJS: 'memberOperations',
             basePath: BASE_PATH,
             members: rows,
             stats: {
