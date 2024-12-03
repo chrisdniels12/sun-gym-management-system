@@ -11,9 +11,6 @@ git clone https://github.com/chrisdniels12/sun-gym-management-system.git
 
 # Navigate to project directory
 cd sun-gym-management-system
-
-# Switch to updated branch
-git checkout updated-handlebars-version
 ```
 
 2. **Install Dependencies**
@@ -203,6 +200,5 @@ sun-gym-management-system/
 - Clear schema documentation
 
 ### Version Control
-- Main branch: Original implementation
-- updated-handlebars-version: Current working version
+- Main branch: Current working version with Handlebars implementation
 - All changes documented in commits
