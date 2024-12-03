@@ -48,6 +48,25 @@ const pool = mysql.createPool({
 3. Import the DML.sql to add sample data
 4. Update db-connector.js with their credentials
 
+**Note about ONID paths:**
+- Each user needs to use their own ONID username in the URL
+- The app uses an environment variable `ONID` to set this path
+- If not set, it defaults to 'piercebe' for development
+- You can set your ONID before starting the server:
+  ```bash
+   # Windows PowerShell
+  $env:ONID = "your_onid"
+  node app.js
+
+  # Windows Command Prompt
+  set ONID=your_onid
+  node app.js
+
+  # Mac/Linux
+  export ONID=your_onid
+  node app.js
+  ```
+
 4. **Start the Server**
 ```bash
 # Start the server
