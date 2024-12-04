@@ -12,9 +12,7 @@ const IS_OSU_SERVER = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 8997; // OSU engr server port
 
 // Set base path based on environment
-const BASE_PATH = IS_OSU_SERVER
-    ? '' // Empty for OSU server since we're serving from root
-    : `/~${ONID}/CS340/sun-gym-management-system`;
+const BASE_PATH = `/~${ONID}/CS340/sun-gym-management-system`;
 console.log('Current BASE_PATH:', BASE_PATH);
 console.log('Running on:', IS_OSU_SERVER ? 'OSU Server' : 'Local Development');
 
@@ -47,8 +45,10 @@ app.use(BASE_PATH, express.static(path.join(__dirname, 'public')));
 // Root route with environment-aware path
 app.get(BASE_PATH || '/', (req, res) => {
     res.render('index', {
+        title: 'Home',
         basePath: BASE_PATH,
-        isOsuServer: IS_OSU_SERVER
+        isOsuServer: IS_OSU_SERVER,
+        customCSS: 'index'  // Add this to load index.css
     });
 });
 
@@ -133,7 +133,7 @@ routes.forEach(route => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Access the application at: ${IS_OSU_SERVER
-        ? `http://classwork.engr.oregonstate.edu:${PORT}`
+        ? `http://classwork.engr.oregonstate.edu:${PORT}${BASE_PATH}`
         : `http://localhost:${PORT}${BASE_PATH}`
         }`);
 });
