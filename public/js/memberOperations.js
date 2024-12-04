@@ -151,16 +151,16 @@ window.onclick = function (event) {
 
 async function loadMembers() {
     try {
-        console.log('Fetching members...'); // Add this log
+        console.log('Fetching members...');
         const response = await fetch(`${BASE_PATH}/api/members`);
-        console.log('Response:', response); // Add this log
+        console.log('Response:', response);
 
         if (!response.ok) {
             throw new Error('Failed to fetch members');
         }
 
         const members = await response.json();
-        console.log('Members data:', members); // Add this log
+        console.log('Members data:', members);
 
         // Update the table with the members data
         const tbody = document.querySelector('#members-table tbody');
@@ -213,10 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMembers();
 });
 
-// Add function to update member-trainer relationships
+// Add function to update member-trainer relationships (fixed to use BASE_PATH)
 async function updateMemberTrainer(memberId, oldTrainerId, newTrainerId) {
     try {
-        const response = await fetch(`/api/member-trainers/${memberId}/${oldTrainerId}`, {
+        const response = await fetch(`${BASE_PATH}/api/member-trainers/${memberId}/${oldTrainerId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
