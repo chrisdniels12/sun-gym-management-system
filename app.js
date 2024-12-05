@@ -110,11 +110,9 @@ app.get(`${BASE_PATH}/members`, async (req, res) => {
 // Trainers route
 app.get(`${BASE_PATH}/trainers`, async (req, res) => {
     try {
+        console.log('Fetching trainers...');
         const [trainers] = await db.query('SELECT * FROM Trainers ORDER BY lastName, firstName');
-        const [classesResult] = await db.query('SELECT COUNT(*) as count FROM Classes WHERE status = "active"');
-        const activeClasses = classesResult[0].count;
-        const availableTrainers = trainers.length;
-        const avgClassLoad = activeClasses / (trainers.length || 1);
+        console.log('Successfully fetched trainers:', trainers);
 
         res.render('trainers', {
             title: 'Manage Trainers',
@@ -124,13 +122,20 @@ app.get(`${BASE_PATH}/trainers`, async (req, res) => {
             trainers: trainers,
             stats: {
                 totalTrainers: trainers.length,
-                activeClasses,
-                availableTrainers,
-                avgClassLoad: Math.round(avgClassLoad * 10) / 10
+                activeClasses: 0,
+                availableTrainers: trainers.length,
+                avgClassLoad: 0
             }
         });
+        console.log('Trainers page rendered successfully');
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error in trainers route:', error);
+        console.error('Full error details:', {
+            message: error.message,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            stack: error.stack
+        });
         res.status(500).send('Error loading trainers');
     }
 });
