@@ -97,18 +97,24 @@ editTrainerForm.addEventListener("submit", async function (e) {
     try {
         const response = await fetch(`${BASE_PATH}/api/trainers/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(formData)
         });
 
+        const data = await response.json();
+
         if (response.ok) {
+            // Close the modal immediately
+            closeEditModal();
             notifications.success('Trainer updated successfully!');
+            // Wait 5 seconds before reloading
             setTimeout(() => {
                 location.reload();
             }, 5000);
         } else {
-            const data = await response.json();
-            notifications.error(`Failed to update trainer: ${data.error}`);
+            notifications.error(data.error || 'Failed to update trainer');
         }
     } catch (error) {
         console.error('Error:', error);
