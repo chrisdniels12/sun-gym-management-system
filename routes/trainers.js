@@ -79,20 +79,53 @@ router.post('/', async (req, res) => {
 
 // Update a trainer
 router.put('/:id', async (req, res) => {
-    const { firstName, lastName, email, phoneNumber, specialization } = req.body;
     try {
-        const [result] = await db.query(
-            'UPDATE Trainers SET firstName=?, lastName=?, email=?, phoneNumber=?, specialization=? WHERE trainerID=?',
-            [firstName, lastName, email, phoneNumber, specialization, req.params.id]
+        const trainerId = req.params.id;
+        const { firstName, lastName, email, phoneNumber, specialization } = req.body;
+        console.log('Updating trainer:', { trainerId, firstName, lastName, email, phoneNumber, specialization });
+
+        // Check if trainer exists
+        const [existingTrainer] = await db.query(
+            'SELECT * FROM Trainers WHERE trainerID = ?',
+            [trainerId]
         );
 
-        if (result.affectedRows === 0) {
+        if (existingTrainer.length === 0) {
             return res.status(404).json({ error: 'Trainer not found' });
         }
 
-        res.json({ message: 'Trainer updated successfully' });
+        // Update the trainer
+        const [result] = await db.query(
+            `UPDATE Trainers 
+             SET firstName = ?, 
+                 lastName = ?, 
+                 email = ?, 
+                 phoneNumber = ?, 
+                 specialization = ?
+             WHERE trainerID = ?`,
+            [firstName, lastName, email, phoneNumber, specialization, trainerId]
+        );
+
+        console.log('Update result:', result);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Failed to update trainer' });
+        }
+
+        res.json({
+            message: 'Trainer updated successfully',
+            trainer: {
+                trainerID: trainerId,
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+                specialization
+            }
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error updating trainer:', error);
+        res.status(500).json({ error: error.message || 'Error updating trainer' });
     }
 });
 
