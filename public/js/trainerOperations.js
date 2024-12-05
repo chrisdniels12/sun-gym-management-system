@@ -76,7 +76,7 @@ function editTrainer(id) {
     document.getElementById('edit-lastName').value = row.cells[2].textContent;
     document.getElementById('edit-email').value = row.cells[3].textContent;
     document.getElementById('edit-phone').value = row.cells[4].textContent;
-    document.getElementById('edit-specialization').value = row.cells[5].textContent;
+    document.getElementById('edit-specialization').value = row.cells[5].textContent.trim(); // Added trim()
 
     modal.style.display = 'block';
 }
@@ -94,6 +94,8 @@ editTrainerForm.addEventListener("submit", async function (e) {
         specialization: document.getElementById("edit-specialization").value
     };
 
+    console.log('Updating trainer with data:', formData); // Added logging
+
     try {
         const response = await fetch(`${BASE_PATH}/api/trainers/${id}`, {
             method: 'PUT',
@@ -104,6 +106,7 @@ editTrainerForm.addEventListener("submit", async function (e) {
         });
 
         const data = await response.json();
+        console.log('Server response:', data); // Added logging
 
         if (response.ok) {
             // Close the modal immediately
