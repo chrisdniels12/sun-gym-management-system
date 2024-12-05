@@ -102,7 +102,9 @@ editMemberForm.addEventListener("submit", async function (e) {
 
         if (response.ok) {
             notifications.success('Member updated successfully!');
-            location.reload();
+            setTimeout(() => {
+                location.reload();
+            }, 5000);
         } else {
             const data = await response.json();
             notifications.error(`Failed to update member: ${data.error}`);
@@ -128,7 +130,10 @@ async function deleteMember(id) {
 
             if (response.ok) {
                 notifications.success('Member deleted successfully!');
-                location.reload();
+                // Wait 5 seconds before reloading
+                setTimeout(() => {
+                    location.reload();
+                }, 5000);
             } else {
                 notifications.error(data.error || 'Failed to delete member');
             }
