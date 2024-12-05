@@ -44,9 +44,14 @@
         {{{body}}}
     </main>
 
+    <!-- Load notifications.js first -->
+    <script src="{{basePath}}/js/notifications.js"></script>
+    
+    <!-- Then load page-specific JS -->
     {{#if customJS}}
     <script src="{{basePath}}/js/{{customJS}}.js"></script>
     {{/if}}
+
     <!-- Navigation JavaScript -->
     <script>
         document.querySelector('.nav-toggle').addEventListener('click', function() {

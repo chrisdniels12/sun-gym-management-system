@@ -37,7 +37,7 @@ addMemberForm.addEventListener('submit', async function (e) {
         console.log('Server response:', data);
 
         if (response.ok) {
-            showSuccess('Member added successfully!');
+            notifications.success('Member added successfully!');
             addMemberForm.reset();
             location.reload();
         } else {
@@ -45,23 +45,22 @@ addMemberForm.addEventListener('submit', async function (e) {
             if (data.error === 'Duplicate entries found' && data.duplicates) {
                 data.duplicates.forEach(duplicate => {
                     if (duplicate.field === 'email') {
-                        showError('email', `This email address is already registered: ${duplicate.value}`);
+                        notifications.error(`This email address is already registered: ${duplicate.value}`);
                     }
                     if (duplicate.field === 'phone') {
-                        showError('phoneNumber', `This phone number is already registered: ${duplicate.value}`);
+                        notifications.error(`This phone number is already registered: ${duplicate.value}`);
                     }
                     if (duplicate.field === 'name') {
-                        showError('firstName', `A member with name "${duplicate.value}" already exists`);
-                        showError('lastName', `A member with name "${duplicate.value}" already exists`);
+                        notifications.error(`A member with name "${duplicate.value}" already exists`);
                     }
                 });
             } else {
-                showError('form', `Failed to add member: ${data.error}`);
+                notifications.error(`Failed to add member: ${data.error}`);
             }
         }
     } catch (error) {
         console.error('Error details:', error);
-        showError('form', `Error adding member: ${error.message}`);
+        notifications.error(`Error adding member: ${error.message}`);
     }
 });
 
@@ -102,13 +101,15 @@ editMemberForm.addEventListener("submit", async function (e) {
         });
 
         if (response.ok) {
-            location.reload(); // Refresh to show updated data
+            notifications.success('Member updated successfully!');
+            location.reload();
         } else {
-            throw new Error('Failed to update member');
+            const data = await response.json();
+            notifications.error(`Failed to update member: ${data.error}`);
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error updating member');
+        notifications.error('Error updating member');
     }
 });
 
@@ -126,11 +127,12 @@ async function deleteMember(id) {
 
             const data = await response.json();
             if (data.message) {
-                location.reload(); // Refresh to show deletion
+                notifications.success('Member deleted successfully!');
+                location.reload();
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error deleting member');
+            notifications.error('Error deleting member');
         }
     }
 }
@@ -149,41 +151,6 @@ window.onclick = function (event) {
     }
 }
 
-async function loadMembers() {
-    try {
-        console.log('Fetching members...');
-        const response = await fetch(`${BASE_PATH}/api/members`);
-        console.log('Response:', response);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch members');
-        }
-
-        const members = await response.json();
-        console.log('Members data:', members);
-
-        // Update the table with the members data
-        const tbody = document.querySelector('#members-table tbody');
-        tbody.innerHTML = ''; // Clear existing rows
-
-        members.forEach(member => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${member.memberID}</td>
-                    <td>${member.firstName}</td>
-                    <td>${member.lastName}</td>
-                    <td>${member.email}</td>
-                    <td>${member.phoneNumber || 'N/A'}</td>
-                    <td>${new Date(member.joinDate).toLocaleDateString()}</td>
-                    <td>${member.membershipType}</td>
-                </tr>
-            `;
-        });
-    } catch (error) {
-        console.error('Error loading members:', error);
-    }
-}
-
 // Helper Functions
 function showError(fieldId, message) {
     const field = document.getElementById(fieldId);
@@ -191,13 +158,6 @@ function showError(fieldId, message) {
     errorDiv.className = 'error-message';
     errorDiv.textContent = message;
     field.parentNode.appendChild(errorDiv);
-}
-
-function showSuccess(message) {
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    successDiv.textContent = message;
-    document.querySelector('.form-section').insertBefore(successDiv, addMemberForm);
 }
 
 function clearErrors() {
@@ -209,24 +169,5 @@ function clearErrors() {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Page loaded, calling loadMembers()');
-    loadMembers();
+    console.log('Page loaded');
 });
-
-// Add function to update member-trainer relationships (fixed to use BASE_PATH)
-async function updateMemberTrainer(memberId, oldTrainerId, newTrainerId) {
-    try {
-        const response = await fetch(`${BASE_PATH}/api/member-trainers/${memberId}/${oldTrainerId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ newTrainerId })
-        });
-        if (!response.ok) throw new Error('Failed to update relationship');
-        refreshTable();
-    } catch (err) {
-        console.error('Error:', err);
-        alert('Failed to update member-trainer relationship');
-    }
-}
