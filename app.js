@@ -45,7 +45,7 @@ app.get(`${BASE_PATH}`, (req, res) => {
 
 // API routes
 app.use(`${BASE_PATH}/api/members`, require('./routes/members'));
-app.use(`${BASE_PATH}/api/trainers`, require('./routes/trainers'));
+app.use(`${BASE_PATH}/trainers`, require('./routes/trainers')); // Changed from /api/trainers to /trainers
 app.use(`${BASE_PATH}/api/classes`, require('./routes/classes'));
 app.use(`${BASE_PATH}/api/equipment`, require('./routes/equipment'));
 app.use(`${BASE_PATH}/api/payments`, require('./routes/payments'));
@@ -104,37 +104,6 @@ app.get(`${BASE_PATH}/members`, async (req, res) => {
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Error loading members');
-    }
-});
-
-// Trainers route
-app.get(`${BASE_PATH}/trainers`, async (req, res) => {
-    try {
-        const [trainers] = await db.query('SELECT * FROM Trainers');
-
-        // Calculate stats
-        const totalTrainers = trainers.length;
-        const [classesResult] = await db.query('SELECT COUNT(*) as count FROM Classes WHERE status = "active"');
-        const activeClasses = classesResult[0].count;
-        const availableTrainers = trainers.length; // This could be refined based on your business logic
-        const avgClassLoad = activeClasses / (totalTrainers || 1);
-
-        res.render('trainers', {
-            title: 'Manage Trainers',
-            basePath: BASE_PATH,
-            customCSS: 'trainers',
-            customJS: 'trainerOperations',
-            trainers: trainers,
-            stats: {
-                totalTrainers,
-                activeClasses,
-                availableTrainers,
-                avgClassLoad: Math.round(avgClassLoad * 10) / 10
-            }
-        });
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Error loading trainers');
     }
 });
 
