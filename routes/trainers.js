@@ -4,10 +4,20 @@ const db = require('../database/db-connector').pool;
 
 // Get all trainers (API route)
 router.get('/', async (req, res) => {
+    console.log('API: GET /api/trainers called');
     try {
+        console.log('Attempting to fetch trainers from database...');
         const [rows] = await db.query('SELECT * FROM Trainers');
+        console.log('Successfully fetched trainers:', rows);
         res.json(rows);
     } catch (error) {
+        console.error('Database error in GET /api/trainers:', error);
+        console.error('Full error details:', {
+            message: error.message,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            stack: error.stack
+        });
         res.status(500).json({ error: error.message });
     }
 });
@@ -15,9 +25,10 @@ router.get('/', async (req, res) => {
 // Add a new trainer
 router.post('/', async (req, res) => {
     const { firstName, lastName, email, phoneNumber, specialization, hireDate } = req.body;
-    console.log('Received trainer data:', { firstName, lastName, email, phoneNumber, specialization, hireDate });
+    console.log('API: POST /api/trainers called with data:', { firstName, lastName, email, phoneNumber, specialization, hireDate });
 
     try {
+        console.log('Checking for existing trainers...');
         const [existingTrainers] = await db.query(
             'SELECT * FROM Trainers WHERE email = ? OR phoneNumber = ? OR (firstName = ? AND lastName = ?)',
             [email, phoneNumber, firstName, lastName]
@@ -45,6 +56,7 @@ router.post('/', async (req, res) => {
             });
 
             if (errors.length > 0) {
+                console.log('Duplicate entries found:', errors);
                 return res.status(400).json({
                     error: 'Duplicate entries found',
                     duplicates: errors
@@ -69,7 +81,8 @@ router.post('/', async (req, res) => {
         console.error('Full error details:', {
             message: error.message,
             code: error.code,
-            sqlMessage: error.sqlMessage
+            sqlMessage: error.sqlMessage,
+            stack: error.stack
         });
         res.status(500).json({
             error: error.message || 'Error adding trainer to database'
@@ -82,19 +95,22 @@ router.put('/:id', async (req, res) => {
     try {
         const trainerId = req.params.id;
         const { firstName, lastName, email, phoneNumber, specialization } = req.body;
-        console.log('Updating trainer:', { trainerId, firstName, lastName, email, phoneNumber, specialization });
+        console.log('API: PUT /api/trainers/:id called with data:', { trainerId, firstName, lastName, email, phoneNumber, specialization });
 
         // Check if trainer exists
+        console.log('Checking if trainer exists...');
         const [existingTrainer] = await db.query(
             'SELECT * FROM Trainers WHERE trainerID = ?',
             [trainerId]
         );
 
         if (existingTrainer.length === 0) {
+            console.log('No trainer found with ID:', trainerId);
             return res.status(404).json({ error: 'Trainer not found' });
         }
 
         // Update the trainer
+        console.log('Attempting to update trainer...');
         const [result] = await db.query(
             `UPDATE Trainers 
              SET firstName = ?, 
@@ -109,6 +125,7 @@ router.put('/:id', async (req, res) => {
         console.log('Update result:', result);
 
         if (result.affectedRows === 0) {
+            console.log('Update failed for trainer ID:', trainerId);
             return res.status(404).json({ error: 'Failed to update trainer' });
         }
 
@@ -125,6 +142,12 @@ router.put('/:id', async (req, res) => {
         });
     } catch (error) {
         console.error('Error updating trainer:', error);
+        console.error('Full error details:', {
+            message: error.message,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            stack: error.stack
+        });
         res.status(500).json({ error: error.message || 'Error updating trainer' });
     }
 });
@@ -133,16 +156,19 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const trainerId = req.params.id;
-        console.log('Deleting trainer with ID:', trainerId);
+        console.log('API: DELETE /api/trainers/:id called for ID:', trainerId);
 
         // First delete related records in intersection tables
+        console.log('Deleting related records...');
         await db.query('DELETE FROM MemberTrainer WHERE trainerID = ?', [trainerId]);
         await db.query('DELETE FROM TrainerEquipment WHERE trainerID = ?', [trainerId]);
 
         // Update any classes to remove this trainer (set to NULL)
+        console.log('Updating related classes...');
         await db.query('UPDATE Classes SET trainerID = NULL WHERE trainerID = ?', [trainerId]);
 
         // Then delete the trainer
+        console.log('Attempting to delete trainer...');
         const [result] = await db.query('DELETE FROM Trainers WHERE trainerID = ?', [trainerId]);
 
         if (result.affectedRows === 0) {
@@ -154,6 +180,12 @@ router.delete('/:id', async (req, res) => {
         res.json({ message: 'Trainer deleted successfully' });
     } catch (error) {
         console.error('Error deleting trainer:', error);
+        console.error('Full error details:', {
+            message: error.message,
+            code: error.code,
+            sqlMessage: error.sqlMessage,
+            stack: error.stack
+        });
         res.status(500).json({ error: error.message || 'Failed to delete trainer' });
     }
 });
