@@ -129,6 +129,16 @@ async function deleteMember(id) {
             const data = await response.json();
 
             if (response.ok) {
+                // Remove the row from the table immediately
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    row.style.transition = 'opacity 0.3s ease';
+                    row.style.opacity = '0';
+                    setTimeout(() => {
+                        row.remove();
+                    }, 300);
+                }
+
                 notifications.success('Member deleted successfully!');
                 // Wait 5 seconds before reloading
                 setTimeout(() => {
