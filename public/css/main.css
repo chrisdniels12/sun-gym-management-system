@@ -15,6 +15,36 @@ body {
     background-color: var(--background-color);
 }
 
+/* Back Link Button */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    background-color: white;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.back-link:before {
+    content: '←';
+    margin-right: 0.5rem;
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+.back-link:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Navigation Styles */
 .navbar {
     background-color: white;
@@ -159,7 +189,7 @@ body {
     }
 }
 
-/* Rest of existing styles */
+/* Headers */
 h1,
 h2,
 h3 {
