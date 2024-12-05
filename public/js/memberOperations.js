@@ -71,11 +71,11 @@ function editMember(id) {
 
     // Fill the edit form with current data
     document.getElementById('edit-memberID').value = id;
-    document.getElementById('edit-firstName').value = row.cells[1].textContent.split(' ')[0];
-    document.getElementById('edit-lastName').value = row.cells[1].textContent.split(' ')[1];
-    document.getElementById('edit-email').value = row.cells[2].textContent;
-    document.getElementById('edit-phone').value = row.cells[3].textContent;
-    document.getElementById('edit-membershipType').value = row.cells[4].textContent;
+    document.getElementById('edit-firstName').value = row.cells[1].textContent;
+    document.getElementById('edit-lastName').value = row.cells[2].textContent;
+    document.getElementById('edit-email').value = row.cells[3].textContent;
+    document.getElementById('edit-phone').value = row.cells[4].textContent;
+    document.getElementById('edit-membershipType').value = row.cells[6].textContent;
 
     modal.style.display = 'block';
 }
@@ -119,20 +119,22 @@ async function deleteMember(id) {
         try {
             const response = await fetch(`${BASE_PATH}/api/members/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to delete member');
-            }
-
             const data = await response.json();
-            if (data.message) {
+
+            if (response.ok) {
                 notifications.success('Member deleted successfully!');
                 location.reload();
+            } else {
+                notifications.error(data.error || 'Failed to delete member');
             }
         } catch (error) {
             console.error('Error:', error);
-            notifications.error('Error deleting member');
+            notifications.error('Error connecting to server');
         }
     }
 }
