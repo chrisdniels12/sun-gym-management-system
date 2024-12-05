@@ -75,7 +75,7 @@ function editMember(id) {
     document.getElementById('edit-lastName').value = row.cells[2].textContent;
     document.getElementById('edit-email').value = row.cells[3].textContent;
     document.getElementById('edit-phone').value = row.cells[4].textContent;
-    document.getElementById('edit-membershipType').value = row.cells[6].textContent;
+    document.getElementById('edit-membershipType').value = row.cells[6].textContent.trim();
 
     modal.style.display = 'block';
 }
@@ -84,6 +84,7 @@ function editMember(id) {
 editMemberForm.addEventListener("submit", async function (e) {
     e.preventDefault();
     const id = document.getElementById('edit-memberID').value;
+    const row = document.querySelector(`tr[data-id="${id}"]`);
 
     const formData = {
         firstName: document.getElementById("edit-firstName").value,
@@ -93,6 +94,8 @@ editMemberForm.addEventListener("submit", async function (e) {
         membershipType: document.getElementById("edit-membershipType").value
     };
 
+    console.log('Updating member with data:', formData);
+
     try {
         const response = await fetch(`${BASE_PATH}/api/members/${id}`, {
             method: 'PUT',
@@ -100,14 +103,24 @@ editMemberForm.addEventListener("submit", async function (e) {
             body: JSON.stringify(formData)
         });
 
+        const data = await response.json();
+        console.log('Server response:', data);
+
         if (response.ok) {
+            // Close the modal immediately
+            closeEditModal();
+
+            // Update the row immediately
+            row.cells[1].textContent = formData.firstName;
+            row.cells[2].textContent = formData.lastName;
+            row.cells[3].textContent = formData.email;
+            row.cells[4].textContent = formData.phoneNumber;
+            row.cells[6].textContent = formData.membershipType;
+
+            // Show success message for 5 seconds
             notifications.success('Member updated successfully!');
-            setTimeout(() => {
-                location.reload();
-            }, 5000);
         } else {
-            const data = await response.json();
-            notifications.error(`Failed to update member: ${data.error}`);
+            notifications.error(data.error || 'Failed to update member');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -140,10 +153,6 @@ async function deleteMember(id) {
                 }
 
                 notifications.success('Member deleted successfully!');
-                // Wait 5 seconds before reloading
-                setTimeout(() => {
-                    location.reload();
-                }, 5000);
             } else {
                 notifications.error(data.error || 'Failed to delete member');
             }

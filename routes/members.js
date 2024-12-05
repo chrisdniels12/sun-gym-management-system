@@ -69,6 +69,58 @@ router.post('/', async (req, res) => {
     }
 });
 
+// UPDATE member
+router.put('/:id', async (req, res) => {
+    try {
+        const memberId = req.params.id;
+        const { firstName, lastName, email, phoneNumber, membershipType } = req.body;
+        console.log('Updating member:', { memberId, firstName, lastName, email, phoneNumber, membershipType });
+
+        // Check if member exists
+        const [existingMember] = await db.query(
+            'SELECT * FROM Members WHERE memberID = ?',
+            [memberId]
+        );
+
+        if (existingMember.length === 0) {
+            return res.status(404).json({ error: 'Member not found' });
+        }
+
+        // Update the member
+        const [result] = await db.query(
+            `UPDATE Members 
+             SET firstName = ?, 
+                 lastName = ?, 
+                 email = ?, 
+                 phoneNumber = ?, 
+                 membershipType = ?
+             WHERE memberID = ?`,
+            [firstName, lastName, email, phoneNumber, membershipType, memberId]
+        );
+
+        console.log('Update result:', result);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Failed to update member' });
+        }
+
+        res.json({
+            message: 'Member updated successfully',
+            member: {
+                memberID: memberId,
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+                membershipType
+            }
+        });
+    } catch (error) {
+        console.error('Error updating member:', error);
+        res.status(500).json({ error: error.message || 'Error updating member' });
+    }
+});
+
 // Add route to handle nullable trainer relationship
 router.put('/members/:id/trainer', async (req, res) => {
     try {
