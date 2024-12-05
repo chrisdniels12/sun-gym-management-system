@@ -69,7 +69,7 @@ async function testDatabase() {
 testDatabase();
 
 // Start server
-const PORT = process.env.PORT || 8999;
+const PORT = 8997;  // Fixed port for OSU engr server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
