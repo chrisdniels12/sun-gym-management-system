@@ -76,7 +76,7 @@ function editTrainer(id) {
     document.getElementById('edit-lastName').value = row.cells[2].textContent;
     document.getElementById('edit-email').value = row.cells[3].textContent;
     document.getElementById('edit-phone').value = row.cells[4].textContent;
-    document.getElementById('edit-specialization').value = row.cells[5].textContent.trim(); // Added trim()
+    document.getElementById('edit-specialization').value = row.cells[5].textContent.trim();
 
     modal.style.display = 'block';
 }
@@ -85,6 +85,7 @@ function editTrainer(id) {
 editTrainerForm.addEventListener("submit", async function (e) {
     e.preventDefault();
     const id = document.getElementById('edit-trainerID').value;
+    const row = document.querySelector(`tr[data-id="${id}"]`);
 
     const formData = {
         firstName: document.getElementById("edit-firstName").value,
@@ -94,7 +95,7 @@ editTrainerForm.addEventListener("submit", async function (e) {
         specialization: document.getElementById("edit-specialization").value
     };
 
-    console.log('Updating trainer with data:', formData); // Added logging
+    console.log('Updating trainer with data:', formData);
 
     try {
         const response = await fetch(`${BASE_PATH}/api/trainers/${id}`, {
@@ -106,16 +107,21 @@ editTrainerForm.addEventListener("submit", async function (e) {
         });
 
         const data = await response.json();
-        console.log('Server response:', data); // Added logging
+        console.log('Server response:', data);
 
         if (response.ok) {
             // Close the modal immediately
             closeEditModal();
+
+            // Update the row immediately
+            row.cells[1].textContent = formData.firstName;
+            row.cells[2].textContent = formData.lastName;
+            row.cells[3].textContent = formData.email;
+            row.cells[4].textContent = formData.phoneNumber;
+            row.cells[5].textContent = formData.specialization;
+
+            // Show success message for 5 seconds
             notifications.success('Trainer updated successfully!');
-            // Wait 5 seconds before reloading
-            setTimeout(() => {
-                location.reload();
-            }, 5000);
         } else {
             notifications.error(data.error || 'Failed to update trainer');
         }
@@ -150,10 +156,6 @@ async function deleteTrainer(id) {
                 }
 
                 notifications.success('Trainer deleted successfully!');
-                // Wait 5 seconds before reloading
-                setTimeout(() => {
-                    location.reload();
-                }, 5000);
             } else {
                 notifications.error(data.error || 'Failed to delete trainer');
             }
