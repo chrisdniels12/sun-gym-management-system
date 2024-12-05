@@ -76,8 +76,8 @@ router.put('/members/:id/trainer', async (req, res) => {
         const { trainerId } = req.body;
 
         // Allow setting trainer to null
-        const query = 'UPDATE Members SET trainer_id = ? WHERE member_id = ?';
-        await db.pool.query(query, [trainerId || null, memberId]);
+        const query = 'UPDATE Members SET trainerID = ? WHERE memberID = ?';
+        await db.query(query, [trainerId || null, memberId]);
 
         res.status(200).json({ message: 'Trainer updated successfully' });
     } catch (err) {
@@ -90,8 +90,8 @@ router.put('/members/:id/trainer', async (req, res) => {
 router.delete('/member-trainers/:memberId/:trainerId', async (req, res) => {
     try {
         const { memberId, trainerId } = req.params;
-        const query = 'DELETE FROM MemberTrainers WHERE member_id = ? AND trainer_id = ?';
-        await db.pool.query(query, [memberId, trainerId]);
+        const query = 'DELETE FROM MemberTrainer WHERE memberID = ? AND trainerID = ?';
+        await db.query(query, [memberId, trainerId]);
         res.status(200).json({ message: 'Relationship deleted successfully' });
     } catch (err) {
         console.error(err);
@@ -103,23 +103,27 @@ router.delete('/member-trainers/:memberId/:trainerId', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const memberId = req.params.id;
+        console.log('Deleting member with ID:', memberId);
 
         // First delete related records in intersection tables
-        await db.query('DELETE FROM MemberTrainers WHERE member_id = ?', [memberId]);
-        await db.query('DELETE FROM ClassBookings WHERE member_id = ?', [memberId]);
-        await db.query('DELETE FROM MemberEquipment WHERE member_id = ?', [memberId]);
+        await db.query('DELETE FROM MemberTrainer WHERE memberID = ?', [memberId]);
+        await db.query('DELETE FROM ClassBookings WHERE memberID = ?', [memberId]);
+        await db.query('DELETE FROM MemberEquipment WHERE memberID = ?', [memberId]);
+        await db.query('DELETE FROM Payments WHERE memberID = ?', [memberId]);
 
         // Then delete the member
-        const [result] = await db.query('DELETE FROM Members WHERE member_id = ?', [memberId]);
+        const [result] = await db.query('DELETE FROM Members WHERE memberID = ?', [memberId]);
 
         if (result.affectedRows === 0) {
+            console.log('No member found with ID:', memberId);
             return res.status(404).json({ error: 'Member not found' });
         }
 
+        console.log('Member deleted successfully:', memberId);
         res.json({ message: 'Member deleted successfully' });
     } catch (error) {
         console.error('Error deleting member:', error);
-        res.status(500).json({ error: 'Failed to delete member' });
+        res.status(500).json({ error: error.message || 'Failed to delete member' });
     }
 });
 
