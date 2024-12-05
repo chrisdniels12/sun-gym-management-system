@@ -87,7 +87,7 @@
                 <td>{{this.specialization}}</td>
                 <td>
                     <button onclick="editTrainer({{this.trainerID}})" class="edit-btn">Edit</button>
-                    <button onclick="deleteTrainer({{this.trainerID}})" class="delete-btn">Delete</button>
+                    <button onclick="deleteTrainer({{this.trainerID}})" class="delete-btn" type="button">Delete</button>
                 </td>
             </tr>
             {{/each}}
@@ -131,3 +131,6 @@
         </form>
     </div>
 </div>
+
+{{!-- Load JavaScript --}}
+<script src="{{basePath}}/js/trainerOperations.js"></script>
