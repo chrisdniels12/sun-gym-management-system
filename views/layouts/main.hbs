@@ -12,10 +12,47 @@
     {{/if}}
 </head>
 <body>
-    {{{body}}}
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{{basePath}}">Sun Gym</a>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-section">
+                <h3>Primary Tables</h3>
+                <a href="{{basePath}}/members">Members</a>
+                <a href="{{basePath}}/trainers">Trainers</a>
+                <a href="{{basePath}}/classes">Classes</a>
+                <a href="{{basePath}}/equipment">Equipment</a>
+                <a href="{{basePath}}/payments">Payments</a>
+            </div>
+            <div class="nav-section">
+                <h3>Relationships</h3>
+                <a href="{{basePath}}/member-equipment">Member-Equipment</a>
+                <a href="{{basePath}}/class-bookings">Class-Bookings</a>
+                <a href="{{basePath}}/member-trainer">Member-Trainer</a>
+                <a href="{{basePath}}/trainer-equipment">Trainer-Equipment</a>
+            </div>
+        </div>
+        <button class="nav-toggle">
+            <span class="hamburger"></span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content">
+        {{{body}}}
+    </main>
 
     {{#if customJS}}
     <script src="{{basePath}}/js/{{customJS}}.js"></script>
     {{/if}}
+    <!-- Navigation JavaScript -->
+    <script>
+        document.querySelector('.nav-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-menu').classList.toggle('active');
+            this.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>
