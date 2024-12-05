@@ -2,34 +2,13 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db-connector').pool;
 
-// Get all trainers
+// Get all trainers (API route)
 router.get('/', async (req, res) => {
     try {
-        const [trainers] = await db.query('SELECT * FROM Trainers');
-
-        // Calculate stats
-        const totalTrainers = trainers.length;
-        const [classesResult] = await db.query('SELECT COUNT(*) as count FROM Classes WHERE status = "active"');
-        const activeClasses = classesResult[0].count;
-        const availableTrainers = trainers.length;
-        const avgClassLoad = activeClasses / (totalTrainers || 1);
-
-        res.render('trainers', {
-            title: 'Manage Trainers',
-            basePath: req.baseUrl.split('/api')[0],
-            customCSS: 'trainers',
-            customJS: 'trainerOperations',
-            trainers: trainers,
-            stats: {
-                totalTrainers,
-                activeClasses,
-                availableTrainers,
-                avgClassLoad: Math.round(avgClassLoad * 10) / 10
-            }
-        });
+        const [rows] = await db.query('SELECT * FROM Trainers');
+        res.json(rows);
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Error loading trainers');
+        res.status(500).json({ error: error.message });
     }
 });
 
