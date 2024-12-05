@@ -185,6 +185,8 @@ h1 {
 /* Updated Form Section */
 .form-section {
     max-width: var(--form-width);
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .form-group {
