@@ -44,7 +44,12 @@ router.post('/', async (req, res) => {
                 }
             });
 
-            console.log('Found duplicates:', errors);
+            if (errors.length > 0) {
+                return res.status(400).json({
+                    error: 'Duplicate entries found',
+                    duplicates: errors
+                });
+            }
         }
 
         // If no duplicates, insert new trainer
@@ -76,10 +81,15 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     const { firstName, lastName, email, phoneNumber, specialization } = req.body;
     try {
-        await db.query(
+        const [result] = await db.query(
             'UPDATE Trainers SET firstName=?, lastName=?, email=?, phoneNumber=?, specialization=? WHERE trainerID=?',
             [firstName, lastName, email, phoneNumber, specialization, req.params.id]
         );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Trainer not found' });
+        }
+
         res.json({ message: 'Trainer updated successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -89,10 +99,29 @@ router.put('/:id', async (req, res) => {
 // Delete a trainer
 router.delete('/:id', async (req, res) => {
     try {
-        await db.query('DELETE FROM Trainers WHERE trainerID=?', [req.params.id]);
+        const trainerId = req.params.id;
+        console.log('Deleting trainer with ID:', trainerId);
+
+        // First delete related records in intersection tables
+        await db.query('DELETE FROM MemberTrainer WHERE trainerID = ?', [trainerId]);
+        await db.query('DELETE FROM TrainerEquipment WHERE trainerID = ?', [trainerId]);
+
+        // Update any classes to remove this trainer (set to NULL)
+        await db.query('UPDATE Classes SET trainerID = NULL WHERE trainerID = ?', [trainerId]);
+
+        // Then delete the trainer
+        const [result] = await db.query('DELETE FROM Trainers WHERE trainerID = ?', [trainerId]);
+
+        if (result.affectedRows === 0) {
+            console.log('No trainer found with ID:', trainerId);
+            return res.status(404).json({ error: 'Trainer not found' });
+        }
+
+        console.log('Trainer deleted successfully:', trainerId);
         res.json({ message: 'Trainer deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error deleting trainer:', error);
+        res.status(500).json({ error: error.message || 'Failed to delete trainer' });
     }
 });
 

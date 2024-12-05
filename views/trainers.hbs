@@ -73,19 +73,61 @@
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Specialization</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {{#each trainers}}
-            <tr>
+            <tr data-id="{{this.trainerID}}">
                 <td>{{this.trainerID}}</td>
                 <td>{{this.firstName}}</td>
                 <td>{{this.lastName}}</td>
                 <td>{{this.email}}</td>
                 <td>{{this.phoneNumber}}</td>
                 <td>{{this.specialization}}</td>
+                <td>
+                    <button onclick="editTrainer({{this.trainerID}})" class="edit-btn">Edit</button>
+                    <button onclick="deleteTrainer({{this.trainerID}})" class="delete-btn">Delete</button>
+                </td>
             </tr>
             {{/each}}
         </tbody>
     </table>
+</div>
+
+{{!-- Edit Trainer Modal --}}
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <h2>Edit Trainer</h2>
+        <form id="edit-trainer-form">
+            <input type="hidden" id="edit-trainerID">
+            <div class="form-group">
+                <label for="edit-firstName">First Name:</label>
+                <input type="text" id="edit-firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-lastName">Last Name:</label>
+                <input type="text" id="edit-lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-email">Email:</label>
+                <input type="email" id="edit-email" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-phone">Phone:</label>
+                <input type="tel" id="edit-phone">
+            </div>
+            <div class="form-group">
+                <label for="edit-specialization">Specialization:</label>
+                <select id="edit-specialization" required>
+                    <option value="Strength Training">Strength Training</option>
+                    <option value="Cardio">Cardio</option>
+                    <option value="Yoga">Yoga</option>
+                    <option value="CrossFit">CrossFit</option>
+                </select>
+            </div>
+            <button type="submit">Update Trainer</button>
+            <button type="button" onclick="closeEditModal()">Cancel</button>
+        </form>
+    </div>
 </div>
