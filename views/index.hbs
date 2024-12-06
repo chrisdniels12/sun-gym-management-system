@@ -1,94 +1,78 @@
-{{!-- Main header with modern styling --}}
+{{!-- Main header with clean styling --}}
 <div class="header-section">
     <h1>Sun Gym Management System</h1>
-    <p class="subtitle">Database Administration Interface</p>
 </div>
 
-{{!-- Primary Tables section with card layout --}}
-<section class="content-section">
-    <h2>Primary Tables</h2>
-    <div class="card-grid">
-        {{!-- Members Card --}}
-        <div class="card">
-            <div class="card-icon">👥</div>
-            <h3>Members</h3>
-            <p>Manage member profiles, view and update membership details</p>
-            <a href="{{basePath}}/members" class="card-button">Manage Members</a>
-        </div>
+{{!-- Main content in a compact layout --}}
+<div class="dashboard-container">
+    {{!-- Primary Tables section --}}
+    <section class="content-section">
+        <h2>Primary Tables</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>Members</h3>
+                <p>Member profiles and membership details</p>
+                <a href="{{basePath}}/members" class="card-button">Access</a>
+            </div>
 
-        {{!-- Trainers Card --}}
-        <div class="card">
-            <div class="card-icon">💪</div>
-            <h3>Trainers</h3>
-            <p>Manage trainer profiles and their specializations</p>
-            <a href="{{basePath}}/trainers" class="card-button">Manage Trainers</a>
-        </div>
+            <div class="card">
+                <h3>Trainers</h3>
+                <p>Trainer profiles and specializations</p>
+                <a href="{{basePath}}/trainers" class="card-button">Access</a>
+            </div>
 
-        {{!-- Classes Card --}}
-        <div class="card">
-            <div class="card-icon">🏋️</div>
-            <h3>Classes</h3>
-            <p>Manage fitness classes, schedules, and capacity</p>
-            <a href="{{basePath}}/classes" class="card-button">Manage Classes</a>
-        </div>
+            <div class="card">
+                <h3>Classes</h3>
+                <p>Fitness classes and schedules</p>
+                <a href="{{basePath}}/classes" class="card-button">Access</a>
+            </div>
 
-        {{!-- Equipment Card --}}
-        <div class="card">
-            <div class="card-icon">🎯</div>
-            <h3>Equipment</h3>
-            <p>Track gym equipment inventory and maintenance status</p>
-            <a href="{{basePath}}/equipment" class="card-button">Manage Equipment</a>
-        </div>
+            <div class="card">
+                <h3>Equipment</h3>
+                <p>Equipment inventory and status</p>
+                <a href="{{basePath}}/equipment" class="card-button">Access</a>
+            </div>
 
-        {{!-- Payments Card --}}
-        <div class="card">
-            <div class="card-icon">💰</div>
-            <h3>Payments</h3>
-            <p>Track and manage member payments</p>
-            <a href="{{basePath}}/payments" class="card-button">Manage Payments</a>
+            <div class="card">
+                <h3>Payments</h3>
+                <p>Member payment tracking</p>
+                <a href="{{basePath}}/payments" class="card-button">Access</a>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
-{{!-- Relationship Management section with card layout --}}
-<section class="content-section">
-    <h2>Relationship Management</h2>
-    <div class="card-grid">
-        {{!-- Member-Equipment Card --}}
-        <div class="card">
-            <div class="card-icon">🏋️‍♂️</div>
-            <h3>Member-Equipment</h3>
-            <p>Track and manage member equipment usage</p>
-            <a href="{{basePath}}/member-equipment" class="card-button">View Usage</a>
-        </div>
+    {{!-- Relationship Management section --}}
+    <section class="content-section">
+        <h2>Relationship Management</h2>
+        <div class="card-grid">
+            <div class="card">
+                <h3>Member-Equipment</h3>
+                <p>Equipment usage tracking</p>
+                <a href="{{basePath}}/member-equipment" class="card-button">Access</a>
+            </div>
 
-        {{!-- Class-Bookings Card --}}
-        <div class="card">
-            <div class="card-icon">📅</div>
-            <h3>Class-Bookings</h3>
-            <p>Manage member class enrollments and attendance</p>
-            <a href="{{basePath}}/class-bookings" class="card-button">View Bookings</a>
-        </div>
+            <div class="card">
+                <h3>Class-Bookings</h3>
+                <p>Class enrollment management</p>
+                <a href="{{basePath}}/class-bookings" class="card-button">Access</a>
+            </div>
 
-        {{!-- Member-Trainer Card --}}
-        <div class="card">
-            <div class="card-icon">🤝</div>
-            <h3>Member-Trainer</h3>
-            <p>Manage personal training relationships and schedules</p>
-            <a href="{{basePath}}/member-trainer" class="card-button">View Assignments</a>
-        </div>
+            <div class="card">
+                <h3>Member-Trainer</h3>
+                <p>Training assignments</p>
+                <a href="{{basePath}}/member-trainer" class="card-button">Access</a>
+            </div>
 
-        {{!-- Trainer-Equipment Card --}}
-        <div class="card">
-            <div class="card-icon">📋</div>
-            <h3>Trainer-Equipment</h3>
-            <p>Manage trainer equipment certifications and assignments</p>
-            <a href="{{basePath}}/trainer-equipment" class="card-button">View Certifications</a>
+            <div class="card">
+                <h3>Trainer-Equipment</h3>
+                <p>Equipment certifications</p>
+                <a href="{{basePath}}/trainer-equipment" class="card-button">Access</a>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
+</div>
 
 {{!-- Footer section --}}
 <footer>
-    <p>Sun Gym Management System - Streamlined Gym Management Solution</p>
+    <p>Database Administration Interface</p>
 </footer>
