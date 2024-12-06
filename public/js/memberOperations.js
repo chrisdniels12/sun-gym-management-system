@@ -37,9 +37,15 @@ addMemberForm.addEventListener('submit', async function (e) {
         console.log('Server response:', data);
 
         if (response.ok) {
-            notifications.success('Member added successfully!');
+            // Show success message for 5 seconds
+            const successMessage = notifications.success('Member added successfully!');
+            setTimeout(() => {
+                successMessage.remove();
+                // Only reload after success message has been shown
+                location.reload();
+            }, 5000);
+
             addMemberForm.reset();
-            location.reload();
         } else {
             // Handle multiple error cases
             if (data.error === 'Duplicate entries found' && data.duplicates) {
@@ -118,7 +124,10 @@ editMemberForm.addEventListener("submit", async function (e) {
             row.cells[6].textContent = formData.membershipType;
 
             // Show success message for 5 seconds
-            notifications.success('Member updated successfully!');
+            const successMessage = notifications.success('Member updated successfully!');
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
         } else {
             notifications.error(data.error || 'Failed to update member');
         }
@@ -152,7 +161,11 @@ async function deleteMember(id) {
                     }, 300);
                 }
 
-                notifications.success('Member deleted successfully!');
+                // Show success message for 5 seconds
+                const successMessage = notifications.success('Member deleted successfully!');
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 5000);
             } else {
                 notifications.error(data.error || 'Failed to delete member');
             }
