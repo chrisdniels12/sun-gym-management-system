@@ -52,7 +52,7 @@
                 <select id="equipmentID" name="equipmentID" required>
                     <option value="">Select Equipment...</option>
                     {{#each equipment}}
-                    <option value="{{this.equipmentID}}">{{this.equipmentName}} - {{this.type}}</option>
+                    <option value="{{this.equipmentID}}">{{this.equipmentName}} - {{this.equipmentType}}</option>
                     {{/each}}
                 </select>
             </div>
@@ -84,15 +84,15 @@
             </thead>
             <tbody>
                 {{#each usageHistory}}
-                <tr>
+                <tr data-id="{{this.memberEquipID}}">
                     <td>{{this.memberEquipID}}</td>
                     <td>{{this.memberName}}</td>
                     <td>{{this.equipmentName}}</td>
                     <td>{{this.usageDate}}</td>
                     <td>{{this.usageDuration}}</td>
                     <td>
-                        <button onclick="editUsage({{this.memberEquipID}})">Edit</button>
-                        <button onclick="deleteUsage({{this.memberEquipID}})">Delete</button>
+                        <button onclick="editUsage({{this.memberEquipID}})" class="edit-btn">Edit</button>
+                        <button onclick="deleteUsage({{this.memberEquipID}})" class="delete-btn">Delete</button>
                     </td>
                 </tr>
                 {{/each}}
@@ -100,6 +100,45 @@
         </table>
     </div>
 
+    {{!-- Edit Usage Modal --}}
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Equipment Usage</h2>
+            <form id="edit-usage-form">
+                <input type="hidden" id="edit-usageID">
+                <div class="form-group">
+                    <label for="edit-memberID">Member:</label>
+                    <select id="edit-memberID" required>
+                        {{#each members}}
+                        <option value="{{this.memberID}}">{{this.firstName}} {{this.lastName}} - {{this.membershipType}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-equipmentID">Equipment:</label>
+                    <select id="edit-equipmentID" required>
+                        {{#each equipment}}
+                        <option value="{{this.equipmentID}}">{{this.equipmentName}} - {{this.equipmentType}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-usageDate">Usage Date:</label>
+                    <input type="date" id="edit-usageDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-usageDuration">Duration (minutes):</label>
+                    <input type="number" id="edit-usageDuration" min="1" max="240" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit">Update Usage</button>
+                    <button type="button" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{basePath}}/js/notifications.js"></script>
     <script src="{{basePath}}/js/memberEquipmentOperations.js"></script>
 </body>
-</html> 
+</html>

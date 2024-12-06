@@ -1,5 +1,6 @@
 // DOM Elements
 const addMemberEquipmentForm = document.getElementById('addMemberEquipment');
+const editUsageForm = document.getElementById('edit-usage-form');
 const usageTable = document.getElementById('usage-table');
 
 // Get BASE_PATH from meta tag
@@ -76,17 +77,98 @@ addMemberEquipmentForm.addEventListener('submit', async function (e) {
     }
 });
 
-// Edit and Delete functions
+// Edit Usage
 function editUsage(id) {
-    console.log('Edit usage:', id);
-    // Implement edit functionality
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+    const modal = document.getElementById('edit-modal');
+
+    // Fill the edit form with current data
+    document.getElementById('edit-usageID').value = id;
+
+    // Get member ID from the select option that matches the member name
+    const memberName = row.cells[1].textContent;
+    const memberSelect = document.getElementById('edit-memberID');
+    Array.from(memberSelect.options).forEach(option => {
+        if (option.text === memberName) {
+            option.selected = true;
+        }
+    });
+
+    // Get equipment ID from the select option that matches the equipment name
+    const equipmentName = row.cells[2].textContent;
+    const equipmentSelect = document.getElementById('edit-equipmentID');
+    Array.from(equipmentSelect.options).forEach(option => {
+        if (option.text === equipmentName) {
+            option.selected = true;
+        }
+    });
+
+    document.getElementById('edit-usageDate').value = row.cells[3].textContent;
+    document.getElementById('edit-usageDuration').value = row.cells[4].textContent;
+
+    modal.style.display = 'block';
 }
 
+// Update Usage
+editUsageForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-usageID').value;
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+
+    const formData = {
+        memberID: document.getElementById("edit-memberID").value,
+        equipmentID: document.getElementById("edit-equipmentID").value,
+        usageDate: document.getElementById("edit-usageDate").value,
+        usageDuration: document.getElementById("edit-usageDuration").value
+    };
+
+    console.log('Updating usage with data:', formData);
+
+    try {
+        const response = await fetch(`${BASE_PATH}/api/member-equipment/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        console.log('Server response:', data);
+
+        if (response.ok) {
+            // Close the modal immediately
+            closeEditModal();
+
+            // Update the row immediately
+            const memberSelect = document.getElementById('edit-memberID');
+            const equipmentSelect = document.getElementById('edit-equipmentID');
+            row.cells[1].textContent = memberSelect.options[memberSelect.selectedIndex].text;
+            row.cells[2].textContent = equipmentSelect.options[equipmentSelect.selectedIndex].text;
+            row.cells[3].textContent = formData.usageDate;
+            row.cells[4].textContent = formData.usageDuration;
+
+            // Show success message for 5 seconds
+            const successMessage = notifications.success('Usage record updated successfully!');
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
+        } else {
+            notifications.error(data.error || 'Failed to update usage record');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        notifications.error('Error updating usage record');
+    }
+});
+
+// Delete Usage
 async function deleteUsage(id) {
     if (confirm('Are you sure you want to delete this usage record?')) {
         try {
             const response = await fetch(`${BASE_PATH}/api/member-equipment/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
 
             const data = await response.json();
@@ -114,6 +196,20 @@ async function deleteUsage(id) {
             console.error('Error:', error);
             notifications.error('Error connecting to server');
         }
+    }
+}
+
+// Modal functions
+function closeEditModal() {
+    const modal = document.getElementById('edit-modal');
+    modal.style.display = 'none';
+}
+
+// Close modal if clicking outside
+window.onclick = function (event) {
+    const modal = document.getElementById('edit-modal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
     }
 }
 
