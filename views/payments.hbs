@@ -102,6 +102,7 @@
             <h2>Edit Payment</h2>
             <form id="edit-payment-form">
                 <input type="hidden" id="edit-paymentID">
+                <input type="hidden" id="edit-paymentDate">
                 <div class="form-group">
                     <label for="edit-memberID">Member:</label>
                     <select id="edit-memberID" required>
@@ -115,8 +116,8 @@
                     <input type="number" id="edit-amount" min="0.01" step="0.01" required>
                 </div>
                 <div class="form-group">
-                    <label for="edit-paymentDate">Payment Date:</label>
-                    <input type="date" id="edit-paymentDate" required>
+                    <label>Payment Date:</label>
+                    <div class="payment-date-display"></div>
                 </div>
                 <div class="form-group">
                     <label for="edit-paymentMethod">Payment Method:</label>

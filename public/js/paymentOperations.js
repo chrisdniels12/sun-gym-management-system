@@ -38,10 +38,11 @@ addPaymentForm.addEventListener('submit', async function (e) {
             const successMessage = notifications.success('Payment added successfully!');
             setTimeout(() => {
                 successMessage.remove();
+                // Only reload after success message has been shown
+                location.reload();
             }, 5000);
 
             addPaymentForm.reset();
-            location.reload();
         } else {
             notifications.error(`Failed to add payment: ${data.error}`);
         }
@@ -71,9 +72,10 @@ function editPayment(id) {
     // Remove $ symbol from amount and set value
     document.getElementById('edit-amount').value = row.cells[2].textContent.replace('$', '');
 
-    // Keep the original payment date
-    document.getElementById('edit-paymentDate').value = row.cells[3].textContent;
-    document.getElementById('edit-paymentDate').readOnly = true;
+    // Store payment date in hidden input and display it
+    const paymentDate = row.cells[3].textContent;
+    document.getElementById('edit-paymentDate').value = paymentDate;
+    document.querySelector('.payment-date-display').textContent = paymentDate;
 
     document.getElementById('edit-paymentMethod').value = row.cells[4].textContent;
 
