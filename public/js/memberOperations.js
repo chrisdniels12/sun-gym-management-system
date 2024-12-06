@@ -39,13 +39,37 @@ addMemberForm.addEventListener('submit', async function (e) {
         if (response.ok) {
             // Show success message for 5 seconds
             const successMessage = notifications.success('Member added successfully!');
+
+            // Add the new member to the table immediately
+            const tbody = membersTable.querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.dataset.id = data.id;
+
+            // Get current date for joinDate
+            const today = new Date().toISOString().split('T')[0];
+
+            newRow.innerHTML = `
+                <td>${data.id}</td>
+                <td>${formData.firstName}</td>
+                <td>${formData.lastName}</td>
+                <td>${formData.email}</td>
+                <td>${formData.phoneNumber || ''}</td>
+                <td>${today}</td>
+                <td>${formData.membershipType}</td>
+                <td>
+                    <button onclick="editMember(${data.id})" class="edit-btn">Edit</button>
+                    <button onclick="deleteMember(${data.id})" class="delete-btn">Delete</button>
+                </td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+
+            // Reset the form
+            addMemberForm.reset();
+
+            // Remove success message after 5 seconds
             setTimeout(() => {
                 successMessage.remove();
-                // Only reload after success message has been shown
-                location.reload();
             }, 5000);
-
-            addMemberForm.reset();
         } else {
             // Handle multiple error cases
             if (data.error === 'Duplicate entries found' && data.duplicates) {
