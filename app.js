@@ -112,7 +112,32 @@ app.get(`${BASE_PATH}/trainers`, async (req, res) => {
     try {
         console.log('Fetching trainers...');
         const [trainers] = await db.query('SELECT * FROM Trainers ORDER BY lastName, firstName');
-        console.log('Successfully fetched trainers:', trainers);
+
+        // Get active classes count for each trainer
+        const [classAssignments] = await db.query(`
+            SELECT t.trainerID, COUNT(c.classID) as classCount
+            FROM Trainers t
+            LEFT JOIN Classes c ON t.trainerID = c.trainerID
+            GROUP BY t.trainerID
+        `);
+
+        // Create a map of trainer to class count
+        const trainerClassCounts = {};
+        classAssignments.forEach(assignment => {
+            trainerClassCounts[assignment.trainerID] = assignment.classCount;
+        });
+
+        // Calculate total active classes
+        const totalActiveClasses = Object.values(trainerClassCounts).reduce((sum, count) => sum + count, 0);
+
+        // Calculate available trainers (those with no classes)
+        const availableTrainers = trainers.filter(trainer =>
+            !trainerClassCounts[trainer.trainerID] || trainerClassCounts[trainer.trainerID] === 0
+        ).length;
+
+        // Calculate average class load
+        const avgClassLoad = trainers.length > 0 ?
+            Math.round((totalActiveClasses / trainers.length) * 10) / 10 : 0;
 
         res.render('trainers', {
             title: 'Manage Trainers',
@@ -122,20 +147,14 @@ app.get(`${BASE_PATH}/trainers`, async (req, res) => {
             trainers: trainers,
             stats: {
                 totalTrainers: trainers.length,
-                activeClasses: 0,
-                availableTrainers: trainers.length,
-                avgClassLoad: 0
+                activeClasses: totalActiveClasses,
+                availableTrainers: availableTrainers,
+                avgClassLoad: avgClassLoad
             }
         });
         console.log('Trainers page rendered successfully');
     } catch (error) {
         console.error('Error in trainers route:', error);
-        console.error('Full error details:', {
-            message: error.message,
-            code: error.code,
-            sqlMessage: error.sqlMessage,
-            stack: error.stack
-        });
         res.status(500).send('Error loading trainers');
     }
 });
@@ -151,22 +170,35 @@ app.get(`${BASE_PATH}/classes`, async (req, res) => {
         `);
         const [trainers] = await db.query('SELECT * FROM Trainers');
 
-        // Calculate stats
-        const totalClasses = classes.length;
-        const activeClasses = classes.filter(c => c.status === 'active').length;
-        const totalEnrollments = classes.reduce((sum, c) => sum + c.currentEnrollment, 0);
-        const avgCapacity = totalClasses ?
-            Math.round((totalEnrollments / (totalClasses * classes[0].maxCapacity)) * 100) : 0;
+        // Get current date and time
+        const now = new Date();
+        const currentDay = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()];
+        const currentTime = now.toTimeString().slice(0, 5); // HH:mm format
+
+        // Calculate active classes (classes scheduled for current day)
+        const activeClasses = classes.filter(c => c.scheduleDay === currentDay).length;
+
+        // Calculate total enrollments and average capacity
+        let totalEnrollments = 0;
+        let totalCapacity = 0;
+
+        classes.forEach(c => {
+            totalEnrollments += c.currentEnrollment || 0;
+            totalCapacity += c.maxCapacity || 0;
+        });
+
+        const avgCapacity = totalCapacity > 0 ?
+            Math.round((totalEnrollments / totalCapacity) * 100) : 0;
 
         res.render('classes', {
             basePath: BASE_PATH,
             classes: classes,
             trainers: trainers,
             stats: {
-                totalClasses,
-                activeClasses,
-                totalEnrollments,
-                avgCapacity
+                totalClasses: classes.length,
+                activeClasses: activeClasses,
+                totalEnrollments: totalEnrollments,
+                avgCapacity: avgCapacity
             }
         });
     } catch (error) {
