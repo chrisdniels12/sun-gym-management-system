@@ -92,23 +92,74 @@
                     <th>Day</th>
                     <th>Time</th>
                     <th>Capacity</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {{#each classes}}
-                <tr>
+                <tr data-id="{{this.classID}}">
                     <td>{{this.classID}}</td>
                     <td>{{this.className}}</td>
                     <td>{{this.trainerName}}</td>
                     <td>{{this.scheduleDay}}</td>
                     <td>{{formatTime this.scheduleTime}}</td>
                     <td>{{this.currentEnrollment}}/{{this.maxCapacity}}</td>
+                    <td>
+                        <button onclick="editClass({{this.classID}})" class="edit-btn">Edit</button>
+                        <button onclick="deleteClass({{this.classID}})" class="delete-btn">Delete</button>
+                    </td>
                 </tr>
                 {{/each}}
             </tbody>
         </table>
     </div>
 
+    {{!-- Edit Class Modal --}}
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Class</h2>
+            <form id="edit-class-form">
+                <input type="hidden" id="edit-classID">
+                <div class="form-group">
+                    <label for="edit-className">Class Name:</label>
+                    <input type="text" id="edit-className" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-trainerID">Trainer:</label>
+                    <select id="edit-trainerID">
+                        <option value="">Select Trainer (Optional)</option>
+                        {{#each trainers}}
+                        <option value="{{this.trainerID}}">{{this.firstName}} {{this.lastName}} - {{this.specialization}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-scheduleTime">Time:</label>
+                    <input type="time" id="edit-scheduleTime" required step="900">
+                </div>
+                <div class="form-group">
+                    <label for="edit-scheduleDay">Day:</label>
+                    <select id="edit-scheduleDay" required>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-maxCapacity">Maximum Capacity:</label>
+                    <input type="number" id="edit-maxCapacity" min="1" required>
+                </div>
+                <button type="submit">Update Class</button>
+                <button type="button" onclick="closeEditModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{basePath}}/js/notifications.js"></script>
     <script src="{{basePath}}/js/classOperations.js"></script>
 </body>
-</html> 
+</html>
