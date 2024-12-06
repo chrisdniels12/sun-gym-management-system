@@ -87,18 +87,10 @@ function editUsage(id) {
     // Fill the edit form with current data
     document.getElementById('edit-usageID').value = id;
 
-    // Get member name from the row
+    // Set member ID and display member name
     const memberName = row.cells[1].textContent.trim();
-    const memberSelect = document.getElementById('edit-memberID');
-
-    // Find and select the matching member option
-    Array.from(memberSelect.options).forEach(option => {
-        // Remove membership type from option text for comparison
-        const optionName = option.text.split(' - ')[0].trim();
-        if (optionName === memberName) {
-            option.selected = true;
-        }
-    });
+    document.getElementById('edit-memberID').value = row.dataset.memberId;
+    document.querySelector('.member-name-display').textContent = memberName;
 
     // Get equipment name from the row
     const equipmentName = row.cells[2].textContent.trim();
@@ -154,14 +146,11 @@ editUsageForm.addEventListener("submit", async function (e) {
             closeEditModal();
 
             // Update the row immediately
-            const memberSelect = document.getElementById('edit-memberID');
             const equipmentSelect = document.getElementById('edit-equipmentID');
-            row.cells[1].textContent = memberSelect.options[memberSelect.selectedIndex].text.split(' - ')[0];
             row.cells[2].textContent = equipmentSelect.options[equipmentSelect.selectedIndex].text.split(' - ')[0];
             row.cells[4].textContent = formData.usageDuration;
 
             // Update data attributes
-            row.dataset.memberId = formData.memberID;
             row.dataset.equipmentId = formData.equipmentID;
 
             // Show success message for 5 seconds

@@ -88,6 +88,17 @@ h2 {
     box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
+/* Read-only displays */
+.payment-date-display,
+.member-name-display {
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
 /* Table Section */
 .table-section {
     background: white;

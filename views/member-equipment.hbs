@@ -106,14 +106,10 @@
             <h2>Edit Equipment Usage</h2>
             <form id="edit-usage-form">
                 <input type="hidden" id="edit-usageID">
-                <input type="hidden" id="edit-usageDate">
+                <input type="hidden" id="edit-memberID">
                 <div class="form-group">
-                    <label for="edit-memberID">Member:</label>
-                    <select id="edit-memberID" required>
-                        {{#each members}}
-                        <option value="{{this.memberID}}">{{this.firstName}} {{this.lastName}} - {{this.membershipType}}</option>
-                        {{/each}}
-                    </select>
+                    <label>Member:</label>
+                    <div class="member-name-display"></div>
                 </div>
                 <div class="form-group">
                     <label for="edit-equipmentID">Equipment:</label>
