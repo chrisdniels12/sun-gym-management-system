@@ -3,64 +3,66 @@
     <h1>Sun Gym Management System</h1>
 </div>
 
-{{!-- Main content in a compact layout --}}
+{{!-- Main content in a two-column layout --}}
 <div class="dashboard-container">
-    {{!-- Primary Tables section --}}
-    <section class="content-section">
-        <h2>Primary Tables</h2>
-        <div class="link-grid">
-            <div class="link-item">
-                <a href="{{basePath}}/members" class="title-link">Members</a>
-                <span class="description">Member profiles and membership details</span>
-            </div>
+    <div class="dashboard-grid">
+        {{!-- Primary Tables section (Left Column) --}}
+        <section class="content-section primary-section">
+            <h2>Primary Tables</h2>
+            <div class="link-grid">
+                <div class="link-item">
+                    <a href="{{basePath}}/members" class="title-link">Members</a>
+                    <span class="description">Member profiles and membership details</span>
+                </div>
 
-            <div class="link-item">
-                <a href="{{basePath}}/trainers" class="title-link">Trainers</a>
-                <span class="description">Trainer profiles and specializations</span>
-            </div>
+                <div class="link-item">
+                    <a href="{{basePath}}/trainers" class="title-link">Trainers</a>
+                    <span class="description">Trainer profiles and specializations</span>
+                </div>
 
-            <div class="link-item">
-                <a href="{{basePath}}/classes" class="title-link">Classes</a>
-                <span class="description">Fitness classes and schedules</span>
-            </div>
+                <div class="link-item">
+                    <a href="{{basePath}}/classes" class="title-link">Classes</a>
+                    <span class="description">Fitness classes and schedules</span>
+                </div>
 
-            <div class="link-item">
-                <a href="{{basePath}}/equipment" class="title-link">Equipment</a>
-                <span class="description">Equipment inventory and status</span>
-            </div>
+                <div class="link-item">
+                    <a href="{{basePath}}/equipment" class="title-link">Equipment</a>
+                    <span class="description">Equipment inventory and status</span>
+                </div>
 
-            <div class="link-item">
-                <a href="{{basePath}}/payments" class="title-link">Payments</a>
-                <span class="description">Member payment tracking</span>
+                <div class="link-item">
+                    <a href="{{basePath}}/payments" class="title-link">Payments</a>
+                    <span class="description">Member payment tracking</span>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    {{!-- Relationship Management section --}}
-    <section class="content-section">
-        <h2>Relationship Management</h2>
-        <div class="link-grid">
-            <div class="link-item">
-                <a href="{{basePath}}/member-equipment" class="title-link">Member-Equipment</a>
-                <span class="description">Equipment usage tracking</span>
-            </div>
+        {{!-- Relationship Management section (Right Column) --}}
+        <section class="content-section relationship-section">
+            <h2>Relationship Management</h2>
+            <div class="link-grid">
+                <div class="link-item">
+                    <a href="{{basePath}}/member-equipment" class="title-link">Member-Equipment</a>
+                    <span class="description">Equipment usage tracking</span>
+                </div>
 
-            <div class="link-item">
-                <a href="{{basePath}}/class-bookings" class="title-link">Class-Bookings</a>
-                <span class="description">Class enrollment management</span>
-            </div>
+                <div class="link-item">
+                    <a href="{{basePath}}/class-bookings" class="title-link">Class-Bookings</a>
+                    <span class="description">Class enrollment management</span>
+                </div>
 
-            <div class="link-item">
-                <a href="{{basePath}}/member-trainer" class="title-link">Member-Trainer</a>
-                <span class="description">Training assignments</span>
-            </div>
+                <div class="link-item">
+                    <a href="{{basePath}}/member-trainer" class="title-link">Member-Trainer</a>
+                    <span class="description">Training assignments</span>
+                </div>
 
-            <div class="link-item">
-                <a href="{{basePath}}/trainer-equipment" class="title-link">Trainer-Equipment</a>
-                <span class="description">Equipment certifications</span>
+                <div class="link-item">
+                    <a href="{{basePath}}/trainer-equipment" class="title-link">Trainer-Equipment</a>
+                    <span class="description">Equipment certifications</span>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </div>
 
 {{!-- Footer section --}}
