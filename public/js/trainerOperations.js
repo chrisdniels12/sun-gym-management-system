@@ -38,9 +38,35 @@ addTrainerForm.addEventListener('submit', async function (e) {
         console.log('Server response:', data);
 
         if (response.ok) {
-            notifications.success('Trainer added successfully!');
+            // Show success message for 5 seconds
+            const successMessage = notifications.success('Trainer added successfully!');
+
+            // Add the new trainer to the table immediately
+            const tbody = trainersTable.querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.dataset.id = data.id;
+
+            newRow.innerHTML = `
+                <td>${data.id}</td>
+                <td>${formData.firstName}</td>
+                <td>${formData.lastName}</td>
+                <td>${formData.email}</td>
+                <td>${formData.phoneNumber || ''}</td>
+                <td>${formData.specialization}</td>
+                <td>
+                    <button onclick="editTrainer(${data.id})" class="edit-btn">Edit</button>
+                    <button onclick="deleteTrainer(${data.id})" class="delete-btn">Delete</button>
+                </td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+
+            // Reset the form
             addTrainerForm.reset();
-            location.reload();
+
+            // Remove success message after 5 seconds
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
         } else {
             // Handle multiple error cases
             if (data.error === 'Duplicate entries found' && data.duplicates) {
@@ -121,7 +147,10 @@ editTrainerForm.addEventListener("submit", async function (e) {
             row.cells[5].textContent = formData.specialization;
 
             // Show success message for 5 seconds
-            notifications.success('Trainer updated successfully!');
+            const successMessage = notifications.success('Trainer updated successfully!');
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
         } else {
             notifications.error(data.error || 'Failed to update trainer');
         }
@@ -155,7 +184,11 @@ async function deleteTrainer(id) {
                     }, 300);
                 }
 
-                notifications.success('Trainer deleted successfully!');
+                // Show success message for 5 seconds
+                const successMessage = notifications.success('Trainer deleted successfully!');
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 5000);
             } else {
                 notifications.error(data.error || 'Failed to delete trainer');
             }
