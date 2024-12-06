@@ -81,7 +81,7 @@
             </thead>
             <tbody>
                 {{#each bookings}}
-                <tr>
+                <tr data-id="{{this.bookingID}}">
                     <td>{{this.bookingID}}</td>
                     <td>{{this.memberName}}</td>
                     <td>{{this.className}}</td>
@@ -89,7 +89,8 @@
                     <td>{{formatTime this.scheduleTime}}</td>
                     <td>{{this.bookingDate}}</td>
                     <td>
-                        <button onclick="deleteBooking({{this.bookingID}})">Cancel</button>
+                        <button onclick="editBooking('{{this.bookingID}}')" class="edit-btn">Edit</button>
+                        <button onclick="deleteBooking('{{this.bookingID}}')" class="delete-btn">Cancel</button>
                     </td>
                 </tr>
                 {{/each}}
@@ -97,6 +98,37 @@
         </table>
     </div>
 
+    {{!-- Edit Booking Modal --}}
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Class Booking</h2>
+            <form id="edit-booking-form">
+                <input type="hidden" id="edit-bookingID">
+                <div class="form-group">
+                    <label>Member:</label>
+                    <div class="member-name-display"></div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-classID">Class:</label>
+                    <select id="edit-classID" required>
+                        {{#each classes}}
+                        <option value="{{this.classID}}">{{this.className}} - {{this.scheduleDay}} {{formatTime this.scheduleTime}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Booking Date:</label>
+                    <div class="booking-date-display"></div>
+                </div>
+                <div class="button-group">
+                    <button type="submit">Update Booking</button>
+                    <button type="button" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{basePath}}/js/notifications.js"></script>
     <script src="{{basePath}}/js/classBookingsOperations.js"></script>
 </body>
-</html> 
+</html>
