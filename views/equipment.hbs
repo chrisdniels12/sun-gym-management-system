@@ -79,22 +79,67 @@
                     <th>Type</th>
                     <th>Status</th>
                     <th>Location</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {{#each equipment}}
-                <tr>
+                <tr data-id="{{this.equipmentID}}">
                     <td>{{this.equipmentID}}</td>
                     <td>{{this.equipmentName}}</td>
                     <td>{{this.type}}</td>
                     <td>{{this.status}}</td>
                     <td>{{this.location}}</td>
+                    <td>
+                        <button onclick="editEquipment({{this.equipmentID}})" class="edit-btn">Edit</button>
+                        <button onclick="deleteEquipment({{this.equipmentID}})" class="delete-btn">Delete</button>
+                    </td>
                 </tr>
                 {{/each}}
             </tbody>
         </table>
     </div>
 
+    {{!-- Edit Equipment Modal --}}
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Equipment</h2>
+            <form id="edit-equipment-form">
+                <input type="hidden" id="edit-equipmentID">
+                <div class="form-group">
+                    <label for="edit-equipmentName">Equipment Name:</label>
+                    <input type="text" id="edit-equipmentName" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-type">Type:</label>
+                    <select id="edit-type" required>
+                        <option value="Cardio">Cardio</option>
+                        <option value="Strength">Strength</option>
+                        <option value="Flexibility">Flexibility</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-status">Status:</label>
+                    <select id="edit-status" required>
+                        <option value="Available">Available</option>
+                        <option value="In Use">In Use</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-location">Location:</label>
+                    <input type="text" id="edit-location" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit">Update Equipment</button>
+                    <button type="button" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{basePath}}/js/notifications.js"></script>
     <script src="{{basePath}}/js/equipmentOperations.js"></script>
 </body>
-</html> 
+</html>
