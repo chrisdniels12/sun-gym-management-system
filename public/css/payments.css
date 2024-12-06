@@ -130,6 +130,16 @@ h2 {
     background-color: #f5f5f5;
 }
 
+#payments-table td:last-child {
+    text-align: center;
+    white-space: nowrap;
+    width: 150px;
+}
+
+#payments-table td button {
+    margin: 0 0.25rem;
+}
+
 /* Button Styles */
 button {
     padding: 0.75rem 1.5rem;
@@ -149,6 +159,108 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
     background-color: #2980b9;
+}
+
+.edit-btn {
+    background-color: #3498db;
+    color: white;
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.edit-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-1px);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    margin: 10% auto;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+/* Modal form buttons container */
+.modal-content form {
+    margin-bottom: 0;
+}
+
+.modal-content .button-group {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Update button in modal */
+.modal-content button[type="submit"] {
+    background-color: #3498db;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: auto;
+    margin-top: 0;
+}
+
+.modal-content button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+/* Cancel button in modal */
+.modal-content button[type="button"] {
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin: 0;
+}
+
+.modal-content button[type="button"]:hover {
+    background-color: #c0392b;
 }
 
 /* Back Link */
@@ -181,5 +293,10 @@ button[type="submit"]:hover {
     #payments-table td,
     #payments-table th {
         padding: 0.75rem;
+    }
+
+    .modal-content {
+        margin: 5% auto;
+        width: 90%;
     }
 }
