@@ -41,6 +41,8 @@ addMemberEquipmentForm.addEventListener('submit', async function (e) {
             const tbody = usageTable.querySelector('tbody');
             const newRow = document.createElement('tr');
             newRow.dataset.id = data.id;
+            newRow.dataset.memberId = formData.memberID;
+            newRow.dataset.equipmentId = formData.equipmentID;
 
             // Get member and equipment names from the select elements
             const memberSelect = document.getElementById('memberID');
@@ -85,25 +87,20 @@ function editUsage(id) {
     // Fill the edit form with current data
     document.getElementById('edit-usageID').value = id;
 
-    // Get member ID from the select option that matches the member name
-    const memberName = row.cells[1].textContent;
+    // Set member ID
     const memberSelect = document.getElementById('edit-memberID');
-    Array.from(memberSelect.options).forEach(option => {
-        if (option.text === memberName) {
-            option.selected = true;
-        }
-    });
+    memberSelect.value = row.dataset.memberId;
 
-    // Get equipment ID from the select option that matches the equipment name
-    const equipmentName = row.cells[2].textContent;
+    // Set equipment ID
     const equipmentSelect = document.getElementById('edit-equipmentID');
-    Array.from(equipmentSelect.options).forEach(option => {
-        if (option.text === equipmentName) {
-            option.selected = true;
-        }
-    });
+    equipmentSelect.value = row.dataset.equipmentId;
 
-    document.getElementById('edit-usageDate').value = row.cells[3].textContent;
+    // Set and display usage date
+    const usageDate = row.cells[3].textContent;
+    document.getElementById('edit-usageDate').value = usageDate;
+    document.querySelector('.payment-date-display').textContent = usageDate;
+
+    // Set usage duration
     document.getElementById('edit-usageDuration').value = row.cells[4].textContent;
 
     modal.style.display = 'block';
@@ -143,8 +140,11 @@ editUsageForm.addEventListener("submit", async function (e) {
             const equipmentSelect = document.getElementById('edit-equipmentID');
             row.cells[1].textContent = memberSelect.options[memberSelect.selectedIndex].text;
             row.cells[2].textContent = equipmentSelect.options[equipmentSelect.selectedIndex].text;
-            row.cells[3].textContent = formData.usageDate;
             row.cells[4].textContent = formData.usageDuration;
+
+            // Update data attributes
+            row.dataset.memberId = formData.memberID;
+            row.dataset.equipmentId = formData.equipmentID;
 
             // Show success message for 5 seconds
             const successMessage = notifications.success('Usage record updated successfully!');

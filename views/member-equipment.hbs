@@ -84,7 +84,7 @@
             </thead>
             <tbody>
                 {{#each usageHistory}}
-                <tr data-id="{{this.memberEquipID}}">
+                <tr data-id="{{this.memberEquipID}}" data-member-id="{{this.memberID}}" data-equipment-id="{{this.equipmentID}}">
                     <td>{{this.memberEquipID}}</td>
                     <td>{{this.memberName}}</td>
                     <td>{{this.equipmentName}}</td>
@@ -106,6 +106,7 @@
             <h2>Edit Equipment Usage</h2>
             <form id="edit-usage-form">
                 <input type="hidden" id="edit-usageID">
+                <input type="hidden" id="edit-usageDate">
                 <div class="form-group">
                     <label for="edit-memberID">Member:</label>
                     <select id="edit-memberID" required>
@@ -123,8 +124,8 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="edit-usageDate">Usage Date:</label>
-                    <input type="date" id="edit-usageDate" required>
+                    <label>Usage Date:</label>
+                    <div class="payment-date-display"></div>
                 </div>
                 <div class="form-group">
                     <label for="edit-usageDuration">Duration (minutes):</label>

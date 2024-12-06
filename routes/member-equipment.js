@@ -6,7 +6,8 @@ const db = require('../database/db-connector').pool;
 router.get('/', async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT me.memberEquipID, CONCAT(m.firstName, ' ', m.lastName) AS memberName, 
+            SELECT me.memberEquipID, me.memberID, me.equipmentID,
+                   CONCAT(m.firstName, ' ', m.lastName) AS memberName, 
                    e.equipmentName, me.usageDate, me.usageDuration
             FROM MemberEquipment me
             JOIN Members m ON me.memberID = m.memberID
@@ -64,10 +65,9 @@ router.put('/:id', async (req, res) => {
             `UPDATE MemberEquipment 
              SET memberID = ?, 
                  equipmentID = ?, 
-                 usageDate = ?, 
                  usageDuration = ?
              WHERE memberEquipID = ?`,
-            [memberID, equipmentID, usageDate, usageDuration, usageId]
+            [memberID, equipmentID, usageDuration, usageId]
         );
 
         console.log('Update result:', result);
