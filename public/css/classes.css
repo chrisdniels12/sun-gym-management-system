@@ -215,7 +215,7 @@ button[type="submit"]:hover {
 
 .modal-content .button-group {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
     gap: 1rem;
     margin-top: 2rem;
 }
@@ -240,7 +240,7 @@ button[type="submit"]:hover {
 
 /* Cancel button in modal */
 .modal-content button[type="button"] {
-    background-color: #95a5a6;
+    background-color: #e74c3c;
     color: white;
     padding: 0.75rem 1.5rem;
     border: none;
@@ -252,7 +252,7 @@ button[type="submit"]:hover {
 }
 
 .modal-content button[type="button"]:hover {
-    background-color: #7f8c8d;
+    background-color: #c0392b;
 }
 
 /* Back Link */
