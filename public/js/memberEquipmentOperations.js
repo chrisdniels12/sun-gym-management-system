@@ -87,13 +87,31 @@ function editUsage(id) {
     // Fill the edit form with current data
     document.getElementById('edit-usageID').value = id;
 
-    // Set member ID
+    // Get member name from the row
+    const memberName = row.cells[1].textContent.trim();
     const memberSelect = document.getElementById('edit-memberID');
-    memberSelect.value = row.dataset.memberId;
 
-    // Set equipment ID
+    // Find and select the matching member option
+    Array.from(memberSelect.options).forEach(option => {
+        // Remove membership type from option text for comparison
+        const optionName = option.text.split(' - ')[0].trim();
+        if (optionName === memberName) {
+            option.selected = true;
+        }
+    });
+
+    // Get equipment name from the row
+    const equipmentName = row.cells[2].textContent.trim();
     const equipmentSelect = document.getElementById('edit-equipmentID');
-    equipmentSelect.value = row.dataset.equipmentId;
+
+    // Find and select the matching equipment option
+    Array.from(equipmentSelect.options).forEach(option => {
+        // Remove equipment type from option text for comparison
+        const optionName = option.text.split(' - ')[0].trim();
+        if (optionName === equipmentName) {
+            option.selected = true;
+        }
+    });
 
     // Set and display usage date
     const usageDate = row.cells[3].textContent;
@@ -138,8 +156,8 @@ editUsageForm.addEventListener("submit", async function (e) {
             // Update the row immediately
             const memberSelect = document.getElementById('edit-memberID');
             const equipmentSelect = document.getElementById('edit-equipmentID');
-            row.cells[1].textContent = memberSelect.options[memberSelect.selectedIndex].text;
-            row.cells[2].textContent = equipmentSelect.options[equipmentSelect.selectedIndex].text;
+            row.cells[1].textContent = memberSelect.options[memberSelect.selectedIndex].text.split(' - ')[0];
+            row.cells[2].textContent = equipmentSelect.options[equipmentSelect.selectedIndex].text.split(' - ')[0];
             row.cells[4].textContent = formData.usageDuration;
 
             // Update data attributes
