@@ -84,15 +84,15 @@
             </thead>
             <tbody>
                 {{#each usageHistory}}
-                <tr data-id="{{this.memberEquipID}}" data-member-id="{{this.memberID}}" data-equipment-id="{{this.equipmentID}}">
+                <tr data-id="{{this.memberEquipID}}">
                     <td>{{this.memberEquipID}}</td>
                     <td>{{this.memberName}}</td>
                     <td>{{this.equipmentName}}</td>
                     <td>{{this.usageDate}}</td>
                     <td>{{this.usageDuration}}</td>
                     <td>
-                        <button onclick="editUsage({{this.memberEquipID}})" class="edit-btn">Edit</button>
-                        <button onclick="deleteUsage({{this.memberEquipID}})" class="delete-btn">Delete</button>
+                        <button onclick="editUsage('{{this.memberEquipID}}')" class="edit-btn">Edit</button>
+                        <button onclick="deleteUsage('{{this.memberEquipID}}')" class="delete-btn">Delete</button>
                     </td>
                 </tr>
                 {{/each}}
@@ -106,7 +106,7 @@
             <h2>Edit Equipment Usage</h2>
             <form id="edit-usage-form">
                 <input type="hidden" id="edit-usageID">
-                <input type="hidden" id="edit-memberID">
+                <input type="hidden" id="edit-usageDate">
                 <div class="form-group">
                     <label>Member:</label>
                     <div class="member-name-display"></div>

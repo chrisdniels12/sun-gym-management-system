@@ -41,8 +41,6 @@ addMemberEquipmentForm.addEventListener('submit', async function (e) {
             const tbody = usageTable.querySelector('tbody');
             const newRow = document.createElement('tr');
             newRow.dataset.id = data.id;
-            newRow.dataset.memberId = formData.memberID;
-            newRow.dataset.equipmentId = formData.equipmentID;
 
             // Get member and equipment names from the select elements
             const memberSelect = document.getElementById('memberID');
@@ -57,8 +55,8 @@ addMemberEquipmentForm.addEventListener('submit', async function (e) {
                 <td>${formData.usageDate}</td>
                 <td>${formData.usageDuration}</td>
                 <td>
-                    <button onclick="editUsage(${data.id})" class="edit-btn">Edit</button>
-                    <button onclick="deleteUsage(${data.id})" class="delete-btn">Delete</button>
+                    <button onclick="editUsage('${data.id}')" class="edit-btn">Edit</button>
+                    <button onclick="deleteUsage('${data.id}')" class="delete-btn">Delete</button>
                 </td>
             `;
             tbody.insertBefore(newRow, tbody.firstChild);
@@ -81,15 +79,19 @@ addMemberEquipmentForm.addEventListener('submit', async function (e) {
 
 // Edit Usage
 function editUsage(id) {
+    console.log('Editing usage:', id);
     const row = document.querySelector(`tr[data-id="${id}"]`);
+    if (!row) {
+        console.error('Row not found for id:', id);
+        return;
+    }
     const modal = document.getElementById('edit-modal');
 
     // Fill the edit form with current data
     document.getElementById('edit-usageID').value = id;
 
-    // Set member ID and display member name
+    // Set member name display
     const memberName = row.cells[1].textContent.trim();
-    document.getElementById('edit-memberID').value = row.dataset.memberId;
     document.querySelector('.member-name-display').textContent = memberName;
 
     // Get equipment name from the row
@@ -123,7 +125,6 @@ editUsageForm.addEventListener("submit", async function (e) {
     const row = document.querySelector(`tr[data-id="${id}"]`);
 
     const formData = {
-        memberID: document.getElementById("edit-memberID").value,
         equipmentID: document.getElementById("edit-equipmentID").value,
         usageDate: document.getElementById("edit-usageDate").value,
         usageDuration: document.getElementById("edit-usageDuration").value
@@ -149,9 +150,6 @@ editUsageForm.addEventListener("submit", async function (e) {
             const equipmentSelect = document.getElementById('edit-equipmentID');
             row.cells[2].textContent = equipmentSelect.options[equipmentSelect.selectedIndex].text.split(' - ')[0];
             row.cells[4].textContent = formData.usageDuration;
-
-            // Update data attributes
-            row.dataset.equipmentId = formData.equipmentID;
 
             // Show success message for 5 seconds
             const successMessage = notifications.success('Usage record updated successfully!');
