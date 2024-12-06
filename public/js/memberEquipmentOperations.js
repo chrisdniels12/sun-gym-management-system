@@ -33,15 +33,46 @@ addMemberEquipmentForm.addEventListener('submit', async function (e) {
         console.log('Server response:', data);
 
         if (response.ok) {
-            showSuccess('Equipment usage recorded successfully!');
+            // Show success message for 5 seconds
+            const successMessage = notifications.success('Equipment usage recorded successfully!');
+
+            // Add the new usage record to the table immediately
+            const tbody = usageTable.querySelector('tbody');
+            const newRow = document.createElement('tr');
+            newRow.dataset.id = data.id;
+
+            // Get member and equipment names from the select elements
+            const memberSelect = document.getElementById('memberID');
+            const equipmentSelect = document.getElementById('equipmentID');
+            const memberName = memberSelect.options[memberSelect.selectedIndex].text;
+            const equipmentName = equipmentSelect.options[equipmentSelect.selectedIndex].text;
+
+            newRow.innerHTML = `
+                <td>${data.id}</td>
+                <td>${memberName}</td>
+                <td>${equipmentName}</td>
+                <td>${formData.usageDate}</td>
+                <td>${formData.usageDuration}</td>
+                <td>
+                    <button onclick="editUsage(${data.id})" class="edit-btn">Edit</button>
+                    <button onclick="deleteUsage(${data.id})" class="delete-btn">Delete</button>
+                </td>
+            `;
+            tbody.insertBefore(newRow, tbody.firstChild);
+
+            // Reset the form
             addMemberEquipmentForm.reset();
-            location.reload();
+
+            // Remove success message after 5 seconds
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
         } else {
-            showError('form', `Failed to record usage: ${data.error}`);
+            notifications.error(`Failed to record usage: ${data.error}`);
         }
     } catch (error) {
         console.error('Error details:', error);
-        showError('form', `Error recording usage: ${error.message}`);
+        notifications.error(`Error recording usage: ${error.message}`);
     }
 });
 
@@ -51,37 +82,42 @@ function editUsage(id) {
     // Implement edit functionality
 }
 
-function deleteUsage(id) {
+async function deleteUsage(id) {
     if (confirm('Are you sure you want to delete this usage record?')) {
-        fetch(`${BASE_PATH}/api/member-equipment/${id}`, {
-            method: 'DELETE'
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    location.reload();
+        try {
+            const response = await fetch(`${BASE_PATH}/api/member-equipment/${id}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Remove the row from the table immediately
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    row.style.transition = 'opacity 0.3s ease';
+                    row.style.opacity = '0';
+                    setTimeout(() => {
+                        row.remove();
+                    }, 300);
                 }
-            })
-            .catch(error => console.error('Error:', error));
+
+                // Show success message for 5 seconds
+                const successMessage = notifications.success('Usage record deleted successfully!');
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 5000);
+            } else {
+                notifications.error(data.error || 'Failed to delete usage record');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            notifications.error('Error connecting to server');
+        }
     }
 }
 
 // Helper Functions
-function showError(fieldId, message) {
-    const field = document.getElementById(fieldId);
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    field.parentNode.appendChild(errorDiv);
-}
-
-function showSuccess(message) {
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    successDiv.textContent = message;
-    document.querySelector('.form-section').insertBefore(successDiv, addMemberEquipmentForm);
-}
-
 function clearErrors() {
     const errorMessages = document.querySelectorAll('.error-message');
     errorMessages.forEach(msg => msg.remove());
@@ -92,4 +128,4 @@ function clearErrors() {
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Page loaded');
-}); 
+});
