@@ -22,6 +22,30 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET single member equipment usage
+router.get('/:id', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT me.memberEquipID, me.memberID, me.equipmentID,
+                   CONCAT(m.firstName, ' ', m.lastName) AS memberName, 
+                   e.equipmentName, me.usageDate, me.usageDuration
+            FROM MemberEquipment me
+            JOIN Members m ON me.memberID = m.memberID
+            JOIN Equipments e ON me.equipmentID = e.equipmentID
+            WHERE me.memberEquipID = ?
+        `, [req.params.id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Usage record not found' });
+        }
+
+        res.json(rows[0]);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // CREATE new member equipment usage
 router.post('/', async (req, res) => {
     const { memberID, equipmentID, usageDate, usageDuration } = req.body;

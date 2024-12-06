@@ -124,7 +124,13 @@ editUsageForm.addEventListener("submit", async function (e) {
     const id = document.getElementById('edit-usageID').value;
     const row = document.querySelector(`tr[data-id="${id}"]`);
 
+    // Get the memberID from the route
+    const response = await fetch(`${BASE_PATH}/api/member-equipment/${id}`);
+    const data = await response.json();
+    const memberID = data.memberID;
+
     const formData = {
+        memberID: memberID, // Include the original memberID
         equipmentID: document.getElementById("edit-equipmentID").value,
         usageDate: document.getElementById("edit-usageDate").value,
         usageDuration: document.getElementById("edit-usageDuration").value
