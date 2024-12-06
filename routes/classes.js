@@ -5,7 +5,12 @@ const db = require('../database/db-connector').pool;
 // GET all classes
 router.get('/', async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM Classes ORDER BY scheduleDay, scheduleTime');
+        const [rows] = await db.query(`
+            SELECT c.*, CONCAT(t.firstName, ' ', t.lastName) as trainerName 
+            FROM Classes c
+            LEFT JOIN Trainers t ON c.trainerID = t.trainerID
+            ORDER BY c.scheduleDay, c.scheduleTime
+        `);
         console.log('Fetched classes:', rows);
         res.json(rows);
     } catch (error) {
@@ -81,7 +86,7 @@ router.put('/:id', async (req, res) => {
         const { className, trainerID, scheduleTime, scheduleDay, maxCapacity } = req.body;
         console.log('Updating class:', { classId, className, trainerID, scheduleTime, scheduleDay, maxCapacity });
 
-        // Check if class exists
+        // Check if class exists and get current enrollment
         const [existingClass] = await db.query(
             'SELECT * FROM Classes WHERE classID = ?',
             [classId]
@@ -119,14 +124,9 @@ router.put('/:id', async (req, res) => {
         }
 
         // Check if new maxCapacity is less than current enrollment
-        const [enrollmentCheck] = await db.query(
-            'SELECT currentEnrollment FROM Classes WHERE classID = ?',
-            [classId]
-        );
-
-        if (enrollmentCheck[0].currentEnrollment > maxCapacity) {
+        if (existingClass[0].currentEnrollment > maxCapacity) {
             return res.status(400).json({
-                error: `Cannot reduce capacity below current enrollment (${enrollmentCheck[0].currentEnrollment} students)`
+                error: `Cannot reduce capacity below current enrollment (${existingClass[0].currentEnrollment} students)`
             });
         }
 
@@ -148,16 +148,17 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ error: 'Failed to update class' });
         }
 
+        // Get updated class data with trainer name
+        const [updatedClass] = await db.query(`
+            SELECT c.*, CONCAT(t.firstName, ' ', t.lastName) as trainerName 
+            FROM Classes c
+            LEFT JOIN Trainers t ON c.trainerID = t.trainerID
+            WHERE c.classID = ?
+        `, [classId]);
+
         res.json({
             message: 'Class updated successfully',
-            class: {
-                classID: classId,
-                className,
-                trainerID,
-                scheduleTime,
-                scheduleDay,
-                maxCapacity
-            }
+            class: updatedClass[0]
         });
     } catch (error) {
         console.error('Error updating class:', error);

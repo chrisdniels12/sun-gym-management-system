@@ -98,29 +98,38 @@ h2 {
     overflow-x: auto;
 }
 
-table {
+#classes-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
+    font-size: 0.95rem;
 }
 
-th {
+#classes-table th {
     background: #f8f9fa;
     padding: 1rem;
     text-align: left;
     font-weight: 600;
     color: #2c3e50;
     border-bottom: 2px solid #ddd;
+    white-space: nowrap;
 }
 
-td {
+#classes-table td {
     padding: 1rem;
     border-bottom: 1px solid #eee;
     color: #2c3e50;
+    vertical-align: middle;
 }
 
-tr:hover {
+#classes-table tr:hover {
     background-color: #f8f9fa;
+}
+
+#classes-table td:last-child {
+    text-align: center;
+    white-space: nowrap;
+    width: 150px;
 }
 
 /* Button Styles */
@@ -130,12 +139,14 @@ button {
     border-radius: 4px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
 }
 
 button[type="submit"] {
     background-color: #3498db;
     color: white;
+    width: 100%;
+    margin-top: 1rem;
 }
 
 button[type="submit"]:hover {
@@ -148,10 +159,12 @@ button[type="submit"]:hover {
     padding: 0.5rem 1rem;
     margin-right: 0.5rem;
     border-radius: 4px;
+    font-size: 0.9rem;
 }
 
 .edit-btn:hover {
     background-color: #2980b9;
+    transform: translateY(-1px);
 }
 
 .delete-btn {
@@ -159,10 +172,12 @@ button[type="submit"]:hover {
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 4px;
+    font-size: 0.9rem;
 }
 
 .delete-btn:hover {
     background-color: #c0392b;
+    transform: translateY(-1px);
 }
 
 /* Modal Styles */
@@ -184,6 +199,34 @@ button[type="submit"]:hover {
     border-radius: 8px;
     max-width: 500px;
     position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+
+.modal-content button[type="button"] {
+    background-color: #95a5a6;
+    color: white;
+    margin-left: 0.5rem;
+}
+
+.modal-content button[type="button"]:hover {
+    background-color: #7f8c8d;
+}
+
+/* Back Link */
+.back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    color: #3498db;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
 }
 
 /* Schedule Grid */
@@ -219,18 +262,6 @@ button[type="submit"]:hover {
     background: #dc3545;
 }
 
-/* Back Link */
-.back-link {
-    display: inline-block;
-    margin-bottom: 2rem;
-    color: #3498db;
-    text-decoration: none;
-}
-
-.back-link:hover {
-    text-decoration: underline;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     body {
@@ -246,13 +277,17 @@ button[type="submit"]:hover {
         padding: 1rem;
     }
 
-    td,
-    th {
+    #classes-table td,
+    #classes-table th {
         padding: 0.75rem;
     }
 
     .modal-content {
         margin: 5% auto;
         width: 90%;
+    }
+
+    .schedule-grid {
+        grid-template-columns: 1fr;
     }
 }
