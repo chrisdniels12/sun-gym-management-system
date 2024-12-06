@@ -34,7 +34,12 @@ addPaymentForm.addEventListener('submit', async function (e) {
         console.log('Server response:', data);
 
         if (response.ok) {
-            notifications.success('Payment added successfully!');
+            // Show success message for 5 seconds
+            const successMessage = notifications.success('Payment added successfully!');
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
+
             addPaymentForm.reset();
             location.reload();
         } else {
@@ -65,7 +70,11 @@ function editPayment(id) {
 
     // Remove $ symbol from amount and set value
     document.getElementById('edit-amount').value = row.cells[2].textContent.replace('$', '');
+
+    // Keep the original payment date
     document.getElementById('edit-paymentDate').value = row.cells[3].textContent;
+    document.getElementById('edit-paymentDate').readOnly = true;
+
     document.getElementById('edit-paymentMethod').value = row.cells[4].textContent;
 
     modal.style.display = 'block';
@@ -108,7 +117,10 @@ editPaymentForm.addEventListener("submit", async function (e) {
             row.cells[4].textContent = formData.paymentMethod;
 
             // Show success message for 5 seconds
-            notifications.success('Payment updated successfully!');
+            const successMessage = notifications.success('Payment updated successfully!');
+            setTimeout(() => {
+                successMessage.remove();
+            }, 5000);
         } else {
             notifications.error(data.error || 'Failed to update payment');
         }
@@ -142,7 +154,11 @@ async function deletePayment(id) {
                     }, 300);
                 }
 
-                notifications.success('Payment deleted successfully!');
+                // Show success message for 5 seconds
+                const successMessage = notifications.success('Payment deleted successfully!');
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 5000);
             } else {
                 notifications.error(data.error || 'Failed to delete payment');
             }
