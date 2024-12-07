@@ -1,135 +1,125 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="base-path" content="{{basePath}}">
-    <title>Class Bookings - Sun Gym</title>
-    <link rel="stylesheet" href="{{basePath}}/css/class-bookings.css">
-</head>
-<body>
-    <h1>Class Booking Management</h1>
-    <a href="{{basePath}}" class="back-link">Back to Home</a>
+{{!-- Remove DOCTYPE, html, head, and body tags since they're in the layout --}}
+<h1>Class Booking Management</h1>
+<a href="{{basePath}}" class="back-link">Back to Home</a>
 
-    {{!-- Stats Section --}}
-    <div class="stats-section">
-        <h2>Booking Statistics</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Bookings</h3>
-                <p>{{stats.totalBookings}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>Active Members</h3>
-                <p>{{stats.activeMembers}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>Popular Class</h3>
-                <p>{{stats.popularClass}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>Average Attendance</h3>
-                <p>{{stats.avgAttendance}}%</p>
-            </div>
+{{!-- Stats Section --}}
+<div class="stats-section">
+    <h2>Booking Statistics</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Bookings</h3>
+            <p>{{stats.totalBookings}}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Active Members</h3>
+            <p>{{stats.activeMembers}}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Popular Class</h3>
+            <p>{{stats.popularClass}}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Average Attendance</h3>
+            <p>{{stats.avgAttendance}}%</p>
         </div>
     </div>
+</div>
 
-    {{!-- Add Booking Form --}}
-    <div class="form-section">
-        <h2>Add New Booking</h2>
-        <form id="addBooking" method="POST">
+{{!-- Add Booking Form --}}
+<div class="form-section">
+    <h2>Add New Booking</h2>
+    <form id="addBooking" method="POST">
+        <div class="form-group">
+            <label for="memberID">Member:</label>
+            <select id="memberID" name="memberID" required>
+                <option value="">Select Member...</option>
+                {{#each members}}
+                <option value="{{this.memberID}}">{{this.firstName}} {{this.lastName}} - {{this.membershipType}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="classID">Class:</label>
+            <select id="classID" name="classID" required>
+                <option value="">Select Class...</option>
+                {{#each classes}}
+                <option value="{{this.classID}}">{{this.className}} - {{this.scheduleDay}} {{formatTime this.scheduleTime}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="bookingDate">Booking Date:</label>
+            <input type="date" id="bookingDate" name="bookingDate" required>
+        </div>
+        <button type="submit">Add Booking</button>
+    </form>
+</div>
+
+{{!-- Bookings Table --}}
+<div class="table-section">
+    <h2>Current Bookings</h2>
+    <table id="bookings-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Member</th>
+                <th>Class</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Booking Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each bookings}}
+            <tr data-id="{{this.bookingID}}" data-member-id="{{this.memberID}}" data-class-id="{{this.classID}}">
+                <td>{{this.bookingID}}</td>
+                <td>{{this.memberName}}</td>
+                <td>{{this.className}}</td>
+                <td>{{this.scheduleDay}}</td>
+                <td>{{formatTime this.scheduleTime}}</td>
+                <td>{{this.bookingDate}}</td>
+                <td>
+                    <button onclick="editBooking({{this.bookingID}})" class="edit-btn">Edit</button>
+                    <button onclick="deleteBooking({{this.bookingID}})" class="delete-btn">Delete</button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+{{!-- Edit Booking Modal --}}
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <h2>Edit Current Booking</h2>
+        <form id="edit-booking-form">
+            <input type="hidden" id="edit-bookingID">
+            <input type="hidden" id="edit-memberID">
             <div class="form-group">
-                <label for="memberID">Member:</label>
-                <select id="memberID" name="memberID" required>
-                    <option value="">Select Member...</option>
-                    {{#each members}}
-                    <option value="{{this.memberID}}">{{this.firstName}} {{this.lastName}} - {{this.membershipType}}</option>
-                    {{/each}}
-                </select>
+                <label>Member:</label>
+                <div class="member-name-display"></div>
             </div>
             <div class="form-group">
-                <label for="classID">Class:</label>
-                <select id="classID" name="classID" required>
-                    <option value="">Select Class...</option>
+                <label for="edit-classID">Class:</label>
+                <select id="edit-classID" required>
                     {{#each classes}}
                     <option value="{{this.classID}}">{{this.className}} - {{this.scheduleDay}} {{formatTime this.scheduleTime}}</option>
                     {{/each}}
                 </select>
             </div>
             <div class="form-group">
-                <label for="bookingDate">Booking Date:</label>
-                <input type="date" id="bookingDate" name="bookingDate" required>
+                <label>Booking Date:</label>
+                <div class="booking-date-display"></div>
             </div>
-            <button type="submit">Add Booking</button>
+            <div class="button-group">
+                <button type="submit" class="update-btn">Update Booking</button>
+                <button type="button" onclick="closeEditModal()" class="cancel-btn">Cancel</button>
+            </div>
         </form>
     </div>
+</div>
 
-    {{!-- Bookings Table --}}
-    <div class="table-section">
-        <h2>Current Bookings</h2>
-        <table id="bookings-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Member</th>
-                    <th>Class</th>
-                    <th>Day</th>
-                    <th>Time</th>
-                    <th>Booking Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each bookings}}
-                <tr data-id="{{this.bookingID}}" data-member-id="{{this.memberID}}" data-class-id="{{this.classID}}">
-                    <td>{{this.bookingID}}</td>
-                    <td>{{this.memberName}}</td>
-                    <td>{{this.className}}</td>
-                    <td>{{this.scheduleDay}}</td>
-                    <td>{{formatTime this.scheduleTime}}</td>
-                    <td>{{this.bookingDate}}</td>
-                    <td>
-                        <button onclick="editBooking({{this.bookingID}})" class="edit-btn">Edit</button>
-                        <button onclick="deleteBooking({{this.bookingID}})" class="delete-btn">Delete</button>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
-
-    {{!-- Edit Booking Modal --}}
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <h2>Edit Current Booking</h2>
-            <form id="edit-booking-form">
-                <input type="hidden" id="edit-bookingID">
-                <input type="hidden" id="edit-memberID">
-                <div class="form-group">
-                    <label>Member:</label>
-                    <div class="member-name-display"></div>
-                </div>
-                <div class="form-group">
-                    <label for="edit-classID">Class:</label>
-                    <select id="edit-classID" required>
-                        {{#each classes}}
-                        <option value="{{this.classID}}">{{this.className}} - {{this.scheduleDay}} {{formatTime this.scheduleTime}}</option>
-                        {{/each}}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Booking Date:</label>
-                    <div class="booking-date-display"></div>
-                </div>
-                <div class="button-group">
-                    <button type="submit" class="update-btn">Update Booking</button>
-                    <button type="button" onclick="closeEditModal()" class="cancel-btn">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script src="{{basePath}}/js/notifications.js"></script>
-    <script src="{{basePath}}/js/classBookingsOperations.js"></script>
-</body>
-</html>
+{{!-- Load JavaScript --}}
+<script src="{{basePath}}/js/notifications.js"></script>
+<script src="{{basePath}}/js/classBookingsOperations.js"></script>
