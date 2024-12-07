@@ -87,7 +87,7 @@ addBookingForm.addEventListener('submit', async function (e) {
 });
 
 // Edit Booking
-function editBooking(id) {
+window.editBooking = function (id) {
     console.log('Editing booking:', id);
     const row = document.querySelector(`tr[data-id="${id}"]`);
     if (!row) {
@@ -180,37 +180,41 @@ editBookingForm.addEventListener("submit", async function (e) {
 });
 
 // Delete Booking
-async function deleteBooking(id) {
+window.deleteBooking = function (id) {
     if (confirm('Are you sure you want to delete this booking?')) {
         try {
-            const response = await fetch(`${BASE_PATH}/api/class-bookings/${id}`, {
+            fetch(`${BASE_PATH}/api/class-bookings/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            });
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Remove the row from the table immediately
+                        const row = document.querySelector(`tr[data-id="${id}"]`);
+                        if (row) {
+                            row.style.transition = 'opacity 0.3s ease';
+                            row.style.opacity = '0';
+                            setTimeout(() => {
+                                row.remove();
+                            }, 300);
+                        }
 
-            const data = await response.json();
-
-            if (response.ok) {
-                // Remove the row from the table immediately
-                const row = document.querySelector(`tr[data-id="${id}"]`);
-                if (row) {
-                    row.style.transition = 'opacity 0.3s ease';
-                    row.style.opacity = '0';
-                    setTimeout(() => {
-                        row.remove();
-                    }, 300);
-                }
-
-                // Show success message for 5 seconds
-                const successMessage = notifications.success('Booking deleted successfully!');
-                setTimeout(() => {
-                    successMessage.remove();
-                }, 5000);
-            } else {
-                notifications.error(data.error || 'Failed to delete booking');
-            }
+                        // Show success message for 5 seconds
+                        const successMessage = notifications.success('Booking deleted successfully!');
+                        setTimeout(() => {
+                            successMessage.remove();
+                        }, 5000);
+                    } else {
+                        notifications.error(data.error || 'Failed to delete booking');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    notifications.error('Error connecting to server');
+                });
         } catch (error) {
             console.error('Error:', error);
             notifications.error('Error connecting to server');
