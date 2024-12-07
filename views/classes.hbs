@@ -1,54 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="base-path" content="{{basePath}}">
-    <title>Manage Classes - Sun Gym</title>
-    <link rel="stylesheet" href="{{basePath}}/css/classes.css">
-</head>
-<body>
-    <h1>Class Management</h1>
-    <a href="{{basePath}}" class="back-link">Back to Home</a>
+{{!-- Remove DOCTYPE, html, head, and body tags since they're in the layout --}}
+<h1>Class Management</h1>
+<a href="{{basePath}}" class="back-link">Back to Home</a>
 
-    {{!-- Stats Section --}}
-    <div class="stats-section">
-        <h2>Class Statistics</h2>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Classes</h3>
-                <p>{{stats.totalClasses}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>Active Classes</h3>
-                <p>{{stats.activeClasses}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>Total Enrollments</h3>
-                <p>{{stats.totalEnrollments}}</p>
-            </div>
-            <div class="stat-card">
-                <h3>Average Capacity</h3>
-                <p>{{stats.avgCapacity}}%</p>
-            </div>
+{{!-- Stats Section --}}
+<div class="stats-section">
+    <h2>Class Statistics</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Classes</h3>
+            <p>{{stats.totalClasses}}</p>
         </div>
-        <h3>Weekly Schedule</h3>
-        <div id="scheduleGrid" class="schedule-grid">
-            {{!-- Schedule will be loaded dynamically --}}
+        <div class="stat-card">
+            <h3>Active Classes</h3>
+            <p>{{stats.activeClasses}}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Enrollments</h3>
+            <p>{{stats.totalEnrollments}}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Average Capacity</h3>
+            <p>{{stats.avgCapacity}}%</p>
         </div>
     </div>
+</div>
 
-    {{!-- Add Class Form --}}
-    <div class="form-section">
-        <h2>Add New Class</h2>
-        <form id="addClass" method="POST">
+{{!-- Add Class Form --}}
+<div class="form-section">
+    <h2>Add New Class</h2>
+    <form id="addClass" method="POST">
+        <div class="form-group">
+            <label for="className">Class Name:</label>
+            <input type="text" id="className" name="className" required>
+        </div>
+        <div class="form-group">
+            <label for="trainerID">Trainer:</label>
+            <select id="trainerID" name="trainerID">
+                <option value="">Select Trainer (Optional)</option>
+                {{#each trainers}}
+                <option value="{{this.trainerID}}">{{this.firstName}} {{this.lastName}} - {{this.specialization}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="scheduleTime">Time:</label>
+            <input type="time" id="scheduleTime" name="scheduleTime" required step="900">
+        </div>
+        <div class="form-group">
+            <label for="scheduleDay">Day:</label>
+            <select id="scheduleDay" name="scheduleDay" required>
+                <option value="">Select Day...</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="maxCapacity">Maximum Capacity:</label>
+            <input type="number" id="maxCapacity" name="maxCapacity" min="1" required>
+        </div>
+        <button type="submit">Add Class</button>
+    </form>
+</div>
+
+{{!-- Classes Table --}}
+<div class="table-section">
+    <h2>Current Classes</h2>
+    <table id="classes-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Class Name</th>
+                <th>Trainer</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Capacity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each classes}}
+            <tr data-id="{{this.classID}}">
+                <td>{{this.classID}}</td>
+                <td>{{this.className}}</td>
+                <td>{{this.trainerName}}</td>
+                <td>{{this.scheduleDay}}</td>
+                <td>{{formatTime this.scheduleTime}}</td>
+                <td>{{this.currentEnrollment}}/{{this.maxCapacity}}</td>
+                <td>
+                    <button onclick="editClass({{this.classID}})" class="edit-btn">Edit</button>
+                    <button onclick="deleteClass({{this.classID}})" class="delete-btn">Delete</button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+{{!-- Edit Class Modal --}}
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <h2>Edit Class</h2>
+        <form id="edit-class-form">
+            <input type="hidden" id="edit-classID">
             <div class="form-group">
-                <label for="className">Class Name:</label>
-                <input type="text" id="className" name="className" required>
+                <label for="edit-className">Class Name:</label>
+                <input type="text" id="edit-className" required>
             </div>
             <div class="form-group">
-                <label for="trainerID">Trainer:</label>
-                <select id="trainerID" name="trainerID">
+                <label for="edit-trainerID">Trainer:</label>
+                <select id="edit-trainerID">
                     <option value="">Select Trainer (Optional)</option>
                     {{#each trainers}}
                     <option value="{{this.trainerID}}">{{this.firstName}} {{this.lastName}} - {{this.specialization}}</option>
@@ -56,13 +121,12 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="scheduleTime">Time:</label>
-                <input type="time" id="scheduleTime" name="scheduleTime" required step="900">
+                <label for="edit-scheduleTime">Time:</label>
+                <input type="time" id="edit-scheduleTime" required step="900">
             </div>
             <div class="form-group">
-                <label for="scheduleDay">Day:</label>
-                <select id="scheduleDay" name="scheduleDay" required>
-                    <option value="">Select Day...</option>
+                <label for="edit-scheduleDay">Day:</label>
+                <select id="edit-scheduleDay" required>
                     <option value="Monday">Monday</option>
                     <option value="Tuesday">Tuesday</option>
                     <option value="Wednesday">Wednesday</option>
@@ -73,95 +137,17 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="maxCapacity">Maximum Capacity:</label>
-                <input type="number" id="maxCapacity" name="maxCapacity" min="1" required>
+                <label for="edit-maxCapacity">Maximum Capacity:</label>
+                <input type="number" id="edit-maxCapacity" min="1" required>
             </div>
-            <button type="submit">Add Class</button>
+            <div class="button-group">
+                <button type="submit">Update Class</button>
+                <button type="button" onclick="closeEditModal()">Cancel</button>
+            </div>
         </form>
     </div>
+</div>
 
-    {{!-- Classes Table --}}
-    <div class="table-section">
-        <h2>Current Classes</h2>
-        <table id="classes-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Class Name</th>
-                    <th>Trainer</th>
-                    <th>Day</th>
-                    <th>Time</th>
-                    <th>Capacity</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each classes}}
-                <tr data-id="{{this.classID}}">
-                    <td>{{this.classID}}</td>
-                    <td>{{this.className}}</td>
-                    <td>{{this.trainerName}}</td>
-                    <td>{{this.scheduleDay}}</td>
-                    <td>{{formatTime this.scheduleTime}}</td>
-                    <td>{{this.currentEnrollment}}/{{this.maxCapacity}}</td>
-                    <td>
-                        <button onclick="editClass({{this.classID}})" class="edit-btn">Edit</button>
-                        <button onclick="deleteClass({{this.classID}})" class="delete-btn">Delete</button>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
-
-    {{!-- Edit Class Modal --}}
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <h2>Edit Class</h2>
-            <form id="edit-class-form">
-                <input type="hidden" id="edit-classID">
-                <div class="form-group">
-                    <label for="edit-className">Class Name:</label>
-                    <input type="text" id="edit-className" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-trainerID">Trainer:</label>
-                    <select id="edit-trainerID">
-                        <option value="">Select Trainer (Optional)</option>
-                        {{#each trainers}}
-                        <option value="{{this.trainerID}}">{{this.firstName}} {{this.lastName}} - {{this.specialization}}</option>
-                        {{/each}}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-scheduleTime">Time:</label>
-                    <input type="time" id="edit-scheduleTime" required step="900">
-                </div>
-                <div class="form-group">
-                    <label for="edit-scheduleDay">Day:</label>
-                    <select id="edit-scheduleDay" required>
-                        <option value="Monday">Monday</option>
-                        <option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option>
-                        <option value="Thursday">Thursday</option>
-                        <option value="Friday">Friday</option>
-                        <option value="Saturday">Saturday</option>
-                        <option value="Sunday">Sunday</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-maxCapacity">Maximum Capacity:</label>
-                    <input type="number" id="edit-maxCapacity" min="1" required>
-                </div>
-                <div class="button-group">
-                    <button type="submit">Update Class</button>
-                    <button type="button" onclick="closeEditModal()">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script src="{{basePath}}/js/notifications.js"></script>
-    <script src="{{basePath}}/js/classOperations.js"></script>
-</body>
-</html>
+{{!-- Load JavaScript --}}
+<script src="{{basePath}}/js/notifications.js"></script>
+<script src="{{basePath}}/js/classOperations.js"></script>

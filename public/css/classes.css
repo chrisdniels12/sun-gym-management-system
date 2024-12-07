@@ -1,23 +1,6 @@
 /* Import main styles */
 @import 'main.css';
 
-/* Page Layout */
-body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    margin: 40px;
-    line-height: 1.6;
-}
-
-h1 {
-    color: #2c3e50;
-    margin-bottom: 1rem;
-}
-
-h2 {
-    color: #34495e;
-    margin: 2rem 0 1rem;
-}
-
 /* Stats Section */
 .stats-section {
     margin: 2rem 0;
@@ -27,14 +10,18 @@ h2 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: white;
+    background: #f8fafc;
     padding: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
 }
 
 .stat-card h3 {
@@ -54,11 +41,11 @@ h2 {
 
 /* Form Section */
 .form-section {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
     background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
 }
 
 .form-group {
@@ -91,11 +78,7 @@ h2 {
 /* Table Section */
 .table-section {
     background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 2rem;
-    overflow-x: auto;
 }
 
 #classes-table {
@@ -141,51 +124,33 @@ h2 {
 }
 
 /* Button Styles */
-button {
-    padding: 0.75rem 1.5rem;
+.edit-btn,
+.delete-btn {
+    padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
-    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-button[type="submit"] {
-    background-color: #3498db;
-    color: white;
-    width: 100%;
-    margin-top: 1rem;
-}
-
-button[type="submit"]:hover {
-    background-color: #2980b9;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
 }
 
 .edit-btn {
     background-color: #3498db;
     color: white;
-    padding: 0.5rem 1rem;
     margin-right: 0.5rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
-
-.edit-btn:hover {
-    background-color: #2980b9;
-    transform: translateY(-1px);
 }
 
 .delete-btn {
     background-color: #e74c3c;
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
+}
+
+.edit-btn:hover {
+    background-color: #2980b9;
 }
 
 .delete-btn:hover {
     background-color: #c0392b;
-    transform: translateY(-1px);
 }
 
 /* Modal Styles */
@@ -216,104 +181,44 @@ button[type="submit"]:hover {
     margin-bottom: 1.5rem;
 }
 
-/* Modal form buttons container */
-.modal-content form {
-    margin-bottom: 0;
-}
-
-.modal-content .button-group {
+/* Modal form buttons */
+.button-group {
     display: flex;
     justify-content: flex-start;
     gap: 1rem;
     margin-top: 2rem;
 }
 
-/* Update button in modal */
-.modal-content button[type="submit"] {
-    background-color: #3498db;
-    color: white;
+.update-btn,
+.cancel-btn {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 4px;
-    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
-    width: auto;
-    margin-top: 0;
+    font-weight: 500;
+    min-width: 100px;
 }
 
-.modal-content button[type="submit"]:hover {
+.update-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.update-btn:hover {
     background-color: #2980b9;
 }
 
-/* Cancel button in modal */
-.modal-content button[type="button"] {
-    background-color: #e74c3c;
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin: 0;
-}
-
-.modal-content button[type="button"]:hover {
+.cancel-btn:hover {
     background-color: #c0392b;
-}
-
-/* Back Link */
-.back-link {
-    display: inline-block;
-    margin-bottom: 2rem;
-    color: #3498db;
-    text-decoration: none;
-}
-
-.back-link:hover {
-    text-decoration: underline;
-}
-
-/* Schedule Grid */
-.schedule-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    margin: 20px 0;
-}
-
-.schedule-slot {
-    background: white;
-    padding: 15px;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.capacity-indicator {
-    height: 8px;
-    border-radius: 4px;
-    margin-top: 10px;
-}
-
-.capacity-low {
-    background: #28a745;
-}
-
-.capacity-medium {
-    background: #ffc107;
-}
-
-.capacity-high {
-    background: #dc3545;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    body {
-        margin: 20px;
-    }
-
     .stats-grid {
         grid-template-columns: 1fr;
     }
@@ -331,9 +236,5 @@ button[type="submit"]:hover {
     .modal-content {
         margin: 5% auto;
         width: 90%;
-    }
-
-    .schedule-grid {
-        grid-template-columns: 1fr;
     }
 }
