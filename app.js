@@ -41,8 +41,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// Serve static files from the 'public' directory
-app.use(`${BASE_PATH}`, express.static(path.join(__dirname, 'public')));
+// Serve static files from the 'public' directory with BASE_PATH prefix for js/css
+app.use(`${BASE_PATH}/js`, express.static(path.join(__dirname, 'public/js')));
+app.use(`${BASE_PATH}/css`, express.static(path.join(__dirname, 'public/css')));
 
 // Root route - serve index.html with BASE_PATH
 app.get(`${BASE_PATH}`, (req, res) => {
@@ -124,6 +125,9 @@ app.get(`${BASE_PATH}/class-bookings`, async (req, res) => {
         });
 
         res.render('class-bookings', {
+            title: 'Class Bookings',
+            customCSS: 'class-bookings',
+            customJS: 'classBookingsOperations',
             basePath: BASE_PATH,
             bookings,
             members,
@@ -283,7 +287,7 @@ app.get(`${BASE_PATH}/equipment`, async (req, res) => {
         // Calculate stats
         const totalEquipment = equipment.length;
         const availableEquipment = equipment.filter(e => e.status === 'Available').length;
-        const maintenanceEquipment = equipment.filter(e => e.status === 'Maintenance').length;
+        const maintenanceEquipment = equipment.filter(e => e.status === 'Under Maintenance').length;
         const inUseEquipment = equipment.filter(e => e.status === 'In Use').length;
 
         res.render('equipment', {
