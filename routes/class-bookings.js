@@ -41,6 +41,7 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ error: 'Booking not found' });
         }
 
+        console.log('Fetched single booking:', rows[0]);
         res.json(rows[0]);
     } catch (error) {
         console.error('Error:', error);
