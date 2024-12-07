@@ -1,210 +1,183 @@
 /* Import main styles */
 @import 'main.css';
 
-/* Base styles */
-body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    margin: 0;
-    padding: 1.5rem;
-    line-height: 1.5;
-    background-color: #f8fafc;
-    color: #2c3e50;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Header section */
-.header-section {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding: 1.5rem 0;
-    background: linear-gradient(to right, #3498db, #2980b9);
-}
-
-h1 {
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, #3498db, #2c3e50);
     color: white;
-    font-size: 2.2rem;
+    text-align: center;
+    padding: 4rem 2rem;
+    margin-bottom: 3rem;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
     margin: 0;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    border: none;
 }
 
-/* Dashboard container */
-.dashboard-container {
-    max-width: 1400px;
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-top: 1rem;
+}
+
+/* Content Layout */
+.content {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
-    flex: 1;
+    padding: 0 2rem;
 }
 
-/* Two-column grid layout */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
+.section {
+    margin-bottom: 4rem;
 }
 
-/* Content sections */
-.content-section {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.primary-section {
-    border-top: 4px solid #3498db;
-}
-
-.relationship-section {
-    border-top: 4px solid #2ecc71;
-}
-
-h2 {
+.section h2 {
+    text-align: center;
     color: #2c3e50;
-    font-size: 1.5rem;
-    margin: 0 0 1.5rem 0;
-    font-weight: 600;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #edf2f7;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
 }
 
-/* Link grid layout */
-.link-grid {
+.section h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #3498db;
+    margin: 1rem auto;
+    border-radius: 2px;
+}
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+}
+
+/* Card Styles */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    text-decoration: none;
+    color: #2c3e50;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Link items */
-.link-item {
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    border-color: #3498db;
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: #f8fafc;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
-    padding: 0.75rem;
-    background: #f8fafc;
-    border-radius: 6px;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
-.link-item:hover {
-    transform: translateX(4px);
-    background-color: #edf2f7;
+.card:hover .card-icon {
+    background: #3498db;
+    transform: scale(1.1);
 }
 
-/* Title links */
-.title-link {
+.card h3 {
+    margin: 0;
+    font-size: 1.3rem;
     color: #2c3e50;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 1.1rem;
-    min-width: 160px;
-    padding-right: 1rem;
-    transition: color 0.2s ease;
+    margin-bottom: 0.5rem;
 }
 
-.primary-section .title-link:hover {
-    color: #3498db;
-}
-
-.relationship-section .title-link:hover {
-    color: #2ecc71;
-}
-
-/* Descriptions */
-.description {
-    color: #64748b;
+.card p {
+    margin: 0;
     font-size: 0.95rem;
-    margin-left: 1rem;
-    border-left: 2px solid #edf2f7;
-    padding-left: 1rem;
-    flex: 1;
+    color: #7f8c8d;
+    line-height: 1.5;
 }
 
-/* Footer */
-footer {
-    text-align: center;
-    padding: 1.5rem 0;
-    color: #64748b;
-    font-size: 0.9rem;
-    border-top: 1px solid #edf2f7;
-    margin-top: auto;
-}
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero {
+        padding: 3rem 1rem;
+    }
 
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .content {
+        padding: 0 1rem;
+    }
+
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.5rem;
     }
 
-    .content-section {
-        padding: 1.25rem;
+    .card {
+        padding: 1.5rem;
+    }
+
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
     }
 }
 
-@media (max-width: 768px) {
-    body {
-        padding: 0;
+/* Animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
 
-    .dashboard-container {
-        padding: 1rem;
-    }
-
-    .title-link {
-        min-width: 140px;
-        font-size: 1rem;
-    }
-
-    .description {
-        font-size: 0.9rem;
-        margin-left: 0.75rem;
-        padding-left: 0.75rem;
-    }
-
-    h1 {
-        font-size: 1.75rem;
-    }
-
-    h2 {
-        font-size: 1.25rem;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* Focus styles for accessibility */
-.title-link:focus {
-    outline: none;
-    text-decoration: underline;
+.card {
+    animation: fadeInUp 0.5s ease forwards;
 }
 
-.primary-section .title-link:focus {
-    color: #3498db;
+/* Stagger animation for cards */
+.grid .card:nth-child(1) {
+    animation-delay: 0.1s;
 }
 
-.relationship-section .title-link:focus {
-    color: #2ecc71;
+.grid .card:nth-child(2) {
+    animation-delay: 0.2s;
 }
 
-/* Print styles */
-@media print {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
+.grid .card:nth-child(3) {
+    animation-delay: 0.3s;
+}
 
-    .link-item {
-        break-inside: avoid;
-        background: none;
-        border: 1px solid #edf2f7;
-    }
+.grid .card:nth-child(4) {
+    animation-delay: 0.4s;
+}
 
-    .title-link {
-        color: #2c3e50;
-    }
-
-    .description {
-        color: #4a5568;
-    }
+.grid .card:nth-child(5) {
+    animation-delay: 0.5s;
 }

@@ -1,71 +1,76 @@
-{{!-- Main header with clean styling --}}
-<div class="header-section">
-    <h1>Sun Gym Management System</h1>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sun Gym Management System</title>
+    <link rel="stylesheet" href="{{basePath}}/css/index.css">
+</head>
+<body>
+    <div class="hero">
+        <h1>Sun Gym Management System</h1>
+        <p class="subtitle">A modern solution for gym management</p>
+    </div>
 
-{{!-- Main content in a two-column layout --}}
-<div class="dashboard-container">
-    <div class="dashboard-grid">
-        {{!-- Primary Tables section (Left Column) --}}
-        <section class="content-section primary-section">
+    <div class="content">
+        <!-- Primary Tables Section -->
+        <section class="section">
             <h2>Primary Tables</h2>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="{{basePath}}/members" class="title-link">Members</a>
-                    <span class="description">Member profiles and membership details</span>
-                </div>
-
-                <div class="link-item">
-                    <a href="{{basePath}}/trainers" class="title-link">Trainers</a>
-                    <span class="description">Trainer profiles and specializations</span>
-                </div>
-
-                <div class="link-item">
-                    <a href="{{basePath}}/classes" class="title-link">Classes</a>
-                    <span class="description">Fitness classes and schedules</span>
-                </div>
-
-                <div class="link-item">
-                    <a href="{{basePath}}/equipment" class="title-link">Equipment</a>
-                    <span class="description">Equipment inventory and status</span>
-                </div>
-
-                <div class="link-item">
-                    <a href="{{basePath}}/payments" class="title-link">Payments</a>
-                    <span class="description">Member payment tracking</span>
-                </div>
+            <div class="grid">
+                <a href="{{basePath}}/members" class="card">
+                    <div class="card-icon">👥</div>
+                    <h3>Members</h3>
+                    <p>Manage member profiles and memberships</p>
+                </a>
+                <a href="{{basePath}}/trainers" class="card">
+                    <div class="card-icon">💪</div>
+                    <h3>Trainers</h3>
+                    <p>Manage trainer profiles and specializations</p>
+                </a>
+                <a href="{{basePath}}/classes" class="card">
+                    <div class="card-icon">🏋️</div>
+                    <h3>Classes</h3>
+                    <p>Schedule and manage fitness classes</p>
+                </a>
+                <a href="{{basePath}}/equipment" class="card">
+                    <div class="card-icon">🎯</div>
+                    <h3>Equipment</h3>
+                    <p>Track gym equipment inventory</p>
+                </a>
+                <a href="{{basePath}}/payments" class="card">
+                    <div class="card-icon">💰</div>
+                    <h3>Payments</h3>
+                    <p>Process and track member payments</p>
+                </a>
             </div>
         </section>
 
-        {{!-- Relationship Management section (Right Column) --}}
-        <section class="content-section relationship-section">
+        <!-- Relationship Management Section -->
+        <section class="section">
             <h2>Relationship Management</h2>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="{{basePath}}/member-equipment" class="title-link">Member-Equipment</a>
-                    <span class="description">Equipment usage tracking</span>
-                </div>
-
-                <div class="link-item">
-                    <a href="{{basePath}}/class-bookings" class="title-link">Class-Bookings</a>
-                    <span class="description">Class enrollment management</span>
-                </div>
-
-                <div class="link-item">
-                    <a href="{{basePath}}/member-trainer" class="title-link">Member-Trainer</a>
-                    <span class="description">Training assignments</span>
-                </div>
-
-                <div class="link-item">
-                    <a href="{{basePath}}/trainer-equipment" class="title-link">Trainer-Equipment</a>
-                    <span class="description">Equipment certifications</span>
-                </div>
+            <div class="grid">
+                <a href="{{basePath}}/member-equipment" class="card">
+                    <div class="card-icon">🔄</div>
+                    <h3>Member Equipment</h3>
+                    <p>Track equipment usage by members</p>
+                </a>
+                <a href="{{basePath}}/class-bookings" class="card">
+                    <div class="card-icon">📅</div>
+                    <h3>Class Bookings</h3>
+                    <p>Manage class enrollments</p>
+                </a>
+                <a href="{{basePath}}/member-trainer" class="card">
+                    <div class="card-icon">🤝</div>
+                    <h3>Member Trainer</h3>
+                    <p>Assign trainers to members</p>
+                </a>
+                <a href="{{basePath}}/trainer-equipment" class="card">
+                    <div class="card-icon">📋</div>
+                    <h3>Trainer Equipment</h3>
+                    <p>Manage trainer certifications</p>
+                </a>
             </div>
         </section>
     </div>
-</div>
-
-{{!-- Footer section --}}
-<footer>
-    <p>Database Administration Interface</p>
-</footer>
+</body>
+</html>
