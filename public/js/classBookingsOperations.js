@@ -52,8 +52,8 @@ addBookingForm.addEventListener('submit', async function (e) {
                 <td>${booking.scheduleTime}</td>
                 <td>${booking.bookingDate}</td>
                 <td>
-                    <button onclick="editBooking('${data.id}')" class="edit-btn">Edit</button>
-                    <button onclick="deleteBooking('${data.id}')" class="delete-btn">Delete</button>
+                    <button onclick="editBooking(${data.id})" class="edit-btn">Edit</button>
+                    <button onclick="deleteBooking(${data.id})" class="delete-btn">Delete</button>
                 </td>
             `;
             tbody.insertBefore(newRow, tbody.firstChild);
