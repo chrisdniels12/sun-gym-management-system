@@ -89,8 +89,8 @@
                     <td>{{formatTime this.scheduleTime}}</td>
                     <td>{{this.bookingDate}}</td>
                     <td>
-                        <button onclick="editBooking('{{this.bookingID}}')" class="edit-btn">Edit</button>
-                        <button onclick="deleteBooking('{{this.bookingID}}')" class="delete-btn">Cancel</button>
+                        <button onclick="editBooking({{this.bookingID}})" class="edit-btn">Edit</button>
+                        <button onclick="deleteBooking({{this.bookingID}})" class="delete-btn">Delete</button>
                     </td>
                 </tr>
                 {{/each}}

@@ -52,8 +52,8 @@ addBookingForm.addEventListener('submit', async function (e) {
                 <td>${booking.scheduleTime}</td>
                 <td>${booking.bookingDate}</td>
                 <td>
-                    <button onclick="editBooking('${data.id}')" class="edit-btn">Edit</button>
-                    <button onclick="deleteBooking('${data.id}')" class="delete-btn">Cancel</button>
+                    <button onclick="editBooking(${data.id})" class="edit-btn">Edit</button>
+                    <button onclick="deleteBooking(${data.id})" class="delete-btn">Delete</button>
                 </td>
             `;
             tbody.insertBefore(newRow, tbody.firstChild);
@@ -181,7 +181,7 @@ editBookingForm.addEventListener("submit", async function (e) {
 
 // Delete Booking
 async function deleteBooking(id) {
-    if (confirm('Are you sure you want to cancel this booking?')) {
+    if (confirm('Are you sure you want to delete this booking?')) {
         try {
             const response = await fetch(`${BASE_PATH}/api/class-bookings/${id}`, {
                 method: 'DELETE',
@@ -204,12 +204,12 @@ async function deleteBooking(id) {
                 }
 
                 // Show success message for 5 seconds
-                const successMessage = notifications.success('Booking cancelled successfully!');
+                const successMessage = notifications.success('Booking deleted successfully!');
                 setTimeout(() => {
                     successMessage.remove();
                 }, 5000);
             } else {
-                notifications.error(data.error || 'Failed to cancel booking');
+                notifications.error(data.error || 'Failed to delete booking');
             }
         } catch (error) {
             console.error('Error:', error);
