@@ -1,15 +1,11 @@
-// DOM Elements
-const addTrainerEquipmentForm = document.getElementById('addTrainerEquipment');
-const certificationsTable = document.getElementById('certifications-table');
+// Get base path from meta tag
+const BASE_PATH = document.querySelector('meta[name="base-path"]').content;
 
-// Add Certification
-addTrainerEquipmentForm.addEventListener('submit', async function (e) {
+// Add event listener for form submission
+document.getElementById('addTrainerEquipment').addEventListener('submit', async function (e) {
     e.preventDefault();
-    console.log('Form submitted');
 
-    // Clear any existing error messages
-    clearErrors();
-
+    // Get form data
     const formData = {
         trainerID: document.getElementById('trainerID').value,
         equipmentID: document.getElementById('equipmentID').value,
@@ -17,9 +13,8 @@ addTrainerEquipmentForm.addEventListener('submit', async function (e) {
         expiryDate: document.getElementById('expiryDate').value
     };
 
-    console.log('Sending data:', formData);
-
     try {
+        // Send POST request to API
         const response = await fetch(`${BASE_PATH}/api/trainer-equipment`, {
             method: 'POST',
             headers: {
@@ -29,97 +24,81 @@ addTrainerEquipmentForm.addEventListener('submit', async function (e) {
         });
 
         const data = await response.json();
-        console.log('Server response:', data);
 
-        if (response.ok) {
-            showSuccess('Certification added successfully!');
-            addTrainerEquipmentForm.reset();
-            location.reload();
-        } else {
-            // Handle multiple error cases
-            if (data.error === 'Duplicate entries found' && data.duplicates) {
-                data.duplicates.forEach(duplicate => {
-                    if (duplicate.field === 'active_certification') {
-                        showError('equipmentID', `Trainer already has an active certification for this equipment`);
+        if (!response.ok) {
+            if (data.duplicates) {
+                const errors = data.duplicates.map(err => {
+                    switch (err.field) {
+                        case 'active_certification':
+                            return 'This trainer already has an active certification for this equipment';
+                        default:
+                            return `Error with ${err.field}: ${err.value}`;
                     }
                 });
-            } else {
-                showError('form', `Failed to add certification: ${data.error}`);
+                alert(errors.join('\n'));
+                return;
             }
+            throw new Error(data.error || 'Failed to add certification');
         }
+
+        // Refresh the page to show new certification
+        window.location.reload();
+
     } catch (error) {
-        console.error('Error details:', error);
-        showError('form', `Error adding certification: ${error.message}`);
+        console.error('Error:', error);
+        alert('Failed to add certification: ' + error.message);
     }
 });
 
-// Renew Certification
-async function renewCertification(id) {
-    if (confirm('Are you sure you want to renew this certification?')) {
-        try {
-            const response = await fetch(`${BASE_PATH}/api/trainer-equipment/${id}/renew`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]  // 1 year from now
-                })
-            });
+// Function to renew certification
+async function renewCertification(certificationId) {
+    const newExpiryDate = prompt('Enter new expiry date (YYYY-MM-DD):');
+    if (!newExpiryDate) return;
 
-            if (response.ok) {
-                location.reload();
-            } else {
-                const data = await response.json();
-                showError('form', `Failed to renew certification: ${data.error}`);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showError('form', `Error renewing certification: ${error.message}`);
+    try {
+        const response = await fetch(`${BASE_PATH}/api/trainer-equipment/${certificationId}/renew`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ expiryDate: newExpiryDate })
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to renew certification');
         }
+
+        // Refresh the page to show updated certification
+        window.location.reload();
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to renew certification: ' + error.message);
     }
 }
 
-// Delete Certification
-async function deleteCertification(id) {
-    if (confirm('Are you sure you want to delete this certification?')) {
-        try {
-            const response = await fetch(`${BASE_PATH}/api/trainer-equipment/${id}`, {
-                method: 'DELETE'
-            });
+// Function to delete certification
+async function deleteCertification(certificationId) {
+    if (!confirm('Are you sure you want to delete this certification?')) {
+        return;
+    }
 
-            if (response.ok) {
-                location.reload();
-            } else {
-                const data = await response.json();
-                showError('form', `Failed to delete certification: ${data.error}`);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            showError('form', `Error deleting certification: ${error.message}`);
+    try {
+        const response = await fetch(`${BASE_PATH}/api/trainer-equipment/${certificationId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to delete certification');
         }
+
+        // Refresh the page to show updated list
+        window.location.reload();
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to delete certification: ' + error.message);
     }
 }
-
-// Helper Functions
-function showError(fieldId, message) {
-    const field = document.getElementById(fieldId);
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    field.parentNode.appendChild(errorDiv);
-}
-
-function showSuccess(message) {
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    successDiv.textContent = message;
-    document.querySelector('.form-section').insertBefore(successDiv, addTrainerEquipmentForm);
-}
-
-function clearErrors() {
-    const errorMessages = document.querySelectorAll('.error-message');
-    errorMessages.forEach(msg => msg.remove());
-    const successMessages = document.querySelectorAll('.success-message');
-    successMessages.forEach(msg => msg.remove());
-} 
