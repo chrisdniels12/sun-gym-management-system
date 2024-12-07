@@ -81,7 +81,7 @@
             </thead>
             <tbody>
                 {{#each bookings}}
-                <tr data-id="{{this.bookingID}}">
+                <tr data-id="{{this.bookingID}}" data-member-id="{{this.memberID}}" data-class-id="{{this.classID}}">
                     <td>{{this.bookingID}}</td>
                     <td>{{this.memberName}}</td>
                     <td>{{this.className}}</td>
@@ -104,6 +104,7 @@
             <h2>Edit Class Booking</h2>
             <form id="edit-booking-form">
                 <input type="hidden" id="edit-bookingID">
+                <input type="hidden" id="edit-memberID">
                 <div class="form-group">
                     <label>Member:</label>
                     <div class="member-name-display"></div>

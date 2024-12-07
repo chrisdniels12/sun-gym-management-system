@@ -41,6 +41,8 @@ addBookingForm.addEventListener('submit', async function (e) {
             const newRow = document.createElement('tr');
             const booking = data.booking;
             newRow.dataset.id = data.id;
+            newRow.dataset.memberId = booking.memberID;
+            newRow.dataset.classId = booking.classID;
 
             newRow.innerHTML = `
                 <td>${data.id}</td>
@@ -85,7 +87,7 @@ addBookingForm.addEventListener('submit', async function (e) {
 });
 
 // Edit Booking
-async function editBooking(id) {
+function editBooking(id) {
     console.log('Editing booking:', id);
     const row = document.querySelector(`tr[data-id="${id}"]`);
     if (!row) {
@@ -94,43 +96,36 @@ async function editBooking(id) {
     }
     const modal = document.getElementById('edit-modal');
 
-    try {
-        // Get the booking details from the server
-        const response = await fetch(`${BASE_PATH}/api/class-bookings/${id}`);
-        const data = await response.json();
+    // Fill the edit form with current data
+    document.getElementById('edit-bookingID').value = id;
+    document.getElementById('edit-memberID').value = row.dataset.memberId;
 
-        if (!response.ok) {
-            throw new Error(data.error || 'Failed to fetch booking details');
+    // Set member name display
+    const memberName = row.cells[1].textContent.trim();
+    document.querySelector('.member-name-display').textContent = memberName;
+
+    // Get class name from the row
+    const className = row.cells[2].textContent.trim();
+    const scheduleDay = row.cells[3].textContent.trim();
+    const scheduleTime = row.cells[4].textContent.trim();
+    const classSelect = document.getElementById('edit-classID');
+
+    // Find and select the matching class option
+    Array.from(classSelect.options).forEach(option => {
+        const optionInfo = option.text.split(' - ');
+        const optionClass = optionInfo[0].trim();
+        const optionDay = optionInfo[1].trim();
+        const optionTime = optionInfo[2].trim();
+        if (optionClass === className && optionDay === scheduleDay && optionTime === scheduleTime) {
+            option.selected = true;
         }
+    });
 
-        // Fill the edit form with current data
-        document.getElementById('edit-bookingID').value = id;
+    // Set and display booking date
+    const bookingDate = row.cells[5].textContent;
+    document.querySelector('.booking-date-display').textContent = bookingDate;
 
-        // Set member name display
-        document.querySelector('.member-name-display').textContent = data.memberName;
-
-        // Select the correct class option
-        const classSelect = document.getElementById('edit-classID');
-        Array.from(classSelect.options).forEach(option => {
-            const optionInfo = option.text.split(' - ');
-            const optionClass = optionInfo[0].trim();
-            const optionDay = optionInfo[1].trim();
-            const optionTime = optionInfo[2].trim();
-            if (optionClass === data.className &&
-                optionDay === data.scheduleDay &&
-                optionTime === data.scheduleTime) {
-                option.selected = true;
-            }
-        });
-
-        // Set and display booking date
-        document.querySelector('.booking-date-display').textContent = data.bookingDate;
-
-        modal.style.display = 'block';
-    } catch (error) {
-        console.error('Error fetching booking details:', error);
-        notifications.error('Error loading booking details');
-    }
+    modal.style.display = 'block';
 }
 
 // Update Booking
@@ -139,15 +134,10 @@ editBookingForm.addEventListener("submit", async function (e) {
     const id = document.getElementById('edit-bookingID').value;
     const row = document.querySelector(`tr[data-id="${id}"]`);
 
-    // Get the memberID from the route
-    const response = await fetch(`${BASE_PATH}/api/class-bookings/${id}`);
-    const data = await response.json();
-    const memberID = data.memberID;
-
     const formData = {
-        memberID: memberID,
+        memberID: document.getElementById('edit-memberID').value,
         classID: document.getElementById("edit-classID").value,
-        bookingDate: data.bookingDate // Keep original booking date
+        bookingDate: row.cells[5].textContent // Keep original booking date
     };
 
     console.log('Updating booking with data:', formData);
@@ -171,6 +161,9 @@ editBookingForm.addEventListener("submit", async function (e) {
             row.cells[2].textContent = booking.className;
             row.cells[3].textContent = booking.scheduleDay;
             row.cells[4].textContent = booking.scheduleTime;
+
+            // Update data attributes
+            row.dataset.classId = formData.classID;
 
             // Show success message for 5 seconds
             const successMessage = notifications.success('Booking updated successfully!');
