@@ -6,7 +6,7 @@ const db = require('../database/db-connector').pool;
 router.get('/', async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT cb.bookingID, 
+            SELECT cb.bookingID, cb.memberID,
                    CONCAT(m.firstName, ' ', m.lastName) as memberName,
                    c.className, c.scheduleDay, c.scheduleTime,
                    cb.bookingDate
@@ -17,6 +17,31 @@ router.get('/', async (req, res) => {
         `);
         console.log('Fetched bookings:', rows);
         res.json(rows);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET single booking
+router.get('/:id', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT cb.bookingID, cb.memberID, cb.classID,
+                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
+                   c.className, c.scheduleDay, c.scheduleTime,
+                   cb.bookingDate
+            FROM ClassBookings cb
+            JOIN Members m ON cb.memberID = m.memberID
+            JOIN Classes c ON cb.classID = c.classID
+            WHERE cb.bookingID = ?
+        `, [req.params.id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+
+        res.json(rows[0]);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: error.message });
@@ -61,9 +86,22 @@ router.post('/', async (req, res) => {
             [memberID, classID, bookingDate]
         );
 
+        // Get the newly created booking with all details
+        const [newBooking] = await db.query(`
+            SELECT cb.bookingID, cb.memberID,
+                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
+                   c.className, c.scheduleDay, c.scheduleTime,
+                   cb.bookingDate
+            FROM ClassBookings cb
+            JOIN Members m ON cb.memberID = m.memberID
+            JOIN Classes c ON cb.classID = c.classID
+            WHERE cb.bookingID = ?
+        `, [result.insertId]);
+
         res.status(201).json({
             message: 'Booking added successfully',
-            id: result.insertId
+            id: result.insertId,
+            booking: newBooking[0]
         });
     } catch (error) {
         console.error('Error adding booking:', error);
@@ -73,12 +111,72 @@ router.post('/', async (req, res) => {
     }
 });
 
+// UPDATE booking
+router.put('/:id', async (req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const { memberID, classID, bookingDate } = req.body;
+        console.log('Updating booking:', { bookingId, memberID, classID, bookingDate });
+
+        // Check if booking exists
+        const [existingBooking] = await db.query(
+            'SELECT * FROM ClassBookings WHERE bookingID = ?',
+            [bookingId]
+        );
+
+        if (existingBooking.length === 0) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+
+        // Update the booking
+        const [result] = await db.query(
+            `UPDATE ClassBookings 
+             SET memberID = ?, 
+                 classID = ?
+             WHERE bookingID = ?`,
+            [memberID, classID, bookingId]
+        );
+
+        console.log('Update result:', result);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Failed to update booking' });
+        }
+
+        // Get updated booking data
+        const [updatedBooking] = await db.query(`
+            SELECT cb.bookingID, cb.memberID,
+                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
+                   c.className, c.scheduleDay, c.scheduleTime,
+                   cb.bookingDate
+            FROM ClassBookings cb
+            JOIN Members m ON cb.memberID = m.memberID
+            JOIN Classes c ON cb.classID = c.classID
+            WHERE cb.bookingID = ?
+        `, [bookingId]);
+
+        res.json({
+            message: 'Booking updated successfully',
+            booking: updatedBooking[0]
+        });
+    } catch (error) {
+        console.error('Error updating booking:', error);
+        res.status(500).json({ error: error.message || 'Error updating booking' });
+    }
+});
+
 // DELETE booking
 router.delete('/:id', async (req, res) => {
     try {
-        await db.query('DELETE FROM ClassBookings WHERE bookingID = ?', [req.params.id]);
+        const [result] = await db.query('DELETE FROM ClassBookings WHERE bookingID = ?', [req.params.id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+
         res.json({ message: 'Booking cancelled successfully' });
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
 });

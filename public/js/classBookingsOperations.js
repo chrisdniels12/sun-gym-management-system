@@ -46,16 +46,13 @@ addBookingForm.addEventListener('submit', async function (e) {
             const classSelect = document.getElementById('classID');
             const memberName = memberSelect.options[memberSelect.selectedIndex].text;
             const classInfo = classSelect.options[classSelect.selectedIndex].text.split(' - ');
-            const className = classInfo[0];
-            const scheduleDay = classInfo[1];
-            const scheduleTime = classInfo[2];
 
             newRow.innerHTML = `
                 <td>${data.id}</td>
                 <td>${memberName}</td>
-                <td>${className}</td>
-                <td>${scheduleDay}</td>
-                <td>${scheduleTime}</td>
+                <td>${classInfo[0]}</td>
+                <td>${classInfo[1]}</td>
+                <td>${classInfo[2]}</td>
                 <td>${formData.bookingDate}</td>
                 <td>
                     <button onclick="editBooking('${data.id}')" class="edit-btn">Edit</button>
@@ -126,9 +123,10 @@ async function editBooking(id) {
 
         // Find and select the matching class option
         Array.from(classSelect.options).forEach(option => {
-            const optionClass = option.text.split(' - ')[0].trim();
-            const optionDay = option.text.split(' - ')[1].trim();
-            const optionTime = option.text.split(' - ')[2].trim();
+            const optionInfo = option.text.split(' - ');
+            const optionClass = optionInfo[0].trim();
+            const optionDay = optionInfo[1].trim();
+            const optionTime = optionInfo[2].trim();
             if (optionClass === className && optionDay === scheduleDay && optionTime === scheduleTime) {
                 option.selected = true;
             }
