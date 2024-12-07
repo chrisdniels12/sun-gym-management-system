@@ -36,24 +36,19 @@ addBookingForm.addEventListener('submit', async function (e) {
             // Show success message for 5 seconds
             const successMessage = notifications.success('Booking added successfully!');
 
-            // Add the new booking to the table immediately
+            // Add the new booking to the table immediately using the server response
             const tbody = bookingsTable.querySelector('tbody');
             const newRow = document.createElement('tr');
+            const booking = data.booking;
             newRow.dataset.id = data.id;
-
-            // Get member and class names from the select elements
-            const memberSelect = document.getElementById('memberID');
-            const classSelect = document.getElementById('classID');
-            const memberName = memberSelect.options[memberSelect.selectedIndex].text;
-            const classInfo = classSelect.options[classSelect.selectedIndex].text.split(' - ');
 
             newRow.innerHTML = `
                 <td>${data.id}</td>
-                <td>${memberName}</td>
-                <td>${classInfo[0]}</td>
-                <td>${classInfo[1]}</td>
-                <td>${classInfo[2]}</td>
-                <td>${formData.bookingDate}</td>
+                <td>${booking.memberName}</td>
+                <td>${booking.className}</td>
+                <td>${booking.scheduleDay}</td>
+                <td>${booking.scheduleTime}</td>
+                <td>${booking.bookingDate}</td>
                 <td>
                     <button onclick="editBooking('${data.id}')" class="edit-btn">Edit</button>
                     <button onclick="deleteBooking('${data.id}')" class="delete-btn">Cancel</button>
@@ -112,29 +107,24 @@ async function editBooking(id) {
         document.getElementById('edit-bookingID').value = id;
 
         // Set member name display
-        const memberName = row.cells[1].textContent.trim();
-        document.querySelector('.member-name-display').textContent = memberName;
+        document.querySelector('.member-name-display').textContent = data.memberName;
 
-        // Get class name from the row
-        const className = row.cells[2].textContent.trim();
-        const scheduleDay = row.cells[3].textContent.trim();
-        const scheduleTime = row.cells[4].textContent.trim();
+        // Select the correct class option
         const classSelect = document.getElementById('edit-classID');
-
-        // Find and select the matching class option
         Array.from(classSelect.options).forEach(option => {
             const optionInfo = option.text.split(' - ');
             const optionClass = optionInfo[0].trim();
             const optionDay = optionInfo[1].trim();
             const optionTime = optionInfo[2].trim();
-            if (optionClass === className && optionDay === scheduleDay && optionTime === scheduleTime) {
+            if (optionClass === data.className &&
+                optionDay === data.scheduleDay &&
+                optionTime === data.scheduleTime) {
                 option.selected = true;
             }
         });
 
         // Set and display booking date
-        const bookingDate = row.cells[5].textContent;
-        document.querySelector('.booking-date-display').textContent = bookingDate;
+        document.querySelector('.booking-date-display').textContent = data.bookingDate;
 
         modal.style.display = 'block';
     } catch (error) {
@@ -157,7 +147,7 @@ editBookingForm.addEventListener("submit", async function (e) {
     const formData = {
         memberID: memberID,
         classID: document.getElementById("edit-classID").value,
-        bookingDate: row.cells[5].textContent // Keep original booking date
+        bookingDate: data.bookingDate // Keep original booking date
     };
 
     console.log('Updating booking with data:', formData);
@@ -176,12 +166,11 @@ editBookingForm.addEventListener("submit", async function (e) {
             // Close the modal immediately
             closeEditModal();
 
-            // Update the row immediately
-            const classSelect = document.getElementById('edit-classID');
-            const classInfo = classSelect.options[classSelect.selectedIndex].text.split(' - ');
-            row.cells[2].textContent = classInfo[0]; // Class name
-            row.cells[3].textContent = classInfo[1]; // Schedule day
-            row.cells[4].textContent = classInfo[2]; // Schedule time
+            // Update the row with the server response data
+            const booking = data.booking;
+            row.cells[2].textContent = booking.className;
+            row.cells[3].textContent = booking.scheduleDay;
+            row.cells[4].textContent = booking.scheduleTime;
 
             // Show success message for 5 seconds
             const successMessage = notifications.success('Booking updated successfully!');
