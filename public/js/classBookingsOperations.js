@@ -52,8 +52,8 @@ addBookingForm.addEventListener('submit', async function (e) {
                 <td>${booking.scheduleTime}</td>
                 <td>${booking.bookingDate}</td>
                 <td>
-                    <button onclick="editBooking(${data.id})" class="edit-btn">Edit</button>
-                    <button onclick="deleteBooking(${data.id})" class="delete-btn">Delete</button>
+                    <button onclick="editBooking('${data.id}')" class="edit-btn">Edit</button>
+                    <button onclick="deleteBooking('${data.id}')" class="delete-btn">Delete</button>
                 </td>
             `;
             tbody.insertBefore(newRow, tbody.firstChild);
@@ -87,7 +87,7 @@ addBookingForm.addEventListener('submit', async function (e) {
 });
 
 // Edit Booking
-window.editBooking = function (id) {
+function editBooking(id) {
     console.log('Editing booking:', id);
     const row = document.querySelector(`tr[data-id="${id}"]`);
     if (!row) {
@@ -180,45 +180,40 @@ editBookingForm.addEventListener("submit", async function (e) {
 });
 
 // Delete Booking
-window.deleteBooking = function (id) {
+function deleteBooking(id) {
     if (confirm('Are you sure you want to delete this booking?')) {
-        try {
-            fetch(`${BASE_PATH}/api/class-bookings/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
+        fetch(`${BASE_PATH}/api/class-bookings/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Remove the row from the table immediately
+                    const row = document.querySelector(`tr[data-id="${id}"]`);
+                    if (row) {
+                        row.style.transition = 'opacity 0.3s ease';
+                        row.style.opacity = '0';
+                        setTimeout(() => {
+                            row.remove();
+                        }, 300);
+                    }
+
+                    // Show success message for 5 seconds
+                    const successMessage = notifications.success('Booking deleted successfully!');
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 5000);
+                } else {
+                    notifications.error(data.error || 'Failed to delete booking');
                 }
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        // Remove the row from the table immediately
-                        const row = document.querySelector(`tr[data-id="${id}"]`);
-                        if (row) {
-                            row.style.transition = 'opacity 0.3s ease';
-                            row.style.opacity = '0';
-                            setTimeout(() => {
-                                row.remove();
-                            }, 300);
-                        }
-
-                        // Show success message for 5 seconds
-                        const successMessage = notifications.success('Booking deleted successfully!');
-                        setTimeout(() => {
-                            successMessage.remove();
-                        }, 5000);
-                    } else {
-                        notifications.error(data.error || 'Failed to delete booking');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    notifications.error('Error connecting to server');
-                });
-        } catch (error) {
-            console.error('Error:', error);
-            notifications.error('Error connecting to server');
-        }
+            .catch(error => {
+                console.error('Error:', error);
+                notifications.error('Error connecting to server');
+            });
     }
 }
 
