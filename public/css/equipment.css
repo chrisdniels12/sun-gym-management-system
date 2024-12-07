@@ -2,10 +2,6 @@
 @import 'main.css';
 
 /* Stats Section */
-.stats-section {
-    margin: 2rem 0;
-}
-
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -24,106 +20,40 @@
     transform: translateY(-2px);
 }
 
-.stat-card h3 {
-    color: #7f8c8d;
-    font-size: 0.9rem;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stat-card p {
-    color: #2c3e50;
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 0.5rem 0 0;
-}
-
 /* Form Section */
 .form-section {
     border: 1px solid #ddd;
     padding: 1rem;
     margin-bottom: 1.5rem;
     border-radius: 4px;
-    background: white;
 }
 
 .form-group {
     margin-bottom: 1rem;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #3498db;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-/* Table Section */
-.table-section {
-    background: white;
-    margin-bottom: 2rem;
-}
-
-#equipment-table {
-    width: 100%;
+/* Table styles */
+table {
     border-collapse: collapse;
-    margin-top: 1rem;
-    font-size: 0.95rem;
+    width: 100%;
+    margin: 1rem 0;
 }
 
-#equipment-table th {
+th,
+td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+}
+
+th {
     background-color: #f5f5f5;
-    padding: 0.75rem;
-    text-align: left;
-    font-weight: 600;
-    color: #2c3e50;
-    border: 1px solid #ddd;
-    white-space: nowrap;
 }
 
-#equipment-table td {
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    color: #2c3e50;
-    vertical-align: middle;
-}
-
-#equipment-table tr:nth-child(even) {
+tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-#equipment-table tr:hover {
-    background-color: #f5f5f5;
-}
-
-#equipment-table td:last-child {
-    text-align: center;
-    white-space: nowrap;
-    width: 150px;
-}
-
-#equipment-table td button {
-    margin: 0 0.25rem;
-}
-
-/* Button Styles */
+/* Button styles */
 .edit-btn,
 .delete-btn {
     padding: 0.5rem 1rem;
@@ -153,7 +83,38 @@
     background-color: #c0392b;
 }
 
-/* Modal Styles */
+/* Add some spacing in the table cells */
+td button {
+    margin: 0 0.25rem;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.875em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-available {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-in-use {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-maintenance {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Modal styles */
 .modal {
     display: none;
     position: fixed;
@@ -189,78 +150,9 @@
     margin-top: 2rem;
 }
 
-.update-btn,
-.cancel-btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    min-width: 100px;
-}
-
-.update-btn {
-    background-color: #3498db;
-    color: white;
-}
-
-.cancel-btn {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.update-btn:hover {
-    background-color: #2980b9;
-}
-
-.cancel-btn:hover {
-    background-color: #c0392b;
-}
-
-/* Status badges */
-.status-badge {
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.875em;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.status-available {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.status-in-use {
-    background-color: #fff3cd;
-    color: #856404;
-}
-
-.status-maintenance {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .stats-grid {
         grid-template-columns: 1fr;
-    }
-
-    .form-section,
-    .table-section {
-        padding: 1rem;
-    }
-
-    #equipment-table td,
-    #equipment-table th {
-        padding: 0.75rem;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        width: 90%;
     }
 }
