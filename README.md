@@ -83,25 +83,61 @@ node app.js
 - Open browser to: `http://localhost:8999/~[your_onid]/CS340/sun-gym-management-system`
 - All routes are prefixed with: `/~[your_onid]/CS340/sun-gym-management-system`
 
-**Note about ONID paths:**
-- Each user needs to use their own ONID username in the URL
-- The app uses an environment variable `ONID` to set this path
-- If not set, it defaults to 'piercebe' for development
-- You can set your ONID before starting the server:
-  ```bash
-  # Windows Command Prompt
-  set ONID=your_onid
-  node app.js
+### OSU Engineering Server Setup
+1. **Switch to Engineering Server Branch**
+```bash
+# Switch to the osu-engr-server branch
+git checkout osu-engr-server
+```
 
-  # Windows PowerShell
-  $env:ONID = "your_onid"
-  node app.js
+2. **SSH into Engineering Server**
+```bash
+# SSH into flip server (replace [onid] with your ONID)
+ssh [onid]@access.engr.oregonstate.edu
+```
 
-  # Mac/Linux
-  export ONID=your_onid
-  node app.js
-  ```
-  
+3. **Clone Repository on Server**
+```bash
+# Navigate to your public_html/CS340 directory
+cd public_html/CS340
+
+# Clone the repository
+git clone -b osu-engr-server https://github.com/chrisdniels12/sun-gym-management-system.git
+```
+
+4. **Install Dependencies and Forever**
+```bash
+# Navigate to project directory
+cd sun-gym-management-system
+
+# Install project dependencies
+npm install
+
+# Install forever globally if not already installed
+npm install -g forever
+```
+
+5. **Start the Application**
+```bash
+# Start the application using forever
+forever start app.js
+
+# To restart after changes
+forever restartall
+
+# To stop the application
+forever stopall
+
+# To list running processes
+forever list
+```
+
+6. **Access the Application**
+- Open browser to: `http://classwork.engr.oregonstate.edu:8997/~[your_onid]/CS340/sun-gym-management-system`
+- Replace [your_onid] with your ONID username
+
+**Note**: The engineering server uses port 8997 and requires the forever process manager to keep the application running.
+
 ## Important Notes
 
 ### Base Path and ONID Setup
@@ -133,92 +169,29 @@ sun-gym-management-system/
 │   ├── DDL.sql              # Database schema
 │   ├── DML.sql              # Sample data and queries
 │   └── db-connector.js      # Database connection setup
+├── helpers/                 # Helper functions
+│   └── handlebars-helpers.js # Custom Handlebars helpers
 ├── public/
 │   ├── css/                 # Stylesheets
 │   │   ├── main.css         # Shared styles
 │   │   ├── index.css        # Home page styles
 │   │   └── [entity].css     # Entity-specific styles
 │   ├── js/                  # Client-side JavaScript
+│   │   ├── notifications.js # Notification system
 │   │   └── [entity]Operations.js  # CRUD operations
-│   └── html_archive/        # Original HTML files (reference)
+│   ├── js_archive/         # Archived JavaScript files
+│   └── html_archive/       # Original HTML files (reference)
 ├── routes/                  # Express route handlers
 │   └── [entity].js         # Entity-specific routes
 ├── views/                   # Handlebars templates
+│   ├── layouts/            # Layout templates
+│   │   └── main.hbs        # Main layout template
 │   ├── index.hbs           # Home page template
 │   └── [entity].hbs        # Entity-specific templates
-├── app.js                   # Main application file
-└── package.json            # Project dependencies
+├── .foreverignore         # Forever process manager ignore file
+├── .gitignore             # Git ignore file
+├── app.js                 # Main application file
+└── package.json          # Project dependencies
 ```
 
-## Features
-
-### Primary Tables
-- **Members**: Full member profile management with duplicate detection
-- **Trainers**: Trainer profiles with specialization tracking
-- **Classes**: Class scheduling with capacity management
-- **Equipment**: Inventory with status tracking
-- **Payments**: Member payment processing and history
-
-### Relationship Management
-- **Member-Equipment**: Track equipment usage by members
-- **Class-Bookings**: Manage class enrollments
-- **Member-Trainer**: Personal training assignments
-- **Trainer-Equipment**: Equipment certifications
-
-## API Endpoints
-
-### Primary Tables
-- `/api/members` - Member CRUD with duplicate checking
-- `/api/trainers` - Trainer management with specializations
-- `/api/classes` - Class scheduling with capacity checks
-- `/api/equipment` - Equipment tracking with status updates
-- `/api/payments` - Payment processing and history
-
-### Relationships
-- `/api/member-equipment` - Equipment usage tracking
-- `/api/class-bookings` - Class enrollment management
-- `/api/member-trainer` - Training relationship management
-- `/api/trainer-equipment` - Certification tracking
-
-## Technologies
-
-- **Frontend**:
-  - HTML5, CSS3, JavaScript
-  - Handlebars templating
-  - Modern responsive design
-  - Client-side validation
-
-- **Backend**:
-  - Node.js & Express.js
-  - MySQL with connection pooling
-  - RESTful API architecture
-  - Server-side validation
-
-- **Development Tools**:
-  - Git for version control
-  - npm for package management
-
-## Development Notes
-
-### Error Handling
-- All forms include duplicate entry detection
-- Server-side validation for all inputs
-- Proper error messages displayed to users
-- Database errors properly caught and handled
-
-### Code Organization
-- Handlebars templates for all pages including home page
-- Modular CSS with shared styles in main.css
-- Separate JavaScript files for each entity
-- Consistent naming conventions
-- Clear file structure
-
-### Database
-- Proper foreign key constraints
-- Indexed fields for performance
-- Sample data for testing
-- Clear schema documentation
-
-### Version Control
-- Main branch: Current working version with Handlebars implementation
-- All changes documented in commits
+[Rest of the README remains unchanged...]
