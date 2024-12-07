@@ -77,6 +77,13 @@ tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
+/* Actions column width */
+td:last-child {
+    text-align: center;
+    white-space: nowrap;
+    width: 150px;
+}
+
 /* Button Styles */
 .edit-btn,
 .delete-btn {
