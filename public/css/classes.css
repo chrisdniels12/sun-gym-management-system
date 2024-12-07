@@ -1,7 +1,7 @@
 /* Import main styles */
 @import 'main.css';
 
-/* Stats Section */
+/* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -18,6 +18,19 @@
 
 .stat-card:hover {
     transform: translateY(-2px);
+}
+
+.stat-card h3 {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
 }
 
 /* Form Section */
@@ -126,6 +139,12 @@ td button {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
     .stats-grid {
         grid-template-columns: 1fr;
     }
