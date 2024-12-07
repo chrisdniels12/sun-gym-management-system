@@ -67,7 +67,7 @@
     padding: 2rem;
     text-decoration: none;
     color: #2c3e50;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     border: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -142,42 +142,4 @@
         height: 60px;
         font-size: 2rem;
     }
-}
-
-/* Animation for cards */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.card {
-    animation: fadeInUp 0.5s ease forwards;
-}
-
-/* Stagger animation for cards */
-.grid .card:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.grid .card:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.grid .card:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-.grid .card:nth-child(4) {
-    animation-delay: 0.4s;
-}
-
-.grid .card:nth-child(5) {
-    animation-delay: 0.5s;
 }
