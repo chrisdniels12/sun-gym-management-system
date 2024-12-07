@@ -35,6 +35,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Add logging middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
 // Serve static files from the 'public' directory
 app.use(`${BASE_PATH}`, express.static(path.join(__dirname, 'public')));
 
@@ -43,7 +49,7 @@ app.get(`${BASE_PATH}`, (req, res) => {
     res.render('index', { basePath: BASE_PATH });
 });
 
-// API routes
+// API routes with logging
 app.use(`${BASE_PATH}/api/members`, require('./routes/members'));
 app.use(`${BASE_PATH}/api/trainers`, require('./routes/trainers'));
 app.use(`${BASE_PATH}/api/classes`, require('./routes/classes'));
@@ -72,6 +78,68 @@ testDatabase();
 const PORT = 8997;  // Fixed port for OSU engr server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+});
+
+// Class-Bookings route with detailed logging
+app.get(`${BASE_PATH}/class-bookings`, async (req, res) => {
+    console.log('Handling class-bookings GET request');
+    try {
+        console.log('Fetching bookings from database...');
+        const [bookings] = await db.query(`
+            SELECT cb.bookingID, cb.memberID,
+                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
+                   c.className, c.scheduleDay, c.scheduleTime,
+                   cb.bookingDate
+            FROM ClassBookings cb
+            JOIN Members m ON cb.memberID = m.memberID
+            JOIN Classes c ON cb.classID = c.classID
+            ORDER BY cb.bookingDate DESC, c.scheduleTime
+        `);
+        console.log('Fetched bookings:', bookings);
+
+        console.log('Fetching members...');
+        const [members] = await db.query('SELECT memberID, firstName, lastName, membershipType FROM Members');
+        console.log('Fetched members:', members);
+
+        console.log('Fetching classes...');
+        const [classes] = await db.query('SELECT classID, className, scheduleDay, scheduleTime FROM Classes');
+        console.log('Fetched classes:', classes);
+
+        // Calculate stats
+        console.log('Calculating statistics...');
+        const totalBookings = bookings.length;
+        const activeMembers = new Set(bookings.map(b => b.memberName)).size;
+        const classPopularity = bookings.reduce((acc, curr) => {
+            acc[curr.className] = (acc[curr.className] || 0) + 1;
+            return acc;
+        }, {});
+        const popularClass = Object.entries(classPopularity).sort((a, b) => b[1] - a[1])[0];
+        const avgAttendance = Math.round((totalBookings / classes.length) * 100);
+
+        console.log('Rendering class-bookings template with data:', {
+            totalBookings,
+            activeMembers,
+            popularClass: popularClass ? popularClass[0] : 'N/A',
+            avgAttendance
+        });
+
+        res.render('class-bookings', {
+            basePath: BASE_PATH,
+            bookings,
+            members,
+            classes,
+            stats: {
+                totalBookings,
+                activeMembers,
+                popularClass: popularClass ? popularClass[0] : 'N/A',
+                avgAttendance
+            }
+        });
+        console.log('Class-bookings page rendered successfully');
+    } catch (error) {
+        console.error('Error in class-bookings route:', error);
+        res.status(500).send('Error loading class bookings');
+    }
 });
 
 // Members route
@@ -309,51 +377,6 @@ app.get(`${BASE_PATH}/member-equipment`, async (req, res) => {
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Error loading member-equipment data');
-    }
-});
-
-// Class-Bookings route
-app.get(`${BASE_PATH}/class-bookings`, async (req, res) => {
-    try {
-        const [bookings] = await db.query(`
-            SELECT cb.bookingID, 
-                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
-                   c.className, c.scheduleDay, c.scheduleTime,
-                   cb.bookingDate
-            FROM ClassBookings cb
-            JOIN Members m ON cb.memberID = m.memberID
-            JOIN Classes c ON cb.classID = c.classID
-            ORDER BY cb.bookingDate DESC, c.scheduleTime
-        `);
-
-        const [members] = await db.query('SELECT memberID, firstName, lastName, membershipType FROM Members');
-        const [classes] = await db.query('SELECT classID, className, scheduleDay, scheduleTime FROM Classes');
-
-        // Calculate stats
-        const totalBookings = bookings.length;
-        const activeMembers = new Set(bookings.map(b => b.memberName)).size;
-        const classPopularity = bookings.reduce((acc, curr) => {
-            acc[curr.className] = (acc[curr.className] || 0) + 1;
-            return acc;
-        }, {});
-        const popularClass = Object.entries(classPopularity).sort((a, b) => b[1] - a[1])[0];
-        const avgAttendance = Math.round((totalBookings / classes.length) * 100);
-
-        res.render('class-bookings', {
-            basePath: BASE_PATH,
-            bookings,
-            members,
-            classes,
-            stats: {
-                totalBookings,
-                activeMembers,
-                popularClass: popularClass ? popularClass[0] : 'N/A',
-                avgAttendance
-            }
-        });
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send('Error loading class bookings');
     }
 });
 
