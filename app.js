@@ -263,6 +263,9 @@ app.get(`${BASE_PATH}/classes`, async (req, res) => {
             Math.round((totalEnrollments / totalCapacity) * 100) : 0;
 
         res.render('classes', {
+            title: 'Manage Classes',
+            customCSS: 'classes',
+            customJS: 'classOperations',
             basePath: BASE_PATH,
             classes: classes,
             trainers: trainers,
@@ -291,6 +294,9 @@ app.get(`${BASE_PATH}/equipment`, async (req, res) => {
         const inUseEquipment = equipment.filter(e => e.status === 'In Use').length;
 
         res.render('equipment', {
+            title: 'Manage Equipment',
+            customCSS: 'equipment',
+            customJS: 'equipmentOperations',
             basePath: BASE_PATH,
             equipment: equipment,
             stats: {
@@ -326,6 +332,9 @@ app.get(`${BASE_PATH}/payments`, async (req, res) => {
         const [members] = await db.query('SELECT memberID, firstName, lastName FROM Members ORDER BY lastName, firstName');
 
         res.render('payments', {
+            title: 'Manage Payments',
+            customCSS: 'payments',
+            customJS: 'paymentOperations',
             basePath: BASE_PATH,
             payments: payments,
             members: members,
@@ -367,6 +376,9 @@ app.get(`${BASE_PATH}/member-equipment`, async (req, res) => {
         const avgDuration = Math.round(usageHistory.reduce((sum, u) => sum + u.usageDuration, 0) / totalUsage);
 
         res.render('member-equipment', {
+            title: 'Member Equipment Usage',
+            customCSS: 'member-equipment',
+            customJS: 'memberEquipmentOperations',
             basePath: BASE_PATH,
             usageHistory,
             members,
@@ -426,6 +438,9 @@ app.get(`${BASE_PATH}/member-trainer`, async (req, res) => {
         }, 0) / assignments.length);
 
         res.render('member-trainer', {
+            title: 'Member-Trainer Assignments',
+            customCSS: 'member-trainer',
+            customJS: 'memberTrainerOperations',
             basePath: BASE_PATH,
             assignments,
             members,
@@ -477,6 +492,9 @@ app.get(`${BASE_PATH}/trainer-equipment`, async (req, res) => {
         const avgCertifications = Math.round(Object.values(trainerCerts).reduce((sum, count) => sum + count, 0) / certifiedTrainers);
 
         res.render('trainer-equipment', {
+            title: 'Trainer Equipment Certifications',
+            customCSS: 'trainer-equipment',
+            customJS: 'trainerEquipmentOperations',
             basePath: BASE_PATH,
             certifications,
             trainers,
