@@ -29,6 +29,31 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET single assignment
+router.get('/:id', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT mt.memberTrainerID, mt.memberID, mt.trainerID,
+                   CONCAT(m.firstName, ' ', m.lastName) as memberName,
+                   CONCAT(t.firstName, ' ', t.lastName) as trainerName,
+                   mt.startDate, mt.endDate
+            FROM MemberTrainer mt
+            JOIN Members m ON mt.memberID = m.memberID
+            JOIN Trainers t ON mt.trainerID = t.trainerID
+            WHERE mt.memberTrainerID = ?
+        `, [req.params.id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Assignment not found' });
+        }
+
+        res.json(rows[0]);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // CREATE new assignment
 router.post('/', async (req, res) => {
     const { memberID, trainerID, startDate, endDate } = req.body;
@@ -79,15 +104,48 @@ router.post('/', async (req, res) => {
     }
 });
 
-// END assignment (update endDate)
-router.put('/:id/end', async (req, res) => {
+// UPDATE assignment
+router.put('/:id', async (req, res) => {
+    const { trainerID, startDate, endDate } = req.body;
     try {
-        await db.query(
-            'UPDATE MemberTrainer SET endDate = CURRENT_DATE WHERE memberTrainerID = ?',
+        // Check if assignment exists
+        const [existingAssignment] = await db.query(
+            'SELECT * FROM MemberTrainer WHERE memberTrainerID = ?',
             [req.params.id]
         );
-        res.json({ message: 'Assignment ended successfully' });
+
+        if (existingAssignment.length === 0) {
+            return res.status(404).json({ error: 'Assignment not found' });
+        }
+
+        // Check trainer capacity if trainer is being changed
+        if (trainerID !== existingAssignment[0].trainerID) {
+            const [trainerAssignments] = await db.query(
+                'SELECT COUNT(*) as clientCount FROM MemberTrainer WHERE trainerID = ? AND (endDate IS NULL OR endDate >= CURRENT_DATE)',
+                [trainerID]
+            );
+
+            if (trainerAssignments[0].clientCount >= 5) {
+                return res.status(400).json({
+                    error: 'Trainer capacity full',
+                    duplicates: [{ field: 'trainer_capacity', value: 'full' }]
+                });
+            }
+        }
+
+        // Update the assignment
+        await db.query(
+            `UPDATE MemberTrainer 
+             SET trainerID = ?, 
+                 startDate = ?,
+                 endDate = ?
+             WHERE memberTrainerID = ?`,
+            [trainerID, startDate, endDate, req.params.id]
+        );
+
+        res.json({ message: 'Assignment updated successfully' });
     } catch (error) {
+        console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
 });

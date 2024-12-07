@@ -102,21 +102,21 @@ button {
     margin: 0 0.25rem;
 }
 
-button[onclick*="end"] {
+.edit-btn {
     background-color: #3498db;
     color: white;
 }
 
-button[onclick*="delete"] {
+.delete-btn {
     background-color: #e74c3c;
     color: white;
 }
 
-button[onclick*="end"]:hover {
+.edit-btn:hover {
     background-color: #2980b9;
 }
 
-button[onclick*="delete"]:hover {
+.delete-btn:hover {
     background-color: #c0392b;
 }
 
@@ -154,6 +154,42 @@ button[onclick*="delete"]:hover {
     justify-content: flex-start;
     gap: 1rem;
     margin-top: 2rem;
+}
+
+.update-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.update-btn:hover {
+    background-color: #2980b9;
+}
+
+.cancel-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Form inputs */
+input[type="date"],
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #2c3e50;
+}
+
+input[type="date"]:focus,
+select:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 /* Responsive Design */

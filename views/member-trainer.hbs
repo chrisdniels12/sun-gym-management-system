@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>
-        console.log('BASE_PATH from meta:', document.querySelector('meta[name="base-path"]').content);
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="base-path" content="{{basePath}}">
@@ -100,8 +97,8 @@
                         </span>
                     </td>
                     <td>
-                        <button onclick="endAssignment({{this.memberTrainerID}})">End</button>
-                        <button onclick="deleteAssignment({{this.memberTrainerID}})">Delete</button>
+                        <button onclick="editAssignment({{this.memberTrainerID}})" class="edit-btn">Edit</button>
+                        <button onclick="deleteAssignment({{this.memberTrainerID}})" class="delete-btn">Delete</button>
                     </td>
                 </tr>
                 {{/each}}
@@ -109,6 +106,37 @@
         </table>
     </div>
 
+    {{!-- Edit Assignment Modal --}}
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Training Assignment</h2>
+            <form id="edit-assignment-form">
+                <input type="hidden" id="edit-memberTrainerID">
+                <div class="form-group">
+                    <label for="edit-trainerID">Trainer:</label>
+                    <select id="edit-trainerID" required>
+                        {{#each trainers}}
+                        <option value="{{this.trainerID}}">{{this.firstName}} {{this.lastName}} - {{this.specialization}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-startDate">Start Date:</label>
+                    <input type="date" id="edit-startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-endDate">End Date (Optional):</label>
+                    <input type="date" id="edit-endDate">
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="update-btn">Update Assignment</button>
+                    <button type="button" onclick="closeEditModal()" class="cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{basePath}}/js/notifications.js"></script>
     <script src="{{basePath}}/js/memberTrainerOperations.js"></script>
 </body>
-</html> 
+</html>
