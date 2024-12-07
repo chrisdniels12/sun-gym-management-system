@@ -66,6 +66,13 @@ tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
+/* Actions column width */
+td:last-child {
+    text-align: center;
+    white-space: nowrap;
+    width: 150px;
+}
+
 /* Status badges */
 .status-badge {
     padding: 0.25rem 0.75rem;
@@ -85,38 +92,32 @@ tr:nth-child(even) {
 }
 
 /* Button styles */
-.edit-btn,
-.delete-btn {
+button {
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.875rem;
     transition: background-color 0.2s;
+    margin: 0 0.25rem;
 }
 
-.edit-btn {
+button[onclick*="renew"] {
     background-color: #3498db;
     color: white;
-    margin-right: 0.5rem;
 }
 
-.delete-btn {
+button[onclick*="delete"] {
     background-color: #e74c3c;
     color: white;
 }
 
-.edit-btn:hover {
+button[onclick*="renew"]:hover {
     background-color: #2980b9;
 }
 
-.delete-btn:hover {
+button[onclick*="delete"]:hover {
     background-color: #c0392b;
-}
-
-/* Add some spacing in the table cells */
-td button {
-    margin: 0 0.25rem;
 }
 
 /* Modal styles */

@@ -66,6 +66,36 @@ tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
+/* Actions column width */
+td:last-child {
+    text-align: center;
+    white-space: nowrap;
+    width: 150px;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-available {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-in-use {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-maintenance {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
 /* Button styles */
 .edit-btn,
 .delete-btn {
@@ -99,32 +129,6 @@ tr:nth-child(even) {
 /* Add some spacing in the table cells */
 td button {
     margin: 0 0.25rem;
-}
-
-/* Status badges */
-.status-badge {
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.875em;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.status-available {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.status-in-use {
-    background-color: #fff3cd;
-    color: #856404;
-}
-
-.status-maintenance {
-    background-color: #f8d7da;
-    color: #721c24;
 }
 
 /* Modal styles */

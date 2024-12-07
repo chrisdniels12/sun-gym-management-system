@@ -45,17 +45,6 @@
     margin-bottom: 1rem;
 }
 
-/* Read-only displays */
-.payment-date-display,
-.member-name-display {
-    padding: 0.75rem;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    color: #2c3e50;
-    font-size: 1rem;
-}
-
 /* Table styles */
 table {
     border-collapse: collapse;
@@ -75,6 +64,13 @@ th {
 
 tr:nth-child(even) {
     background-color: #f9f9f9;
+}
+
+/* Actions column width */
+td:last-child {
+    text-align: center;
+    white-space: nowrap;
+    width: 150px;
 }
 
 /* Button styles */
