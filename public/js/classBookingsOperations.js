@@ -93,7 +93,7 @@ addBookingForm.addEventListener('submit', async function (e) {
 });
 
 // Edit Booking
-function editBooking(id) {
+async function editBooking(id) {
     console.log('Editing booking:', id);
     const row = document.querySelector(`tr[data-id="${id}"]`);
     if (!row) {
@@ -102,34 +102,47 @@ function editBooking(id) {
     }
     const modal = document.getElementById('edit-modal');
 
-    // Fill the edit form with current data
-    document.getElementById('edit-bookingID').value = id;
+    try {
+        // Get the booking details from the server
+        const response = await fetch(`${BASE_PATH}/api/class-bookings/${id}`);
+        const data = await response.json();
 
-    // Set member name display
-    const memberName = row.cells[1].textContent.trim();
-    document.querySelector('.member-name-display').textContent = memberName;
-
-    // Get class name from the row
-    const className = row.cells[2].textContent.trim();
-    const scheduleDay = row.cells[3].textContent.trim();
-    const scheduleTime = row.cells[4].textContent.trim();
-    const classSelect = document.getElementById('edit-classID');
-
-    // Find and select the matching class option
-    Array.from(classSelect.options).forEach(option => {
-        const optionClass = option.text.split(' - ')[0].trim();
-        const optionDay = option.text.split(' - ')[1].trim();
-        const optionTime = option.text.split(' - ')[2].trim();
-        if (optionClass === className && optionDay === scheduleDay && optionTime === scheduleTime) {
-            option.selected = true;
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch booking details');
         }
-    });
 
-    // Set and display booking date
-    const bookingDate = row.cells[5].textContent;
-    document.querySelector('.booking-date-display').textContent = bookingDate;
+        // Fill the edit form with current data
+        document.getElementById('edit-bookingID').value = id;
 
-    modal.style.display = 'block';
+        // Set member name display
+        const memberName = row.cells[1].textContent.trim();
+        document.querySelector('.member-name-display').textContent = memberName;
+
+        // Get class name from the row
+        const className = row.cells[2].textContent.trim();
+        const scheduleDay = row.cells[3].textContent.trim();
+        const scheduleTime = row.cells[4].textContent.trim();
+        const classSelect = document.getElementById('edit-classID');
+
+        // Find and select the matching class option
+        Array.from(classSelect.options).forEach(option => {
+            const optionClass = option.text.split(' - ')[0].trim();
+            const optionDay = option.text.split(' - ')[1].trim();
+            const optionTime = option.text.split(' - ')[2].trim();
+            if (optionClass === className && optionDay === scheduleDay && optionTime === scheduleTime) {
+                option.selected = true;
+            }
+        });
+
+        // Set and display booking date
+        const bookingDate = row.cells[5].textContent;
+        document.querySelector('.booking-date-display').textContent = bookingDate;
+
+        modal.style.display = 'block';
+    } catch (error) {
+        console.error('Error fetching booking details:', error);
+        notifications.error('Error loading booking details');
+    }
 }
 
 // Update Booking
