@@ -4,24 +4,24 @@
 /* Stats Section */
 .stats-section {
     margin: 2rem 0;
-    background: transparent !important;
-    box-shadow: none !important;
-    padding: 0 !important;
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: white;
+    background: #f8fafc;
     padding: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
 }
 
 .stat-card h3 {
@@ -41,11 +41,11 @@
 
 /* Form Section */
 .form-section {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
     background: white;
-    padding: 2rem !important;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-    margin-bottom: 2rem;
 }
 
 .form-group {
@@ -78,11 +78,7 @@
 /* Table Section */
 .table-section {
     background: white;
-    padding: 2rem !important;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     margin-bottom: 2rem;
-    overflow-x: auto;
 }
 
 #bookings-table {
@@ -94,17 +90,17 @@
 
 #bookings-table th {
     background-color: #f5f5f5;
-    padding: 1rem !important;
+    padding: 0.75rem;
     text-align: left;
     font-weight: 600;
     color: #2c3e50;
-    border: 1px solid #ddd !important;
+    border: 1px solid #ddd;
     white-space: nowrap;
 }
 
 #bookings-table td {
-    padding: 1rem !important;
-    border: 1px solid #ddd !important;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
     color: #2c3e50;
     vertical-align: middle;
 }
@@ -130,35 +126,31 @@
 /* Button Styles */
 .edit-btn,
 .delete-btn {
-    padding: 0.5rem 1rem !important;
+    padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    min-width: 80px;
+    transition: background-color 0.2s;
 }
 
 .edit-btn {
-    background-color: #3498db !important;
+    background-color: #3498db;
     color: white;
     margin-right: 0.5rem;
 }
 
 .delete-btn {
-    background-color: #e74c3c !important;
+    background-color: #e74c3c;
     color: white;
 }
 
 .edit-btn:hover {
-    background-color: #2980b9 !important;
-    transform: translateY(-1px);
+    background-color: #2980b9;
 }
 
 .delete-btn:hover {
-    background-color: #c0392b !important;
-    transform: translateY(-1px);
+    background-color: #c0392b;
 }
 
 /* Modal Styles */
@@ -199,7 +191,7 @@
 
 .update-btn,
 .cancel-btn {
-    padding: 0.75rem 1.5rem !important;
+    padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -208,21 +200,21 @@
 }
 
 .update-btn {
-    background-color: #3498db !important;
+    background-color: #3498db;
     color: white;
 }
 
 .cancel-btn {
-    background-color: #e74c3c !important;
+    background-color: #e74c3c;
     color: white;
 }
 
 .update-btn:hover {
-    background-color: #2980b9 !important;
+    background-color: #2980b9;
 }
 
 .cancel-btn:hover {
-    background-color: #c0392b !important;
+    background-color: #c0392b;
 }
 
 /* Read-only displays */
@@ -244,12 +236,12 @@
 
     .form-section,
     .table-section {
-        padding: 1rem !important;
+        padding: 1rem;
     }
 
     #bookings-table td,
     #bookings-table th {
-        padding: 0.75rem !important;
+        padding: 0.75rem;
     }
 
     .modal-content {
