@@ -61,8 +61,14 @@ body {
     height: var(--nav-height);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    /* Changed to center */
     z-index: 1000;
+}
+
+.nav-brand {
+    position: absolute;
+    left: 2rem;
 }
 
 .nav-brand a {
@@ -75,6 +81,10 @@ body {
 .nav-menu {
     display: flex;
     gap: 2rem;
+    justify-content: center;
+    /* Added to center menu items */
+    margin: 0 auto;
+    /* Center the menu */
 }
 
 .nav-section {
@@ -110,6 +120,10 @@ body {
     border: none;
     padding: 0.5rem;
     cursor: pointer;
+    position: absolute;
+    /* Added to keep hamburger on right */
+    right: 2rem;
+    /* Added to keep hamburger on right */
 }
 
 .hamburger {
