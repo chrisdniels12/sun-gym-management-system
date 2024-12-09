@@ -6,9 +6,13 @@ const db = require('../database/db-connector').pool;
 router.get('/', async (req, res) => {
     try {
         const [rows] = await db.query(`
-            SELECT c.*, CONCAT(t.firstName, ' ', t.lastName) as trainerName 
+            SELECT c.*, 
+                   CONCAT(t.firstName, ' ', t.lastName) as trainerName,
+                   COUNT(DISTINCT cb.memberID) as currentEnrollment
             FROM Classes c
             LEFT JOIN Trainers t ON c.trainerID = t.trainerID
+            LEFT JOIN ClassBookings cb ON c.classID = cb.classID
+            GROUP BY c.classID
             ORDER BY c.scheduleDay, c.scheduleTime
         `);
         console.log('Fetched classes:', rows);
@@ -63,7 +67,7 @@ router.post('/', async (req, res) => {
 
         // If no conflicts, insert new class
         const [result] = await db.query(
-            'INSERT INTO Classes (className, trainerID, scheduleTime, scheduleDay, maxCapacity, currentEnrollment) VALUES (?, ?, ?, ?, ?, 0)',
+            'INSERT INTO Classes (className, trainerID, scheduleTime, scheduleDay, maxCapacity) VALUES (?, ?, ?, ?, ?)',
             [className, trainerID || null, scheduleTime, scheduleDay, maxCapacity]
         );
 
@@ -86,7 +90,7 @@ router.put('/:id', async (req, res) => {
         const { className, trainerID, scheduleTime, scheduleDay, maxCapacity } = req.body;
         console.log('Updating class:', { classId, className, trainerID, scheduleTime, scheduleDay, maxCapacity });
 
-        // Check if class exists and get current enrollment
+        // Check if class exists
         const [existingClass] = await db.query(
             'SELECT * FROM Classes WHERE classID = ?',
             [classId]
@@ -123,10 +127,17 @@ router.put('/:id', async (req, res) => {
             return res.status(400).json({ error: errors.join(', ') });
         }
 
+        // Check current enrollment
+        const [enrollmentResult] = await db.query(
+            'SELECT COUNT(DISTINCT memberID) as currentEnrollment FROM ClassBookings WHERE classID = ?',
+            [classId]
+        );
+        const currentEnrollment = enrollmentResult[0].currentEnrollment;
+
         // Check if new maxCapacity is less than current enrollment
-        if (existingClass[0].currentEnrollment > maxCapacity) {
+        if (currentEnrollment > maxCapacity) {
             return res.status(400).json({
-                error: `Cannot reduce capacity below current enrollment (${existingClass[0].currentEnrollment} students)`
+                error: `Cannot reduce capacity below current enrollment (${currentEnrollment} students)`
             });
         }
 
@@ -148,12 +159,16 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ error: 'Failed to update class' });
         }
 
-        // Get updated class data with trainer name
+        // Get updated class data with trainer name and current enrollment
         const [updatedClass] = await db.query(`
-            SELECT c.*, CONCAT(t.firstName, ' ', t.lastName) as trainerName 
+            SELECT c.*, 
+                   CONCAT(t.firstName, ' ', t.lastName) as trainerName,
+                   COUNT(DISTINCT cb.memberID) as currentEnrollment
             FROM Classes c
             LEFT JOIN Trainers t ON c.trainerID = t.trainerID
+            LEFT JOIN ClassBookings cb ON c.classID = cb.classID
             WHERE c.classID = ?
+            GROUP BY c.classID
         `, [classId]);
 
         res.json({
