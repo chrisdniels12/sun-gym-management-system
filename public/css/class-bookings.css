@@ -1,11 +1,7 @@
 /* Import main styles */
 @import 'main.css';
 
-/* Stats Section */
-.stats-section {
-    margin: 2rem 0;
-}
-
+/* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -26,17 +22,15 @@
 
 .stat-card h3 {
     color: #7f8c8d;
-    font-size: 0.9rem;
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .stat-card p {
     color: #2c3e50;
     font-size: 1.8rem;
-    font-weight: 600;
-    margin: 0.5rem 0 0;
+    font-weight: bold;
+    margin: 0;
 }
 
 /* Form Section */
@@ -45,85 +39,41 @@
     padding: 1rem;
     margin-bottom: 1.5rem;
     border-radius: 4px;
-    background: white;
 }
 
 .form-group {
     margin-bottom: 1rem;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #3498db;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-/* Table Section */
-.table-section {
-    background: white;
-    margin-bottom: 2rem;
-}
-
-#bookings-table {
-    width: 100%;
+/* Table styles */
+table {
     border-collapse: collapse;
-    margin-top: 1rem;
-    font-size: 0.95rem;
+    width: 100%;
+    margin: 1rem 0;
 }
 
-#bookings-table th {
+th,
+td {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+}
+
+th {
     background-color: #f5f5f5;
-    padding: 0.75rem;
-    text-align: left;
-    font-weight: 600;
-    color: #2c3e50;
-    border: 1px solid #ddd;
-    white-space: nowrap;
 }
 
-#bookings-table td {
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    color: #2c3e50;
-    vertical-align: middle;
-}
-
-#bookings-table tr:nth-child(even) {
+tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-#bookings-table tr:hover {
-    background-color: #f5f5f5;
-}
-
-#bookings-table td:last-child {
+/* Actions column width */
+td:last-child {
     text-align: center;
     white-space: nowrap;
     width: 150px;
 }
 
-#bookings-table td button {
-    margin: 0 0.25rem;
-}
-
-/* Button Styles */
+/* Button styles */
 .edit-btn,
 .delete-btn {
     padding: 0.5rem 1rem;
@@ -153,7 +103,12 @@
     background-color: #c0392b;
 }
 
-/* Modal Styles */
+/* Add some spacing in the table cells */
+td button {
+    margin: 0 0.25rem;
+}
+
+/* Enhanced Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -161,18 +116,27 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
+}
+
+.modal[style*="display: block"] {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-content {
     background: white;
-    margin: 10% auto;
     padding: 2rem;
-    border-radius: 8px;
+    border-radius: 10px;
+    width: 90%;
     max-width: 500px;
+    max-height: 90vh;
     position: relative;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-content h2 {
@@ -181,71 +145,60 @@
     margin-bottom: 1.5rem;
 }
 
+.modal-content form {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 1rem;
+    margin-bottom: 1rem;
+    /* Space for button group */
+}
+
 /* Modal form buttons */
 .button-group {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 1rem 0 0;
+    margin-top: auto;
+    border-top: 1px solid #eee;
     display: flex;
     justify-content: flex-start;
     gap: 1rem;
-    margin-top: 2rem;
-}
-
-.update-btn,
-.cancel-btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    min-width: 100px;
-}
-
-.update-btn {
-    background-color: #3498db;
-    color: white;
-}
-
-.cancel-btn {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.update-btn:hover {
-    background-color: #2980b9;
-}
-
-.cancel-btn:hover {
-    background-color: #c0392b;
-}
-
-/* Read-only displays */
-.member-name-display,
-.booking-date-display {
-    padding: 0.75rem;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    color: #2c3e50;
-    font-size: 1rem;
+    z-index: 1;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-section,
-    .table-section {
-        padding: 1rem;
-    }
-
-    #bookings-table td,
-    #bookings-table th {
-        padding: 0.75rem;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .modal-content {
-        margin: 5% auto;
-        width: 90%;
+        width: 95%;
+        margin: 1rem;
+        padding: 1.5rem;
+        max-height: 80vh;
+    }
+
+    .modal-content form {
+        padding-right: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .button-group {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1rem 0 0;
+    }
+
+    .button-group button {
+        width: 100%;
     }
 }
