@@ -37,9 +37,14 @@ addClassForm.addEventListener('submit', async function (e) {
         console.log('Server response:', data);
 
         if (response.ok) {
+            // Show success message
             notifications.success('Class added successfully!');
+            // Reset form
             addClassForm.reset();
-            location.reload();
+            // Reload page after a short delay to show the success message
+            setTimeout(() => {
+                location.reload();
+            }, 5000);
         } else {
             // Handle multiple error cases
             if (data.error === 'Duplicate entries found' && data.duplicates) {
