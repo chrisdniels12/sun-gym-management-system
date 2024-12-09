@@ -4,34 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="base-path" content="{{basePath}}">
-    <title>{{title}} - Sun Gym</title>
-    <!-- Always load main.css first -->
-    <link rel="stylesheet" href="{{basePath}}/css/main.css">
-    {{#if customCSS}}
+    <title>Sun Gym Management System</title>
     <link rel="stylesheet" href="{{basePath}}/css/{{customCSS}}.css">
-    {{/if}}
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-brand">
             <a href="{{basePath}}">Sun Gym</a>
         </div>
         <div class="nav-menu">
-            <div class="nav-section">
-                <h3>Primary Tables</h3>
-                <a href="{{basePath}}/members">Members</a>
-                <a href="{{basePath}}/trainers">Trainers</a>
-                <a href="{{basePath}}/classes">Classes</a>
-                <a href="{{basePath}}/equipment">Equipment</a>
-                <a href="{{basePath}}/payments">Payments</a>
+            <div class="dropdown">
+                <button class="dropdown-btn">Primary Tables</button>
+                <div class="dropdown-content">
+                    <a href="{{basePath}}/members">Members</a>
+                    <a href="{{basePath}}/trainers">Trainers</a>
+                    <a href="{{basePath}}/classes">Classes</a>
+                    <a href="{{basePath}}/equipment">Equipment</a>
+                    <a href="{{basePath}}/payments">Payments</a>
+                </div>
             </div>
-            <div class="nav-section">
-                <h3>Relationships</h3>
-                <a href="{{basePath}}/member-equipment">Member-Equipment</a>
-                <a href="{{basePath}}/class-bookings">Class-Bookings</a>
-                <a href="{{basePath}}/member-trainer">Member-Trainer</a>
-                <a href="{{basePath}}/trainer-equipment">Trainer-Equipment</a>
+            <div class="dropdown">
+                <button class="dropdown-btn">Relationship Management</button>
+                <div class="dropdown-content">
+                    <a href="{{basePath}}/member-equipment">Member Equipment</a>
+                    <a href="{{basePath}}/class-bookings">Class Bookings</a>
+                    <a href="{{basePath}}/member-trainer">Member Trainer</a>
+                    <a href="{{basePath}}/trainer-equipment">Trainer Equipment</a>
+                </div>
             </div>
         </div>
         <button class="nav-toggle">
@@ -39,25 +38,15 @@
         </button>
     </nav>
 
-    <!-- Main Content -->
-    <main class="content">
+    <div class="content">
         {{{body}}}
-    </main>
+    </div>
 
-    <!-- Load notifications.js first -->
+    <div class="notification-container"></div>
+    <script src="{{basePath}}/js/navigation.js"></script>
     <script src="{{basePath}}/js/notifications.js"></script>
-    
-    <!-- Then load page-specific JS -->
     {{#if customJS}}
     <script src="{{basePath}}/js/{{customJS}}.js"></script>
     {{/if}}
-
-    <!-- Navigation JavaScript -->
-    <script>
-        document.querySelector('.nav-toggle').addEventListener('click', function() {
-            document.querySelector('.nav-menu').classList.toggle('active');
-            this.classList.toggle('active');
-        });
-    </script>
 </body>
 </html>
