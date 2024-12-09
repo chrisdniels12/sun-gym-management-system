@@ -37,11 +37,11 @@ addClassForm.addEventListener('submit', async function (e) {
         console.log('Server response:', data);
 
         if (response.ok) {
-            // Show success message
-            notifications.success('Class added successfully!');
-            // Reset form
+            // Reset form immediately
             addClassForm.reset();
-            // Reload page after a short delay to show the success message
+            // Show success message and reload after 5 seconds
+            notifications.success('Class added successfully!');
+            // Set a timeout to reload the page after the notification duration
             setTimeout(() => {
                 location.reload();
             }, 5000);
