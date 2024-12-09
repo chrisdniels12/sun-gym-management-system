@@ -61,14 +61,14 @@ body {
     height: var(--nav-height);
     display: flex;
     align-items: center;
-    justify-content: center;
-    /* Changed to center */
+    justify-content: space-between;
     z-index: 1000;
 }
 
 .nav-brand {
-    position: absolute;
-    left: 2rem;
+    position: relative;
+    flex-shrink: 0;
+    margin-right: 2rem;
 }
 
 .nav-brand a {
@@ -76,15 +76,17 @@ body {
     font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .nav-menu {
     display: flex;
     gap: 2rem;
     justify-content: center;
-    /* Added to center menu items */
-    margin: 0 auto;
-    /* Center the menu */
+    align-items: center;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    min-width: 0;
 }
 
 .nav-section {
@@ -120,10 +122,8 @@ body {
     border: none;
     padding: 0.5rem;
     cursor: pointer;
-    position: absolute;
-    /* Added to keep hamburger on right */
-    right: 2rem;
-    /* Added to keep hamburger on right */
+    position: relative;
+    margin-left: auto;
 }
 
 .hamburger {
@@ -395,6 +395,10 @@ button[type="button"]:hover {
 
 /* Responsive Navigation */
 @media (max-width: 1024px) {
+    .navbar {
+        justify-content: space-between;
+    }
+
     .nav-menu {
         position: fixed;
         top: var(--nav-height);
@@ -404,11 +408,14 @@ button[type="button"]:hover {
         padding: 1rem;
         flex-direction: column;
         gap: 1rem;
-        transform: translateY(-100%);
+        transform: translateY(-150%);
         opacity: 0;
         visibility: hidden;
         transition: all 0.3s ease;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        height: auto;
+        max-height: calc(100vh - var(--nav-height));
+        overflow-y: auto;
     }
 
     .nav-menu.active {
@@ -420,6 +427,7 @@ button[type="button"]:hover {
     .nav-section {
         flex-direction: column;
         align-items: flex-start;
+        width: 100%;
     }
 
     .nav-toggle {
